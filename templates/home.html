@@ -1,0 +1,34 @@
+{% load static %}<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Surveys</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  </head>
+  <body>
+    <div class="container">
+      <ol class="breadcrumb my-4">
+        <li class="breadcrumb-item active">Survey 1</li>
+      </ol>
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+        {% for field in fields%}
+            <th>{{ field.name }}</th>
+        {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for source in sources %}
+          <tr>
+          {% for field,value in source %}
+            <td class="align-middle">
+              {{ value }}
+            </td>
+          {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
