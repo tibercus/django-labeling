@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.text import Truncator
 from django.contrib.auth.models import User
 
-
 class Survey(models.Model):
     name = models.PositiveIntegerField(unique=True)
     started_at = models.DateTimeField(auto_now_add=True)
@@ -16,11 +15,9 @@ class Survey(models.Model):
         return Source.objects.filter(survey=self).count()
 
 
-class Source(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    RA = models.DecimalField(max_digits=9, decimal_places=4)
-    DEC = models.DecimalField(max_digits=9, decimal_places=4)
-    ztf_name = models.CharField(max_length=255, blank=True, null=True)
+class Comment(models.Model):
+    comment = models.TextField(max_length=4000, blank=True, null=True)
+    follow_up = models.TextField(max_length=2000, blank=True, null=True)
 
     CLASS_CHOICES = [
         ('TDE', 'TDE Source'),
@@ -34,8 +31,32 @@ class Source(models.Model):
         blank=True, null=True,
     )
 
+    # source = models.OneToOneField(Source, on_delete=models.CASCADE, related_name='comment')
+    edit_at = models.DateTimeField(auto_now_add=True)
+    edit_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+
+    def __str__(self):
+        truncated_comment = Truncator(self.comment)
+        return 'Beginning of Comment:{}'.format(truncated_comment.chars(30))
+
+
+class Source(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    RA = models.DecimalField(max_digits=9, decimal_places=4)
+    DEC = models.DecimalField(max_digits=9, decimal_places=4)
+    ztf_name = models.CharField(max_length=255, blank=True, null=True)
+    comment = models.TextField(max_length=4000, blank=True, null=True)
+
+    source_class = models.CharField(
+        max_length=20,
+        choices=Comment.CLASS_CHOICES,
+        default='NaN',
+        blank=True, null=True,
+    )
+
     dup_id = models.PositiveIntegerField(blank=True, null=True)
-    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, blank=True, null=True, related_name='sources')
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='sources')
+    gen_comment = models.ForeignKey(Comment, on_delete=models.CASCADE, blank=True, null=True, related_name='sources')
 
     def __str__(self):
         return 'Source {}'.format(self.name)
@@ -45,15 +66,4 @@ class Source(models.Model):
             value = getattr(self, field.name, None)
             yield (field.name, value)
 
-
-class Comment(models.Model):
-    comment = models.TextField(max_length=4000)
-    follow_up = models.TextField(max_length=2000)
-    source = models.OneToOneField(Source, on_delete=models.CASCADE, related_name='comment')
-    edit_at = models.DateTimeField(auto_now_add=True)
-    edit_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
-
-    def __str__(self):
-        truncated_comment = Truncator(self.comment)
-        return truncated_comment.chars(30)
 

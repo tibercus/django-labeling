@@ -29,7 +29,7 @@ class SourceResource(resources.ModelResource):
 
 class CustomSourceAdmin(ImportMixin, admin.ModelAdmin):
     resource_class = SourceResource
-    list_display = ('dup_id', 'name', 'RA', 'DEC', 'ztf_name', 'source_class', 'survey')
+    list_display = ('dup_id', 'name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'survey', 'gen_comment')
 
     def get_import_form(self):
         return CustomImportForm
@@ -67,5 +67,6 @@ class CustomSourceAdmin(ImportMixin, admin.ModelAdmin):
         return rk
 
 admin.site.register(Survey)
+admin.site.register(Comment)
 admin.site.register(Source, CustomSourceAdmin)
 
