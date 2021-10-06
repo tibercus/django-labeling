@@ -4,31 +4,51 @@
     <meta charset="utf-8">
     <title>Surveys</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
   </head>
+
   <body>
-    <div class="container">
-      <ol class="breadcrumb my-4">
-        <li class="breadcrumb-item active">Survey 1</li>
-      </ol>
-    <table class="table">
-        <thead class="thead-dark">
-        <tr>
-        {% for field in fields%}
-            <th>{{ field.name }}</th>
-        {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for source in sources %}
-          <tr>
-          {% for field,value in source %}
-            <td class="align-middle">
-              {{ value }}
-            </td>
-          {% endfor %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="bs-example">
+        <ul class="nav nav-tabs" id="myTab">
+            {% for survey in surveys %}
+            <li class="nav-item">
+                <a href="#survey{{ survey.name }}" class="nav-link" data-toggle="tab">Survey{{ survey.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% load define_action %}
+        <div class="tab-content">
+            {% for survey in surveys %}
+                {% if survey.name == 1 %}
+                    {% define "active" as param %}
+                {% else %}
+                    {% define "fade" as param %}
+                {% endif %}
+                <div class="tab-pane {{ param }}" id="survey{{ survey.name }}">
+                    <table class="table">
+                        <thead class="thead-dark">
+                        <tr>
+                        {% for field in fields%}
+                            <th>{{ field.name }}</th>
+                        {% endfor %}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for source in survey.sources.all %}
+                          <tr>
+                          {% for field,value in source %}
+                            <td class="align-middle">
+                              {{ value }}
+                            </td>
+                          {% endfor %}
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
   </body>
 </html>
