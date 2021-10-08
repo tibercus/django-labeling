@@ -21,6 +21,7 @@ from surveys import views
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
+    url(r'^source/(?P<pk>\d+)/$', views.source, name='source'),
     url(r'^admin/', admin.site.urls),
 ]
 

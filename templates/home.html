@@ -49,7 +49,7 @@
                           {% for field,value in source %}
                             <td class="align-middle">
                                 {% if field == 'name' %}
-                                    <a href="#">{{ value }}</a>
+                                    <a href="{% url 'source' source.pk %}">{{ value }}</a>
                                 {% else %}
                                     {{ value }}
                                 {% endif %}
