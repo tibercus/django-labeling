@@ -1,0 +1,48 @@
+{% load static %}<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Surveys{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block style %}
+        <style>
+        .bs-navbar
+        {
+            margin: 20px;
+        }
+        </style>
+    {% endblock %}
+  </head>
+
+  {% load define_action %}
+  <body>
+    <div class="bs-navbar">
+        {% block navbar %}
+            <nav class="nav nav-pills">
+                <h3 class="text-primary">AstroLabeling</h3>
+                <pre>  </pre> {% comment %} Spacing between elements {% endcomment %}
+                <a href="{% url 'home' %}" class="nav-item nav-link px-3">Home</a>
+                <a href="#" class="nav-item nav-link">Guide</a>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Tools</a>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item">Option 1</a>
+                        <a href="#" class="dropdown-item">Option 2</a>
+                        <a href="#" class="dropdown-item">Option 3</a>
+                    </div>
+                </div>
+                <a href="#" class="nav-item nav-link" tabindex="-1">Contacts</a>
+            </nav>
+        {% endblock %}
+    </div>
+
+    <div class="bs-surveys">
+        {% block content %}
+        {% endblock %}
+    </div>
+  </body>
+
+</html>

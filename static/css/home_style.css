@@ -1,0 +1,21 @@
+.bs-navbar
+{
+    margin: 20px;
+}
+.bs-surveys
+{
+    margin: 5%;
+}
+/* Next is for Table Scrolling */
+
+.table-responsive
+{
+    height:500px;
+    width:100%;
+    overflow:auto;
+}
+th
+{
+    position: sticky;
+    top: 0;
+}
