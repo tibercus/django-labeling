@@ -6,7 +6,7 @@ class Survey(models.Model):
     name = models.PositiveIntegerField(unique=True)
     started_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(blank=True, null=True)
-    description = models.TextField(max_length=4000)
+    description = models.TextField(max_length=1000)
 
     def __str__(self):
         return 'Survey {}'.format(self.name)
@@ -16,8 +16,8 @@ class Survey(models.Model):
 
 
 class Comment(models.Model):
-    comment = models.TextField(max_length=4000, blank=True, null=True)
-    follow_up = models.TextField(max_length=2000, blank=True, null=True)
+    comment = models.TextField(max_length=2000, blank=True, null=True)
+    follow_up = models.TextField(max_length=1000, blank=True, null=True)
 
     CLASS_CHOICES = [
         ('TDE', 'TDE Source'),
@@ -45,7 +45,7 @@ class Source(models.Model):
     RA = models.DecimalField(max_digits=9, decimal_places=4)
     DEC = models.DecimalField(max_digits=9, decimal_places=4)
     ztf_name = models.CharField(max_length=255, blank=True, null=True)
-    comment = models.TextField(max_length=4000, blank=True, null=True)
+    comment = models.TextField(max_length=2000, blank=True, null=True)
 
     source_class = models.CharField(
         max_length=20,

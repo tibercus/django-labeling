@@ -24,26 +24,12 @@ class SourceResource(resources.ModelResource):
         fields = ('name', 'RA', 'DEC', 'ztf_name', 'source_class', 'survey')
 
 
-# class SourceAdmin(ImportExportModelAdmin):
-#     resource_class = SourceResource
-
 class CustomSourceAdmin(ImportMixin, admin.ModelAdmin):
     resource_class = SourceResource
     list_display = ('dup_id', 'name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'survey', 'gen_comment')
 
     def get_import_form(self):
         return CustomImportForm
-
-    # def get_confirm_import_form(self):
-    #     return CustomConfirmImportForm
-
-    # def get_form_kwargs(self, form, *args, **kwargs):
-    #     # pass on `author` to the kwargs for the custom confirm form
-    #     if isinstance(form, CustomImportForm):
-    #         if form.is_valid():
-    #             survey = form.cleaned_data['survey']
-    #             kwargs.update({'survey': survey.id})
-    #     return kwargs
 
     def get_resource_kwargs(self, request, *args, **kwargs):
         rk = super().get_resource_kwargs(request, *args, **kwargs)

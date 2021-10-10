@@ -15,6 +15,22 @@
     {
         margin: 20px;
     }
+    .comment_section
+    {
+        margin: 20px;
+        width: 300px;
+        height: 200px;
+    }
+    #id_comment
+    {
+        width: 300px;
+        height: 70px;
+    }
+    #id_follow_up
+    {
+        width: 300px;
+        height: 40px;
+    }
     </style>
 {% endblock %}
 
@@ -39,4 +55,12 @@
         </table>
 
     </div>
+    <div class = "comment_section">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Edit</button>
+        </form>
+    </div>
+
 {% endblock %}

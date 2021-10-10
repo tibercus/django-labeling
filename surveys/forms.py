@@ -1,6 +1,6 @@
 from django import forms
 from import_export.forms import ImportForm, ConfirmImportForm
-from .models import Survey
+from .models import Survey, Source, Comment
 
 class CustomImportForm(ImportForm):
     survey = forms.ModelChoiceField(
@@ -8,7 +8,8 @@ class CustomImportForm(ImportForm):
         empty_label=None,
         required=True)
 
-# class CustomConfirmImportForm(ConfirmImportForm):
-#     survey = forms.ModelChoiceField(
-#         queryset=Survey.objects.all(),
-#         required=True)
+class NewCommentForm(forms.ModelForm):
+
+    class Meta:
+        model = Comment
+        fields = ['comment', 'follow_up', 'source_class']
