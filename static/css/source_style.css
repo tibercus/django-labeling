@@ -1,0 +1,35 @@
+.table-source
+{
+    width:20%;
+}
+.table
+{
+    margin: 20px;
+}
+.comment_section
+{
+    margin: 20px;
+    width: 300px;
+    height: 200px;
+}
+#id_comment
+{
+    width: 300px;
+    height: 70px;
+}
+#id_follow_up
+{
+    width: 300px;
+    height: 40px;
+}
+#content
+{
+    position: relative;
+}
+#content img
+{
+    position: absolute;
+    margin: 20px;
+    top: 0px;
+    right: 0px;
+}

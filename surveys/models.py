@@ -37,7 +37,7 @@ class Comment(models.Model):
 
     def __str__(self):
         truncated_comment = Truncator(self.comment)
-        return 'Beginning of Comment:{}'.format(truncated_comment.chars(30))
+        return 'Comment:{}'.format(truncated_comment.chars(10))
 
 
 class Source(models.Model):
@@ -59,11 +59,21 @@ class Source(models.Model):
     gen_comment = models.ForeignKey(Comment, on_delete=models.CASCADE, blank=True, null=True, related_name='sources')
 
     def __str__(self):
-        return 'Source {}'.format(self.name)
+        return 'Source: {}'.format(self.name)
 
     def __iter__(self):
         for field in self._meta.get_fields():
             value = getattr(self, field.name, None)
             yield (field.name, value)
+
+# class Images(models.Model):
+#     light_curve = models.CharField(max_length=255, blank=True, null=True)
+#     spectrum = models.CharField(max_length=255, blank=True, null=True)
+#     trans = models.CharField(max_length=255, blank=True, null=True)
+#
+#     source = models.OneToOneField(Source, on_delete=models.CASCADE, related_name='images')
+#
+#     def __str__(self):
+#         return 'Source_img: {}'.format(self.source.name)
 
 

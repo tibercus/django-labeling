@@ -6,35 +6,17 @@
 {% block title %} {{ source.name }} {% endblock %}
 
 {% block style %}
-    <style>
-    .table-source
-    {
-        width:20%;
-    }
-    .table
-    {
-        margin: 20px;
-    }
-    .comment_section
-    {
-        margin: 20px;
-        width: 300px;
-        height: 200px;
-    }
-    #id_comment
-    {
-        width: 300px;
-        height: 70px;
-    }
-    #id_follow_up
-    {
-        width: 300px;
-        height: 40px;
-    }
-    </style>
+    <link rel="stylesheet" href="{% static "css/source_style.css" %}" />
 {% endblock %}
 
 {% block content %}
+
+    <div id="content" class = "trans-image">
+        {% with source.dup_id|to_str as img_num %}
+            <img src="{% static 'images/trans_'|add:img_num|add:'_e2.png' %}" />
+        {% endwith %}
+    </div>
+
     <div class="table-source">
 
         <table class="table table-bordered">

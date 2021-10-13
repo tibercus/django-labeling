@@ -8,7 +8,7 @@ def home(request):
     surveys = get_list_or_404(Survey)
     # sources = Source.objects.all()
 
-    fields = Source._meta.get_fields()
+    fields = [field.name for field in Source._meta.get_fields()]
     return render(request, 'home.html', {'surveys': surveys, 'fields': fields})
 
 def source(request, pk):
@@ -22,6 +22,7 @@ def source(request, pk):
             comment.save()
 
             source.gen_comment = comment
+            source.comment = comment.comment
             source.source_class = comment.source_class
             source.save()
             return redirect('source', pk=source.pk)  # TODO: redirect to the created topic page
