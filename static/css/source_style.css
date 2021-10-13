@@ -22,14 +22,33 @@
     width: 300px;
     height: 40px;
 }
-#content
+#container
 {
     position: relative;
+    top:0px;
 }
-#content img
+#container > * {
+  position: absolute;
+}
+
+.trans_image
 {
     position: absolute;
-    margin: 20px;
+    margin: 10px;
+    right:50%;
     top: 0px;
-    right: 0px;
+}
+.light_curve
+{
+    position: absolute;
+    margin: 10px;
+    right:5%;
+    top: 0px;
+}
+.spectrum
+{
+    position: absolute;
+    margin: 10px;
+    right:5%;
+    top: 430px;
 }
