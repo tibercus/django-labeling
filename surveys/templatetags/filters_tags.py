@@ -15,5 +15,8 @@ def to_str(value):
 @register.filter
 def is_in_survey(sources, survey):
     """add filter option in template"""
-    source = sources.get(survey=survey)
+    try:
+        source = sources.get(survey=survey)
+    except Source.DoesNotExist:
+        source = None
     return source
