@@ -1,61 +1,97 @@
 {% extends 'base.html' %}
 
 {% load static %}
-{% load define_action %}
+{% load filters_tags %}
 
-{% block title %} {{ source.name }} {% endblock %}
+{% block title %} {{ source_f.name }} {% endblock %}
 
 {% block style %}
     <link rel="stylesheet" href="{% static "css/source_style.css" %}" />
 {% endblock %}
 
 {% block content %}
-    <div id = "container" >
-        <div class = "trans_image">
-            {% with source.dup_id|to_str as img_num %}
-                <img src="{% static 'images/trans_'|add:img_num|add:'_e2.png' %}" />
-            {% endwith %}
-        </div>
 
-        <div class = "light_curve">
-            {% with source.dup_id|to_str as img_num %}
-                <iframe src="{% static 'images/lc_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
-            {% endwith %}
-        </div>
+    <ul class="nav nav-tabs" id="myTab">
+        {% for survey in surveys %}
+            {% if survey == source_f.survey %}
+                {% define "active" as status %}
+            {% else %}
+                {% define "" as status %}
+            {% endif %}
+        <li class="nav-item">
+            <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
 
-        <div class = "spectrum">
-            {% with source.dup_id|to_str as img_num %}
-                <iframe src="{% static 'images/spec_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
-            {% endwith %}
-        </div>
-    </div>
+    <div class="tab-content">
+        {% for survey in surveys %}
 
-    <div class="table-source">
+            {% if survey == source_f.survey %}
+                {% define "fade show active" as status %}
+            {% else %}
+                {% define "fade" as status %}
+            {% endif %}
 
-        <table class="table table-bordered">
-          <thead class="thead-dark">
-            <tr class="d-flex">
-               <th width="40%">Head</th>
-               <th width="60%">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-              {% for field,value in source %}
-                <tr class="d-flex">
-                    <td width="40%">{{ field }}</td>
-                    <td width="60%">{{ value }}</td>
-                </tr>
-              {% endfor %}
-          </tbody>
-        </table>
+            <div class="tab-pane {{ status }}" id="survey{{ survey.name }}">
 
-    </div>
-    <div class = "comment_section">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-success">Edit</button>
-        </form>
+            {% if dup_sources|is_in_survey:survey %}
+                {% with dup_sources|is_in_survey:survey as source %}
+
+                <div id = "container" >
+                    <div class = "trans_image">
+                        {% with source.dup_id|to_str as img_num %}
+                            <img src="{% static 'images/trans_'|add:img_num|add:'_e2.png' %}" />
+                        {% endwith %}
+                    </div>
+
+                    <div class = "light_curve">
+                        {% with source.dup_id|to_str as img_num %}
+                            <iframe src="{% static 'images/lc_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
+                        {% endwith %}
+                    </div>
+
+                    <div class = "spectrum">
+                        {% with source.dup_id|to_str as img_num %}
+                            <iframe src="{% static 'images/spec_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
+                        {% endwith %}
+                    </div>
+                </div>
+
+                <div class="table-source">
+
+                    <table class="table table-bordered">
+                      <thead class="thead-dark">
+                        <tr class="d-flex">
+                           <th width="40%">Head</th>
+                           <th width="60%">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          {% for field,value in source %}
+                            <tr class="d-flex">
+                                <td width="40%">{{ field }}</td>
+                                <td width="60%">{{ value }}</td>
+                            </tr>
+                          {% endfor %}
+                      </tbody>
+                    </table>
+
+                </div>
+                <div class = "comment_section">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-success">Edit</button>
+                    </form>
+                </div>
+
+                {% endwith %}
+            {% endif %}
+
+            </div>
+
+        {% endfor %}
     </div>
 
 {% endblock %}

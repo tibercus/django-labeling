@@ -12,7 +12,9 @@ def home(request):
     return render(request, 'home.html', {'surveys': surveys, 'fields': fields})
 
 def source(request, pk):
-    source = get_object_or_404(Source, pk=pk)
+    surveys = get_list_or_404(Survey)
+    source_f = get_object_or_404(Source, pk=pk)
+    dup_sources = Source.objects.filter(dup_id=source_f.dup_id)
     user = User.objects.first()  # TODO: get the currently logged in user
     if request.method == 'POST':
         form = NewCommentForm(request.POST)
@@ -21,11 +23,11 @@ def source(request, pk):
             comment.edit_by = user
             comment.save()
 
-            source.gen_comment = comment
-            source.comment = comment.comment
-            source.source_class = comment.source_class
-            source.save()
-            return redirect('source', pk=source.pk)  # TODO: redirect to the created topic page
+            source_f.gen_comment = comment
+            source_f.comment = comment.comment
+            source_f.source_class = comment.source_class
+            source_f.save()
+            return redirect('source', pk=source_f.pk)
     else:
         form = NewCommentForm()
-    return render(request, 'source.html', {'source': source, 'form': form})
+    return render(request, 'source.html', {'surveys': surveys, 'source_f': source_f, 'dup_sources': dup_sources, 'form': form})
