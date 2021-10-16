@@ -18,16 +18,25 @@ def source(request, pk):
     user = User.objects.first()  # TODO: get the currently logged in user
     if request.method == 'POST':
         form = NewCommentForm(request.POST)
+        source_id = request.POST.get('source_id', None)
+
         if form.is_valid():
             comment = form.save(commit=False)
             comment.edit_by = user
-            comment.save()
 
-            source_f.gen_comment = comment
-            source_f.comment = comment.comment
-            source_f.source_class = comment.source_class
-            source_f.save()
-            return redirect('source', pk=source_f.pk)
+            if pk == source_id:
+                comment.save()  # TODO: think about logic here!
+                source_f.gen_comment = comment
+                source_f.comment = comment.comment
+                source_f.source_class = comment.source_class
+                source_f.save()
+            else:
+                source_s = dup_sources.get(pk=source_id)
+                source_s.comment = comment.comment
+                source_s.source_class = comment.source_class
+                source_s.save()
+
+            return redirect('source', pk=source_id)
     else:
         form = NewCommentForm()
     return render(request, 'source.html', {'surveys': surveys, 'source_f': source_f, 'dup_sources': dup_sources, 'form': form})
