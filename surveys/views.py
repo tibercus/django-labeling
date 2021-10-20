@@ -13,28 +13,28 @@ def home(request):
 
 def source(request, pk):
     surveys = get_list_or_404(Survey)
-    source_f = get_object_or_404(Source, pk=pk)
-    dup_sources = Source.objects.filter(dup_id=source_f.dup_id)
+    source_f = get_object_or_404(Source, pk=pk)  # get object-source chosen by user on main page
+    dup_sources = Source.objects.filter(dup_id=source_f.dup_id)  # get all object-sources related to this source
     user = User.objects.first()  # TODO: get the currently logged in user
     if request.method == 'POST':
-        form = NewCommentForm(request.POST)
-        source_id = request.POST.get('source_id', None)
+        source_id = request.POST.get('source_id', None)  # get from hidden field source pk for current tab
+        source = dup_sources.get(pk=source_id)  # get current object-source
+        # check if source already has gen_comment to use it as instance later
+        if source.gen_comment:
+            comment = source.gen_comment
+        else:
+            comment = Comment.objects.create(edit_by=user)
+
+        form = NewCommentForm(request.POST, instance=comment)  # use existing or created comment
 
         if form.is_valid():
-            comment = form.save(commit=False)
-            comment.edit_by = user
+            form.save()
 
-            if pk == source_id:
-                comment.save()  # TODO: think about logic here!
-                source_f.gen_comment = comment
-                source_f.comment = comment.comment
-                source_f.source_class = comment.source_class
-                source_f.save()
-            else:
-                source_s = dup_sources.get(pk=source_id)
-                source_s.comment = comment.comment
-                source_s.source_class = comment.source_class
-                source_s.save()
+            source.comment = comment.comment
+            source.source_class = comment.source_class
+            if not source.gen_comment:
+                source.gen_comment = comment
+            source.save()
 
             return redirect('source', pk=source_id)
     else:

@@ -60,18 +60,18 @@
 
                 <div class="table-source">
 
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-responsive" >
                       <thead class="thead-dark">
-                        <tr class="d-flex">
-                           <th width="40%">Head</th>
-                           <th width="60%">Value</th>
+                        <tr>
+                           <th>Head</th>
+                           <th>Value</th>
                         </tr>
                       </thead>
                       <tbody>
                           {% for field,value in source %}
-                            <tr class="d-flex">
-                                <td width="40%">{{ field }}</td>
-                                <td width="60%">{{ value }}</td>
+                            <tr>
+                                <td>{{ field }}</td>
+                                <td>{{ value }}</td>
                             </tr>
                           {% endfor %}
                       </tbody>
@@ -81,7 +81,12 @@
                 <div class = "comment_section">
                     <form method="post">
                         {% csrf_token %}
-                        {{ form.as_p }}
+                        {%  for field in form %}
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                {{ field }}
+                            </div>
+                        {% endfor %}
                         <input type="hidden" name="source_id" value={{ source.pk }}>
                         <button type="submit" class="btn btn-success">Edit</button>
                     </form>
