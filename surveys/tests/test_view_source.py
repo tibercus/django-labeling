@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 from ..models import *
 from ..views import home, source
+from ..forms import NewCommentForm
 
 class SourceTests(TestCase):
     def setUp(self):
@@ -27,6 +28,12 @@ class SourceTests(TestCase):
         response = self.client.post(url, data)
         self.assertTrue(Comment.objects.exists())
 
+    def test_contains_form(self):
+        url = reverse('source', kwargs={'pk': self.source.pk})
+        response = self.client.get(url)
+        form = response.context.get('form')
+        self.assertIsInstance(form, NewCommentForm)
+
     # TODO: When will have comments logic done
     # def test_source_invalid_comment_data(self):
     #     '''
@@ -35,7 +42,9 @@ class SourceTests(TestCase):
     #     '''
     #     url = reverse('source', kwargs={'pk': self.source.pk})
     #     response = self.client.post(url, {})
-    #     self.assertEquals(response.status_code, 200)
+    #     form = response.context.get('form')
+#         self.assertEquals(response.status_code, 200)
+#         self.assertTrue(form.errors)
 
     # def test_source_invalid_comment_data_empty_fields(self):
     #     '''

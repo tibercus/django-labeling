@@ -22,6 +22,9 @@
             <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}</a>
         </li>
         {% endfor %}
+        <li class="nav-item">
+            <a href="#aladin" class="nav-link" data-toggle="tab">Aladin</a>
+        </li>
     </ul>
 
     <div class="tab-content">
@@ -80,12 +83,7 @@
                 <div class = "comment_section">
                     <form method="post">
                         {% csrf_token %}
-                        {%  for field in form %}
-                            <div class="form-group">
-                                {{ field.label_tag }}
-                                {{ field }}
-                            </div>
-                        {% endfor %}
+                        {% include 'includes/form.html' %}
                         <input type="hidden" name="source_id" value={{ source.pk }}>
                         <button type="submit" class="btn btn-success">Edit</button>
                     </form>
@@ -97,6 +95,34 @@
             </div>
 
         {% endfor %}
+        {% comment %} Testing Aladin Lite {% endcomment %}
+        <div class="tab-pane fade" id="aladin">
+
+            <div class="test_aladin">
+                {% comment %} Aladin Lite CSS style file {% endcomment %}
+                <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
+
+                {% comment %} Aladin Lite has a dependency on the jQuery library {% endcomment %}
+                <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js" charset="utf-8"></script>
+
+                {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
+                <div id="aladin-lite-div" style="width:700px;height:400px;"></div>
+
+                <input id="DSS" type="radio" name="survey" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
+                <input id="DSS-blue" type="radio" name="survey" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
+                <input id="2MASS" type="radio" name="survey" value="P/2MASS/color"><label for="2MASS">2MASS</label>
+                <input id="allwise" type="radio" name="survey" value="P/allWISE/color"><label for="allwise">AllWISE</label>
+                <input id="glimpse" type="radio" name="survey" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
+
+                {% comment %} Aladin Lite JS code {% endcomment %}
+                <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+
+                {% comment %} Creation of Aladin Lite instance with initial parameters {% endcomment %}
+                <script type="text/javascript" src="{% static "js/aladin_img.js" %}"></script>
+            </div>
+
+        </div>
+
     </div>
 
 {% endblock %}
