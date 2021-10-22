@@ -18,6 +18,7 @@
 
   {% load filters_tags %}
   <body>
+    {% block body %}
     <div class="bs-navbar">
         {% block navbar %}
             <nav class="nav nav-pills">
@@ -34,6 +35,11 @@
                     </div>
                 </div>
                 <a href="#" class="nav-item nav-link" tabindex="-1">Contacts</a>
+                <ul class="navbar-nav ml-auto">
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">{{ user.username }}</a>
+                  </li>
+                </ul>
             </nav>
         {% endblock %}
     </div>
@@ -42,6 +48,7 @@
         {% block content %}
         {% endblock %}
     </div>
+   {% endblock body %}
   </body>
 
 </html>

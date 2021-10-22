@@ -17,10 +17,12 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
 
+from accounts import views as accounts_views
 from surveys import views
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
+    url(r'^signup/$', accounts_views.signup, name='signup'),
     url(r'^source/(?P<pk>\d+)/$', views.source, name='source'),
     url(r'^admin/', admin.site.urls),
 ]
