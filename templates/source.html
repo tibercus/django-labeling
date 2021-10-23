@@ -19,9 +19,20 @@
             {% else %}
                 {% define "" as status %}
             {% endif %}
-        <li class="nav-item">
-            <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}</a>
-        </li>
+        {% comment %} For mark of master sources {% endcomment %}
+        {% with dup_sources|is_in_survey:survey as source %}
+            {% if  source and source.gen_comment.master_com %}
+                <li class="nav-item">
+                    <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}
+                        <span class="badge">M</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}</a>
+                </li>
+            {% endif %}
+         {% endwith %}
         {% endfor %}
         <li class="nav-item">
             <a href="#aladin" class="nav-link" data-toggle="tab">Aladin</a>
@@ -87,6 +98,7 @@
                         {% include 'includes/form.html' %}
                         <input type="hidden" name="source_id" value={{ source.pk }}>
                         <button type="submit" class="btn btn-success">Edit</button>
+                        <input type="submit" class="btn btn-primary" value="Master" name="master"> </input>
                     </form>
                 </div>
 

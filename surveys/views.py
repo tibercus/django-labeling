@@ -25,18 +25,26 @@ def source(request, pk):
         else:
             comment = Comment.objects.create(edit_by=user)
 
-        form = NewCommentForm(request.POST, instance=comment)  # use existing or created comment
+        # Make master source-object or make normal
+        if request.POST.get('master', False):
+            comment.master_com = False if comment.master_com else True
+            if source.gen_comment:
+                comment.save()
 
-        if form.is_valid():
-            form.save()
+        # Create/Edit comment
+        else:
+            form = NewCommentForm(request.POST, instance=comment)  # use existing or created comment
 
-            source.comment = comment.comment
-            source.source_class = comment.source_class
-            if not source.gen_comment:
-                source.gen_comment = comment
-            source.save()
+            if form.is_valid():
+                form.save()
 
-            return redirect('source', pk=source_id)
+                source.comment = comment.comment
+                source.source_class = comment.source_class
+                if not source.gen_comment:
+                    source.gen_comment = comment
+                source.save()
+
+        return redirect('source', pk=source_id)
     else:
         form = NewCommentForm()
     return render(request, 'source.html', {'surveys': surveys, 'source_f': source_f, 'dup_sources': dup_sources, 'form': form})

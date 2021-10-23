@@ -18,10 +18,11 @@ class Survey(models.Model):
 class Comment(models.Model):
     comment = models.TextField(max_length=2000, blank=True, null=True)
     follow_up = models.TextField(max_length=1000, blank=True, null=True)
+    master_com = models.BooleanField(default=False, blank=True, null=True)
 
     CLASS_CHOICES = [
         ('TDE', 'TDE Source'),
-        ('NOT_TDE', 'Not TDE Source'),
+        ('NOT TDE', 'Not TDE Source'),
         ('NaN', 'Unknown Source'),
     ]
     source_class = models.CharField(
