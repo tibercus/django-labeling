@@ -5,8 +5,8 @@ from django.http import HttpResponse
 from .models import *
 
 def home(request):
-    surveys = get_list_or_404(Survey)
-    # sources = Source.objects.all()
+    # surveys = get_list_or_404(Survey)
+    surveys = Survey.objects.all()
 
     fields = [field.name for field in Source._meta.get_fields()]
     return render(request, 'home.html', {'surveys': surveys, 'fields': fields})
