@@ -25,12 +25,6 @@
       {% endif %}
     {% else %}
       {% render_field field class="form-control" %}
-      {% comment %} This part is strange!!! {% endcomment %}
-      {% if field.name == 'comment' %}
-        <small class="form-text text-muted">
-          <p>Current: {{ source.comment }}</p>
-        </small>
-      {% endif %}
     {% endif %}
 
     {% if field.help_text %}

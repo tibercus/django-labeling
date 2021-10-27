@@ -9,6 +9,7 @@ def home(request):
     surveys = Survey.objects.all()
 
     fields = [field.name for field in Source._meta.get_fields()]
+    fields.remove('comments')  # to not show foreignkey - comments on home page
     return render(request, 'home.html', {'surveys': surveys, 'fields': fields})
 
 def source(request, pk):
@@ -19,32 +20,34 @@ def source(request, pk):
     if request.method == 'POST':
         source_id = request.POST.get('source_id', None)  # get from hidden field source pk for current tab
         source = dup_sources.get(pk=source_id)  # get current object-source
-        # check if source already has gen_comment to use it as instance later
-        if source.gen_comment:
-            comment = source.gen_comment
-        else:
-            comment = Comment.objects.create(edit_by=user)
 
         # Make master source-object or make normal
         if request.POST.get('master', False):
-            comment.master_com = False if comment.master_com else True
-            if source.gen_comment:
-                comment.save()
+            # to prevent from getting several master sources
+            if not source.master_source:
+                for src in list(dup_sources.filter(master_source=True)):
+                    src.master_source = False
+                    src.save()
+
+            source.master_source = False if source.master_source else True
+            source.save()
 
         # Create/Edit comment
         else:
-            form = NewCommentForm(request.POST, instance=comment)  # use existing or created comment
+            form = NewCommentForm(request.POST)  # use existing or created comment
 
             if form.is_valid():
-                form.save()
+                comment = form.save(commit=False)
+                comment.source = source
+                comment.created_by = user
+                comment.save()
 
-                source.comment = comment.comment
-                source.source_class = comment.source_class
-                if not source.gen_comment:
-                    source.gen_comment = comment
-                source.save()
+                if source.master_source:
+                    source.comment = comment
+                    source.source_class = comment.source_class
+                    source.save()
 
-        return redirect('source', pk=source_id)
+        return redirect('source', pk=source_id)  # TODO: redirect to the created topic page
     else:
         form = NewCommentForm()
     return render(request, 'source.html', {'surveys': surveys, 'source_f': source_f, 'dup_sources': dup_sources, 'form': form})
