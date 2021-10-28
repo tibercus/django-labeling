@@ -32,6 +32,8 @@ def source(request, pk):
             source.master_source = False if source.master_source else True
             source.save()
 
+            return redirect('source', pk=source_id)  # TODO: redirect to the created topic page
+
         # Create/Edit comment
         else:
             form = NewCommentForm(request.POST)  # use existing or created comment
@@ -43,11 +45,11 @@ def source(request, pk):
                 comment.save()
 
                 if source.master_source:
-                    source.comment = comment
+                    source.comment = form.cleaned_data.get('comment')
                     source.source_class = comment.source_class
                     source.save()
 
-        return redirect('source', pk=source_id)  # TODO: redirect to the created topic page
+            return redirect('source', pk=source_id)  # TODO: redirect to the created topic page
     else:
         form = NewCommentForm()
     return render(request, 'source.html', {'surveys': surveys, 'source_f': source_f, 'dup_sources': dup_sources, 'form': form})

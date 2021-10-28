@@ -9,6 +9,11 @@ class CustomImportForm(ImportForm):
             required=True)
 
 class NewCommentForm(forms.ModelForm):
+    comment = forms.CharField(
+        widget=forms.Textarea(),
+        max_length=2000,
+        help_text='The max length of the text is 2000.'
+    )
 
     class Meta:
         model = Comment

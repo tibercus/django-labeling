@@ -96,6 +96,8 @@
                 </div>
 
                 <div class = "comment_section">
+                <div id="form-wrapper">
+                    {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
                     <form id="comment_form" method="post">
                         {% csrf_token %}
                         {% include 'includes/form.html' %}
@@ -107,6 +109,7 @@
                         <input id="mas_field" type="hidden" name="source_id" value={{ source.pk }}>
                         <input type="submit" class="btn btn-primary" value="Master" name="master"> </input>
                     </form>
+                </div>
                 </div>
 
                 {% endwith %}

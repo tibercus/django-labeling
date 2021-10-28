@@ -3,22 +3,7 @@
     margin: 20px;
     width: 20%;
 }
-.comment_section
-{
-    margin: 20px;
-    width: 300px;
-    height: 200px;
-}
-#id_comment
-{
-    width: 300px;
-    height: 70px;
-}
-#id_follow_up
-{
-    width: 300px;
-    height: 40px;
-}
+/* For section with source images */
 #container
 {
     position: relative;
@@ -27,7 +12,6 @@
 #container > * {
   position: absolute;
 }
-
 .trans_image
 {
     position: absolute;
@@ -49,7 +33,42 @@
     right:5%;
     top: 430px;
 }
+/* This is for form fields */
+.comment_section
+{
+    margin: 20px;
+    width: 300px;
+    height: 200px;
+}
+#id_comment
+{
+    width: 300px;
+    height: 70px;
+}
+#id_follow_up
+{
+    width: 300px;
+    height: 40px;
+}
+/* This is for two buttons ('Edit' 'Master') next to each other */
+#form-wrapper
+{
+    width: 100%;
+    margin: 0 auto;
+}
+#comment_form
+{
+    width: 65%;
+    display: inline-block;
+}
+#master_form
+{
+    width: 20%;
+    display: inline-block;
+}
+
 .test_aladin
 {
     margin: 40px;
+    width: 35%;
 }
