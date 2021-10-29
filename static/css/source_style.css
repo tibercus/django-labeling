@@ -67,6 +67,13 @@
     display: inline-block;
 }
 
+.comments
+{
+    position: absolute;
+    right:45%;
+    bottom: 0px;
+}
+
 .test_aladin
 {
     margin: 40px;
