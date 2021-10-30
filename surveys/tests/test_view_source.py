@@ -10,8 +10,13 @@ class SourceTests(TestCase):
     def setUp(self):
         survey = Survey.objects.create(name=1, description='First Test Survey.')
         self.source = Source.objects.create(name="SGE_test", RA=0, DEC=0, dup_id=2, survey=survey)
-        User.objects.create_user(username='john', email='john@doe.com', password='123')  # <- included this line here
+        User.objects.create_user(username='john', password='Astro123')
+        self.client.login(username='john', password='Astro123')
 
+    def test_source_view_status_code(self):
+        url = reverse('source', kwargs={'pk': self.source.pk})
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
 
     def test_csrf(self):
         url = reverse('source', kwargs={'pk': self.source.pk})

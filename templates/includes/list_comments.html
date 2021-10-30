@@ -1,0 +1,28 @@
+{% load static %}
+{% load filters_tags %}
+{% load widget_tweaks %}
+
+{% for comment in source.comments.all %}
+    <div class="card mb-2">
+        <div class="card-body p-3">
+            <div class="row mb-3">
+              <div class="col-6">
+                <strong class="text-muted">{{ comment.created_by.username }}</strong>
+              </div>
+              <div class="col-6 text-right">
+                {% if not comment.updated_at %}
+                  <small class="text-muted">{{ comment.created_at }}</small>
+                {% else %}
+                  <small class="text-muted">upd: {{ comment.updated_at }}</small>
+                {% endif %}
+              </div>
+            </div>
+            {{ comment.comment }}
+            {% comment %}{% if comment.created_by == user %}
+              <div class="mt-3">
+                <a href="#" class="btn btn-outline-danger" role="button">Delete</a>
+              </div>
+            {% endif %} {% endcomment %}
+        </div>
+    </div>
+{% endfor %}

@@ -1,0 +1,21 @@
+{% load static %}
+{% load filters_tags %}
+{% load widget_tweaks %}
+
+<div class = "trans_image">
+    {% with source.dup_id|to_str as img_num %}
+        <img src="{% static 'images/trans_'|add:img_num|add:'_e2.png' %}" />
+    {% endwith %}
+</div>
+
+<div class = "light_curve">
+    {% with source.dup_id|to_str as img_num %}
+        <iframe src="{% static 'images/lc_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
+    {% endwith %}
+</div>
+
+<div class = "spectrum">
+    {% with source.dup_id|to_str as img_num %}
+        <iframe src="{% static 'images/spec_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
+    {% endwith %}
+</div>
