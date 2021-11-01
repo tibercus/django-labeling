@@ -2,6 +2,7 @@
 {
     margin: 20px;
     width: 20%;
+    /*height: 500px;*/
 }
 /* For section with source images */
 #container
@@ -74,8 +75,20 @@
     top: 75%;
 }
 
+/* This is for optical surveys */
+.opticalSurveys
+{
+    position: relative;
+    top: 220px;
+
+}
+
 .test_aladin
 {
+    position: absolute;
     margin: 40px;
+    right: 200px;
     width: 35%;
 }
+
+

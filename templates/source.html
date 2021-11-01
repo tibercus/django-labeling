@@ -3,6 +3,7 @@
 {% load static %}
 {% load filters_tags %}
 {% load widget_tweaks %}
+{% load humanize %}
 
 {% block title %} {{ source_f.name }} {% endblock %}
 
@@ -36,9 +37,6 @@
                 {% endwith %}
             {% endif %}
         {% endfor %}
-        <li class="nav-item">
-            <a href="#aladin" class="nav-link" data-toggle="tab">Aladin</a>
-        </li>
         <li class="nav-item">
             <a href="#summary" class="nav-link" data-toggle="tab">Summary</a>
         </li>
@@ -110,34 +108,83 @@
         {% endfor %}
 
         {%  comment %} Summary of all sources {% endcomment %}
+
         <div class="tab-pane fade" id="summary">
             <p> Here should be summary info. </p>
         </div>
 
-        {% comment %} Testing Aladin Lite {% endcomment %}
-        <div class="tab-pane fade" id="aladin">
+    </div>
 
-            <div class="test_aladin">
-                {% comment %} Aladin Lite CSS style file {% endcomment %}
-                <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
+    {% comment %} Optical Surveys {% endcomment %}
+    <div class="opticalSurveys">
 
-                {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
-                <div id="aladin-lite-div" style="width:700px;height:400px;"></div>
+        <ul class="nav nav-tabs" id="myTab">
+            <li class="nav-item">
+                <a href="#gaia" class="nav-link active" data-toggle="tab">GAIA</a>
+            </li>
+            <li class="nav-item">
+                <a href="#panstarrs" class="nav-link" data-toggle="tab">Pan-STARRS</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="gaia">
+                <div class="test_aladin">
+                    {% comment %} Aladin Lite CSS style file {% endcomment %}
+                    <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
 
-                {% comment %} Add surveys {% endcomment %}
-                <input id="DSS" type="radio" name="survey" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
-                <input id="DSS-blue" type="radio" name="survey" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
-                <input id="2MASS" type="radio" name="survey" value="P/2MASS/color"><label for="2MASS">2MASS</label>
-                <input id="allwise" type="radio" name="survey" value="P/allWISE/color"><label for="allwise">AllWISE</label>
-                <input id="glimpse" type="radio" name="survey" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
+                    {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
+                    <div id="aladin-lite-div1" style="width:700px;height:400px;"></div>
+                    <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
 
-                {% comment %} Aladin Lite JS code {% endcomment %}
-                <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+                    {% comment %} Radio buttons with surveys {% endcomment %}
+                    <input id="DSS" type="radio" name="survey_1" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
+                    <input id="DSS-blue" type="radio" name="survey_1" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
+                    <input id="2MASS" type="radio" name="survey_1" value="P/2MASS/color"><label for="2MASS">2MASS</label>
+                    <input id="allwise" type="radio" name="survey_1" value="P/allWISE/color"><label for="allwise">AllWISE</label>
+                    <input id="glimpse" type="radio" name="survey_1" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
 
-                {% comment %} Creation of Aladin Lite instance with initial parameters {% endcomment %}
-                <script type="text/javascript" src="{% static "js/aladin_img.js" %}"></script>
+                    {% comment %} Creation of Aladin Lite instance {% endcomment %}
+                    <script type="text/javascript">
+                        var aladin1 = A.aladin('#aladin-lite-div1', {survey: "P/DSS2/color", fov:1.5, target: "M 20"});
+                        $('input[name=survey_1]').change(function() {
+                            aladin1.setImageSurvey($(this).val());
+                        });
+
+                        var markers = A.catalog({name: 'Some markers'})
+                        aladin1.addCatalog(markers);
+                        markers.addSources([A.marker(270.332621, -23.078944, {popupTitle: 'Alcyone', popupDesc: '<em>Bmag:</em> 2.806<br/><em>Spectral type:</em> B7III<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=NAME%20ALCYONE&submit=submit">in Simbad</a>'})]);
+                        markers.addSources([A.marker(270.63206, -22.905550, {popupTitle: 'Pleione', popupDesc: '<em>Bmag:</em> 4.97<br/><em>Spectral type:</em> B8vne<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=NAME+PLEIONE&NbIdent=1">in Simbad</a>'})]);
+                        markers.addSources([A.marker(270.598121, -23.030819, {popupTitle: 'Merope', popupDesc: '<em>Bmag:</em> 4.113<br/><em>Spectral type:</em> BVI4e<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=V*+V971+Tau&NbIdent=1">in Simbad</a>'})]);
+                    </script>
+                </div>
             </div>
+            <div class="tab-pane fade" id="panstarrs">
 
+                <div class="test_aladin">
+                    {% comment %} Aladin Lite CSS style file {% endcomment %}
+                    <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
+
+                    {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
+                    <div id="aladin-lite-div2" style="width:700px;height:400px;"></div>
+                    <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+
+                    {% comment %} Radio buttons with surveys {% endcomment %}
+                    <input id="DSS" type="radio" name="survey_2" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
+                    <input id="DSS-blue" type="radio" name="survey_2" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
+                    <input id="2MASS" type="radio" name="survey_2" value="P/2MASS/color"><label for="2MASS">2MASS</label>
+                    <input id="allwise" type="radio" name="survey_2" value="P/allWISE/color"><label for="allwise">AllWISE</label>
+                    <input id="glimpse" type="radio" name="survey_2" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
+
+                    {% comment %} Creation of Aladin Lite instance {% endcomment %}
+                    <script type="text/javascript">
+                        var aladin2 = A.aladin('#aladin-lite-div2', {survey: "P/DSS2/color", fov:1.5, target: "M 20"});
+                        $('input[name=survey_2]').change(function() {
+                            aladin2.setImageSurvey($(this).val());
+                        });
+                    </script>
+                </div>
+
+            </div>
         </div>
 
     </div>

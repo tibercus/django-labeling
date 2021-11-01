@@ -11,7 +11,9 @@ def home(request):
     surveys = Survey.objects.all()
 
     fields = [field.name for field in Source._meta.get_fields()]
-    fields.remove('comments')  # to not show foreignkey - comments on home page
+    fields.remove('comments')  # TODO: how to not show fields smarter
+    fields.remove('master_source')
+    fields.remove('survey')
     return render(request, 'home.html', {'surveys': surveys, 'fields': fields})
 
 @login_required

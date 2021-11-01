@@ -1,6 +1,7 @@
 {% load static %}
 {% load filters_tags %}
 {% load widget_tweaks %}
+{% load humanize %}
 
 {% for comment in source.comments.all %}
     <div class="card mb-2">
@@ -13,7 +14,7 @@
                 {% if not comment.updated_at %}
                   <small class="text-muted">{{ comment.created_at }}</small>
                 {% else %}
-                  <small class="text-muted">upd: {{ comment.updated_at }}</small>
+                  <small class="text-muted">upd: {{ comment.updated_at|naturaltime }}</small>
                 {% endif %}
               </div>
             </div>

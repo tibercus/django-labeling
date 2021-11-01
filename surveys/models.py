@@ -41,9 +41,16 @@ class Source(models.Model):
     def __str__(self):
         return 'Source: {}'.format(self.name)
 
+    def get_comment_count(self):
+        return Comment.objects.filter(source=self).count()
+
+    def get_last_comment(self):
+        return Comment.objects.filter(source=self).order_by('-created_at').first()
+
     def __iter__(self):
+        f_list = ['comments', 'master_source', 'survey']  # TODO: how to not show fields smarter
         for field in self._meta.get_fields():
-            if field.name != 'comments':
+            if field.name not in f_list:
                 value = getattr(self, field.name, None)
                 yield (field.name, value)
 
@@ -67,5 +74,6 @@ class Comment(models.Model):
     def __str__(self):
         truncated_comment = Truncator(self.comment)
         return 'Comment: {}'.format(truncated_comment.chars(10))
+
 
 
