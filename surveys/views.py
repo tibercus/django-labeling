@@ -9,7 +9,7 @@ from .models import *
 def home(request):
     # surveys = get_list_or_404(Survey)
     surveys = Survey.objects.all()
-
+    # TODO: Think about summary survey
     fields = [field.name for field in Source._meta.get_fields()]
     fields.remove('comments')  # TODO: how to not show fields smarter
     fields.remove('master_source')

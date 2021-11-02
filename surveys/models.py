@@ -15,10 +15,48 @@ class Survey(models.Model):
         return Source.objects.filter(survey=self).count()
 
 class Source(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    RA = models.DecimalField(max_digits=9, decimal_places=4)
-    DEC = models.DecimalField(max_digits=9, decimal_places=4)
-    ztf_name = models.CharField(max_length=255, blank=True, null=True)
+    name = models.CharField(max_length=150, unique=True)
+    RA = models.DecimalField(max_digits=9, decimal_places=5)
+    DEC = models.DecimalField(max_digits=9, decimal_places=5)
+    # TODO: Think about formats and view of new fields
+    L = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    B = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    R98 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    g_d2d = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    g_s = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    g_nsrc = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    g_gmag = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    s_d2d = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    s_id = models.CharField(max_length=100, blank=True, null=True)
+    s_z = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    s_otype = models.CharField(max_length=100, blank=True, null=True)
+    w = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)  # w1, w2, w3
+    w_snr = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)  # w1snr, w2snr, w3snr
+    w_nsrc = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    flag_agn_wise = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    flag_xray = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    flag_radio = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    sdss_p = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    sdss_nsrc = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    RATIO_e2e1 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    FLUX = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)  # FLUX_e2, FLUX_e3, FLUX_e4
+    CTS = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)  # CTS_e2, CTS_e3, CTS_e4
+    EXP = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)  # EXP_e2, EXP_e3, EXP_e4
+    LIKE = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)  # LIKE_e2, LIKE_e3, LIKE_e4
+    G_L_e2 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    G_e2 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    G_U_e2 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    Tin_L_e2 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    Tin_e2 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    Tin_U_e2 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    NH_L_e2 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    NH_e2 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    NH_U_e2 = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)
+    UPLIM = models.DecimalField(max_digits=9, decimal_places=5, blank=True, null=True)  # UPLIM_e1, UPLIM_e2, UPLIM_e3, UPLIM_e4
+    TSTART = models.CharField(max_length=100, blank=True, null=True)  # TSTART_e1, TSTART_e2, TSTART_e3, TSTART_e4
+    TSTOP = models.CharField(max_length=100, blank=True, null=True)  # TSTOP_e1, TSTOP_e2, TSTOP_e3, TSTOP_e4
+    # end of new fields
+    ztf_name = models.CharField(max_length=100, blank=True, null=True)
     comment = models.TextField(max_length=2000, blank=True, null=True)
 
     CLASS_CHOICES = [

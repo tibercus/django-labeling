@@ -120,18 +120,15 @@
 
         <ul class="nav nav-tabs" id="myTab">
             <li class="nav-item">
-                <a href="#gaia" class="nav-link active" data-toggle="tab">GAIA</a>
+                <a href="#object1" class="nav-link active" data-toggle="tab">Object1</a>
             </li>
             <li class="nav-item">
-                <a href="#panstarrs" class="nav-link" data-toggle="tab">Pan-STARRS</a>
+                <a href="#object2" class="nav-link" data-toggle="tab">Object2</a>
             </li>
         </ul>
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="gaia">
+            <div class="tab-pane fade show active" id="object1">
                 <div class="test_aladin">
-                    {% comment %} Aladin Lite CSS style file {% endcomment %}
-                    <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
-
                     {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
                     <div id="aladin-lite-div1" style="width:700px;height:400px;"></div>
                     <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
@@ -145,25 +142,20 @@
 
                     {% comment %} Creation of Aladin Lite instance {% endcomment %}
                     <script type="text/javascript">
-                        var aladin1 = A.aladin('#aladin-lite-div1', {survey: "P/DSS2/color", fov:1.5, target: "M 20"});
+                        var aladin1 = A.aladin('#aladin-lite-div1', {survey: "P/DSS2/color", fov:1.5, target: "270.61 -23.03"});
                         $('input[name=survey_1]').change(function() {
                             aladin1.setImageSurvey($(this).val());
                         });
 
-                        var markers = A.catalog({name: 'Some markers'})
-                        aladin1.addCatalog(markers);
-                        markers.addSources([A.marker(270.332621, -23.078944, {popupTitle: 'Alcyone', popupDesc: '<em>Bmag:</em> 2.806<br/><em>Spectral type:</em> B7III<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=NAME%20ALCYONE&submit=submit">in Simbad</a>'})]);
-                        markers.addSources([A.marker(270.63206, -22.905550, {popupTitle: 'Pleione', popupDesc: '<em>Bmag:</em> 4.97<br/><em>Spectral type:</em> B8vne<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=NAME+PLEIONE&NbIdent=1">in Simbad</a>'})]);
-                        markers.addSources([A.marker(270.598121, -23.030819, {popupTitle: 'Merope', popupDesc: '<em>Bmag:</em> 4.113<br/><em>Spectral type:</em> BVI4e<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=V*+V971+Tau&NbIdent=1">in Simbad</a>'})]);
+                        var markers1 = A.catalog({name: 'Some markers'})
+                        aladin1.addCatalog(markers1);
+                        markers1.addSources([A.marker(270.332621, -23.078944, {popupTitle: 'Alcyone', popupDesc: '<em>ATT1:</em> 2.806<br/><em>ATT2:</em> 3.44<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=NAME%20ALCYONE&submit=submit">in Simbad</a>'})]);
                     </script>
                 </div>
             </div>
-            <div class="tab-pane fade" id="panstarrs">
+            <div class="tab-pane fade" id="object2">
 
                 <div class="test_aladin">
-                    {% comment %} Aladin Lite CSS style file {% endcomment %}
-                    <link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
-
                     {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
                     <div id="aladin-lite-div2" style="width:700px;height:400px;"></div>
                     <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
@@ -177,10 +169,14 @@
 
                     {% comment %} Creation of Aladin Lite instance {% endcomment %}
                     <script type="text/javascript">
-                        var aladin2 = A.aladin('#aladin-lite-div2', {survey: "P/DSS2/color", fov:1.5, target: "M 20"});
+                        var aladin2 = A.aladin('#aladin-lite-div2', {survey: "P/DSS2/color", fov:1.5, target: "270.94 -24.26"});
                         $('input[name=survey_2]').change(function() {
                             aladin2.setImageSurvey($(this).val());
                         });
+
+                        var markers2 = A.catalog({name: 'Some markers'})
+                        aladin2.addCatalog(markers2);
+                        markers2.addSources([A.marker(270.59, -24.13, {popupTitle: 'Pleione', popupDesc: '<em>ATT1:</em> 4.97<br/><em>ATT2:</em> 5.33<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=NAME+PLEIONE&NbIdent=1">in Simbad</a>'})]);
                     </script>
                 </div>
 

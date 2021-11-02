@@ -5,7 +5,6 @@
 /* Next is for Table Scrolling */
 .table-responsive
 {
-    height:500px;
     width:100%;
     overflow:auto;
 }

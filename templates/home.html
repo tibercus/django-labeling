@@ -19,6 +19,9 @@
             <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}</a>
         </li>
         {% endfor %}
+        <li class="nav-item">
+            <a href="#summary" class="nav-link" data-toggle="tab">Summary</a>
+        </li>
     </ul>
 
     <div class="tab-content">
@@ -49,7 +52,11 @@
                           {% for field,value in source %}
                             <td class="align-middle">
                                 {% if field == 'name' %}
-                                    <a href="{% url 'source' source.pk %}">{{ value }}</a>
+                                    {% if source.master_source %}
+                                        <a href="{% url 'source' source.pk %}">{{ value }} <span class="badge">M</span> </a>
+                                    {% else %}
+                                        <a href="{% url 'source' source.pk %}">{{ value }} </a>
+                                    {% endif %}
                                 {% else %}
                                     {{ value }}
                                 {% endif %}
@@ -64,6 +71,12 @@
             </div>
 
         {% endfor %}
+
+        {%  comment %} Summary of all surveys {% endcomment %}
+
+        <div class="tab-pane fade" id="summary">
+            <p> Here should be summary info. </p>
+        </div>
 
     </div>
 {% endblock %}
