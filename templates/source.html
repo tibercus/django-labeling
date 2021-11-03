@@ -60,7 +60,7 @@
                     </div>
 
                     {%  comment %} Source table with head:value(parameters) {% endcomment %}
-                    <div class="table-source">
+                    <div class="table_source">
                         <table class="table table-bordered table-responsive-md">
                           <thead class="thead-dark">
                             <tr>
@@ -115,7 +115,7 @@
 
     </div>
 
-    {% comment %} Optical Surveys {% endcomment %}
+    {% comment %} OPTICAL SURVEYS {% endcomment %}
     <div class="opticalSurveys">
 
         <ul class="nav nav-tabs" id="myTab">
@@ -125,9 +125,75 @@
             <li class="nav-item">
                 <a href="#object2" class="nav-link" data-toggle="tab">Object2</a>
             </li>
+            <li class="nav-item">
+                <a href="#object3" class="nav-link" data-toggle="tab">Object3</a>
+            </li>
+            <li class="nav-item">
+                <a href="#object4" class="nav-link" data-toggle="tab">Object4</a>
+            </li>
+            <li class="nav-item">
+                <a href="#object5" class="nav-link" data-toggle="tab">Object5</a>
+            </li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane fade show active" id="object1">
+
+                <div class="table_opt_source">
+                    <table class="table table-bordered table-responsive-md">
+                      <thead class="thead-dark">
+                        <tr>
+                            <th>Head <br> id - 234 </th>
+                           <th>Legacy Survey</th>
+                           <th>GAIA</th>
+                           <th>Pan-STARRS</th>
+                           <th>SDSS</th>
+                           <th>WISE</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                            <tr>
+                                <th class="text-center th-dark">name</th>
+                                <td>None</td>
+                                <td>GAIA_TDE</td>
+                                <td>None</td>
+                                <td>SDSS_TDE</td>
+                                <td>WISE_TDE</td>
+                            </tr>
+                            <tr>
+                                <th class="text-center th-dark">RA</th>
+                                <td>230.30</td>
+                                <td>220.10</td>
+                                <td>233.56</td>
+                                <td>225.15</td>
+                                <td>245.23</td>
+                            </tr>
+                            <tr>
+                                <th class="text-center th-dark">DEC</th>
+                                <td>50.30</td>
+                                <td>53.10</td>
+                                <td>49.56</td>
+                                <td>51.15</td>
+                                <td>52.23</td>
+                            </tr>
+                            <tr>
+                                <th class="text-center th-dark">source_class</th>
+                                <td>TDE</td>
+                                <td>TDE</td>
+                                <td>None</td>
+                                <td>TDE</td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <th class="text-center th-dark">flux</th>
+                                <td>25.3</td>
+                                <td>20.15</td>
+                                <td>27.06</td>
+                                <td>None</td>
+                                <td>17.89</td>
+                            </tr>
+                      </tbody>
+                    </table>
+                </div>
                 <div class="test_aladin">
                     {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
                     <div id="aladin-lite-div1" style="width:700px;height:400px;"></div>
@@ -180,6 +246,15 @@
                     </script>
                 </div>
 
+            </div>
+            <div class="tab-pane fade" id="object3">
+                <p> Here should be table and Aladin-Lite for object3. </p>
+            </div>
+            <div class="tab-pane fade" id="object4">
+                <p> Here should be table and Aladin-Lite for object4. </p>
+            </div>
+            <div class="tab-pane fade" id="object5">
+                <p> Here should be table and Aladin-Lite for object5. </p>
             </div>
         </div>
 

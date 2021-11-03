@@ -19,11 +19,11 @@
               </div>
             </div>
             {{ comment.comment }}
-            {% comment %}{% if comment.created_by == user %}
-              <div class="mt-3">
-                <a href="#" class="btn btn-outline-danger" role="button">Delete</a>
+            {% if comment.created_by.is_superuser %}
+              <div class="btn ml-5 pull-right">
+                <a href="#" class="btn btn-sm btn-outline-success" role="button">Final</a>
               </div>
-            {% endif %} {% endcomment %}
+            {% endif %}
         </div>
     </div>
 {% endfor %}

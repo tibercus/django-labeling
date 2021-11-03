@@ -1,4 +1,4 @@
-.table-source
+.table_source
 {
     margin: 20px;
     width: 20%;
@@ -84,9 +84,18 @@
 
 }
 
+.table_opt_source
+{
+    margin: 20px;
+    width: 40%;
+    height: 400px;
+    overflow:auto;
+}
+
 .test_aladin
 {
     position: absolute;
+    top: 20px;
     margin: 40px;
     right: 200px;
     width: 35%;
