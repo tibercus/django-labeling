@@ -18,15 +18,15 @@ class SourceResource(resources.ModelResource):
 
     class Meta:
         model = Source
-        import_id_fields = ('name', 'RA', 'DEC',)
+        import_id_fields = ('name', 'RA', 'DEC')  # TODO: add survey field?
         exclude = ('id',)
         skip_unchanged = True
-        fields = ('name', 'RA', 'DEC', 'ztf_name', 'source_class', 'survey')
+        # fields = ('name', 'RA', 'DEC', 'ztf_name', 'source_class', 'survey')
 
 
 class CustomSourceAdmin(ImportMixin, admin.ModelAdmin):
     resource_class = SourceResource
-    list_display = ('dup_id', 'name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'survey')
+    # list_display = ('dup_id', 'name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'survey')
 
     def get_import_form(self):
         return CustomImportForm

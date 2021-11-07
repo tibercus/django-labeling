@@ -15,26 +15,22 @@
 
     <ul class="nav nav-tabs" id="myTab">
         {% for survey in surveys %}
-            {% if dup_sources|is_in_survey:survey %}
-                {% with dup_sources|is_in_survey:survey as source %}
-                    {% if survey == source_f.survey %}
-                        {% define "active" as status %}
-                    {% else %}
-                        {% define "" as status %}
-                    {% endif %}
-                    {% comment %} For mark of 'master' sources {% endcomment %}
-                    {% if  source and source.master_source %}
-                        <li class="nav-item">
-                            <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}
-                                <span class="badge">M</span>
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                        <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}</a>
-                        </li>
-                    {% endif %}
-                {% endwith %}
+            {% if survey == source.survey %}
+                {% define "active" as status %}
+            {% else %}
+                {% define "" as status %}
+            {% endif %}
+            {% comment %} For mark of 'master' sources {% endcomment %}
+            {% if  source and source.master_source %}
+                <li class="nav-item">
+                    <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}
+                        <span class="badge">M</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}</a>
+                </li>
             {% endif %}
         {% endfor %}
         <li class="nav-item">
@@ -44,73 +40,76 @@
 
     <div class="tab-content">
         {% for survey in surveys %}
-            {% if dup_sources|is_in_survey:survey %}
-            {% with dup_sources|is_in_survey:survey as source %}
-                {% if survey == source_f.survey %}
-                    {% define "fade show active" as status %}
-                {% else %}
-                    {% define "fade" as status %}
-                {% endif %}
+            {% if survey == source.survey %}
+                {% define "fade show active" as status %}
+            {% else %}
+                {% define "fade" as status %}
+            {% endif %}
 
-                <div class="tab-pane {{ status }}" id="survey{{ survey.name }}">
+            <div class="tab-pane {{ status }}" id="survey{{ survey.name }}">
 
-                    {%  comment %} Source X-ray images {% endcomment %}
-                    <div id = "container" >
-                        {% include 'includes/xray_images.html' %}
-                    </div>
+                {%  comment %} Source X-ray images {% endcomment %}
+                <div id = "container" >
+                    {% include 'includes/xray_images.html' %}
+                </div>
 
-                    {%  comment %} Source table with head:value(parameters) {% endcomment %}
-                    <div class="table_source">
-                        <table class="table table-bordered table-responsive-md">
-                          <thead class="thead-dark">
+                {%  comment %} Source table with head:value(parameters) {% endcomment %}
+                <div class="table_source">
+                    <table class="table table-bordered table-responsive-md">
+                      <thead class="thead-dark">
+                        <tr>
+                           <th>Head</th>
+                           <th>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          {% for field,value in source %}
                             <tr>
-                               <th>Head</th>
-                               <th>Value</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                              {% for field,value in source %}
-                                <tr>
+                            {% with sur_num=survey.name|to_str%}
+                                {% if field in base_fields or 'e'|add:sur_num in field%}
                                     <td>{{ field }}</td>
                                     <td>{{ value }}</td>
-                                </tr>
-                              {% endfor %}
-                          </tbody>
-                        </table>
-                    </div>
+                                {% endif %}
+                            {% endwith %}
+                            </tr>
+                          {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
 
-                    {%  comment %} Comment form with 'Master' form {% endcomment %}
-                    <div class = "comment_section">
-                        <div id="form-wrapper">
-                            {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
-                            <form id="comment_form" method="post">
-                                {% csrf_token %}
-                                <input id="com_field" type="hidden" name="source_id" value={{ source.pk }}>
-                                {% include 'includes/form.html' %}
-                                <button type="submit" class="btn btn-success">Create/Edit</button>
-                            </form>
-                            <form id="master_form" method="post" novalidate>
-                                {% csrf_token %}
-                                <input id="mas_field" type="hidden" name="source_id" value={{ source.pk }}>
-                                <input type="submit" class="btn btn-primary" value="Master" name="master"> </input>
-                            </form>
-                        </div>
-                    </div>
-
-                    {%  comment %} List of comments for this source {% endcomment %}
-                    <div class="comments" style="width: 30rem;">
-                        {% include 'includes/list_comments.html' %}
+                {%  comment %} Comment form and 'Master' form {% endcomment %}
+                <div class = "comment_section">
+                    <div id="form-wrapper">
+                        {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
+                        <form id="comment_form" method="post">
+                            {% csrf_token %}
+                            <input id="com_field" type="hidden" name="source_id" value={{ source.pk }}>
+                            {% include 'includes/form.html' %}
+                            <button type="submit" class="btn btn-success">Create/Edit</button>
+                        </form>
+                        <form id="master_form" method="post" novalidate>
+                            {% csrf_token %}
+                            <input id="mas_field" type="hidden" name="source_id" value={{ source.pk }}>
+                            <input type="submit" class="btn btn-primary" value="Master" name="master"> </input>
+                        </form>
                     </div>
                 </div>
 
-            {% endwith %}
-            {% endif %}
+                {%  comment %} List of comments for this source {% endcomment %}
+                <div class="comments" style="width: 30rem;">
+                    {% include 'includes/list_comments.html' %}
+                </div>
+            </div>
+
         {% endfor %}
 
         {%  comment %} Summary of all sources {% endcomment %}
-
         <div class="tab-pane fade" id="summary">
-            <p> Here should be summary info. </p>
+            <div class = "mx-auto text-center mt-5">
+                {% with source.dup_id|to_str as img_num %}
+                    <iframe src="{% static 'images/lc_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
+                {% endwith %}
+            </div>
         </div>
 
     </div>
@@ -139,10 +138,10 @@
             <div class="tab-pane fade show active" id="object1">
 
                 <div class="table_opt_source">
-                    <table class="table table-bordered table-responsive-md">
+                    <table class="table table-bordered table-responsive-md w-auto">
                       <thead class="thead-dark">
                         <tr>
-                            <th>Head <br> id - 234 </th>
+                            <th>Head <br><small> object 234 </small> </th>
                            <th>Legacy Survey</th>
                            <th>GAIA</th>
                            <th>Pan-STARRS</th>
@@ -176,6 +175,14 @@
                                 <td>52.23</td>
                             </tr>
                             <tr>
+                                <th class="text-center th-dark">sep_input</th>
+                                <td>25.66</td>
+                                <td>30.10</td>
+                                <td>21.14</td>
+                                <td>23.78</td>
+                                <td>24.44</td>
+                            </tr>
+                            <tr>
                                 <th class="text-center th-dark">source_class</th>
                                 <td>TDE</td>
                                 <td>TDE</td>
@@ -194,58 +201,9 @@
                       </tbody>
                     </table>
                 </div>
-                <div class="test_aladin">
-                    {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
-                    <div id="aladin-lite-div1" style="width:700px;height:400px;"></div>
-                    <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
-
-                    {% comment %} Radio buttons with surveys {% endcomment %}
-                    <input id="DSS" type="radio" name="survey_1" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
-                    <input id="DSS-blue" type="radio" name="survey_1" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
-                    <input id="2MASS" type="radio" name="survey_1" value="P/2MASS/color"><label for="2MASS">2MASS</label>
-                    <input id="allwise" type="radio" name="survey_1" value="P/allWISE/color"><label for="allwise">AllWISE</label>
-                    <input id="glimpse" type="radio" name="survey_1" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
-
-                    {% comment %} Creation of Aladin Lite instance {% endcomment %}
-                    <script type="text/javascript">
-                        var aladin1 = A.aladin('#aladin-lite-div1', {survey: "P/DSS2/color", fov:1.5, target: "270.61 -23.03"});
-                        $('input[name=survey_1]').change(function() {
-                            aladin1.setImageSurvey($(this).val());
-                        });
-
-                        var markers1 = A.catalog({name: 'Some markers'})
-                        aladin1.addCatalog(markers1);
-                        markers1.addSources([A.marker(270.332621, -23.078944, {popupTitle: 'Alcyone', popupDesc: '<em>ATT1:</em> 2.806<br/><em>ATT2:</em> 3.44<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=NAME%20ALCYONE&submit=submit">in Simbad</a>'})]);
-                    </script>
-                </div>
             </div>
             <div class="tab-pane fade" id="object2">
-
-                <div class="test_aladin">
-                    {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
-                    <div id="aladin-lite-div2" style="width:700px;height:400px;"></div>
-                    <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
-
-                    {% comment %} Radio buttons with surveys {% endcomment %}
-                    <input id="DSS" type="radio" name="survey_2" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
-                    <input id="DSS-blue" type="radio" name="survey_2" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
-                    <input id="2MASS" type="radio" name="survey_2" value="P/2MASS/color"><label for="2MASS">2MASS</label>
-                    <input id="allwise" type="radio" name="survey_2" value="P/allWISE/color"><label for="allwise">AllWISE</label>
-                    <input id="glimpse" type="radio" name="survey_2" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
-
-                    {% comment %} Creation of Aladin Lite instance {% endcomment %}
-                    <script type="text/javascript">
-                        var aladin2 = A.aladin('#aladin-lite-div2', {survey: "P/DSS2/color", fov:1.5, target: "270.94 -24.26"});
-                        $('input[name=survey_2]').change(function() {
-                            aladin2.setImageSurvey($(this).val());
-                        });
-
-                        var markers2 = A.catalog({name: 'Some markers'})
-                        aladin2.addCatalog(markers2);
-                        markers2.addSources([A.marker(270.59, -24.13, {popupTitle: 'Pleione', popupDesc: '<em>ATT1:</em> 4.97<br/><em>ATT2:</em> 5.33<br/>More info <a target="_blank" href="https://simbad.u-strasbg.fr/simbad/sim-id?Ident=NAME+PLEIONE&NbIdent=1">in Simbad</a>'})]);
-                    </script>
-                </div>
-
+                <p> Here should be table and Aladin-Lite for object2. </p>
             </div>
             <div class="tab-pane fade" id="object3">
                 <p> Here should be table and Aladin-Lite for object3. </p>
@@ -255,6 +213,32 @@
             </div>
             <div class="tab-pane fade" id="object5">
                 <p> Here should be table and Aladin-Lite for object5. </p>
+            </div>
+            {% comment %} General Aladin Lite {% endcomment %}
+            <div class="aladin_lite">
+                {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
+                <div id="aladin-lite-div" style="width:700px;height:400px;"></div>
+                <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+
+                {% comment %} Radio buttons with surveys {% endcomment %}
+                <input id="DSS" type="radio" name="survey" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
+                <input id="DSS-blue" type="radio" name="survey" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
+                <input id="2MASS" type="radio" name="survey" value="P/2MASS/color"><label for="2MASS">2MASS</label>
+                <input id="allwise" type="radio" name="survey" value="P/allWISE/color"><label for="allwise">AllWISE</label>
+                <input id="glimpse" type="radio" name="survey" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
+
+                {% comment %} Creation of Aladin Lite instance {% endcomment %}
+                <script type="text/javascript">
+                    var aladin = A.aladin('#aladin-lite-div', {survey: "P/DSS2/color", fov:1.5, target: "270.61 -23.03"});
+                    $('input[name=survey]').change(function() {
+                        aladin.setImageSurvey($(this).val());
+                    });
+
+                    var markers = A.catalog({name: 'Some markers'})
+                    aladin.addCatalog(markers);
+                    markers.addSources([A.marker(270.332621, -23.078944, {popupTitle: 'Object 234',
+                        popupDesc: '<em>RA:</em> 230.3<br/><em>DEC:</em> 50.3<br/><em>class:</em> TDE<br/>More info <a target="_blank" href="#">in Simbad</a>'})]);
+                </script>
             </div>
         </div>
 

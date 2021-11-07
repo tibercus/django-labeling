@@ -3,8 +3,8 @@
 {% load widget_tweaks %}
 
 <div class = "trans_image">
-    {% with source.dup_id|to_str as img_num %}
-        <img src="{% static 'images/trans_'|add:img_num|add:'_e2.png' %}" />
+    {% with img_num=source.dup_id|to_str sur_num=survey.name|to_str %}
+        <img src="{% static 'images/trans_'|add:img_num|add:'_e'|add:sur_num|add:'.png' %}" />
     {% endwith %}
 </div>
 
