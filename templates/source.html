@@ -21,7 +21,7 @@
                 {% define "" as status %}
             {% endif %}
             {% comment %} For mark of 'master' sources {% endcomment %}
-            {% if  source and source.master_source %}
+            {% if  source and source.master_source and survey == source.survey %}
                 <li class="nav-item">
                     <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}
                         <span class="badge">M</span>

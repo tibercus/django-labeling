@@ -18,12 +18,26 @@
                 {% endif %}
               </div>
             </div>
-            {{ comment.comment }}
-            {% if comment.created_by.is_superuser %}
-              <div class="btn ml-5 pull-right">
-                <a href="#" class="btn btn-sm btn-outline-success" role="button">Final</a>
-              </div>
-            {% endif %}
+            <div class="row ml-0">
+                {{ comment.comment }}
+                {% if comment.created_by.is_superuser %}
+                  <div class="btn ml-auto">
+                    <a href="#" class="btn btn-sm btn-outline-success" role="button">Final</a>
+                  </div>
+                {% endif %}
+            </div>
+            <div class="row bottom">
+                {% if comment.follow_up %}
+                    <div class="col-6 text-left">
+                        <small class="text-muted">Follow up: {{ comment.follow_up }} </small>
+                    </div>
+                {% endif %}
+                {% if comment.source_class %}
+                    <div class="col-6 pull-right">
+                        <small class="text-muted">Class: {{ comment.source_class }} </small>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endfor %}
