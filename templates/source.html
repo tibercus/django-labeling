@@ -118,128 +118,76 @@
     <div class="opticalSurveys">
 
         <ul class="nav nav-tabs" id="myTab">
-            <li class="nav-item">
-                <a href="#object1" class="nav-link active" data-toggle="tab">Object1</a>
-            </li>
-            <li class="nav-item">
-                <a href="#object2" class="nav-link" data-toggle="tab">Object2</a>
-            </li>
-            <li class="nav-item">
-                <a href="#object3" class="nav-link" data-toggle="tab">Object3</a>
-            </li>
-            <li class="nav-item">
-                <a href="#object4" class="nav-link" data-toggle="tab">Object4</a>
-            </li>
-            <li class="nav-item">
-                <a href="#object5" class="nav-link" data-toggle="tab">Object5</a>
-            </li>
+            {% for opt_source in source.opt_sources.all %}
+                {% if opt_source.opt_id == 1 %}
+                    {% define "active" as status %}
+                {% else %}
+                    {% define "" as status %}
+                {% endif %}
+                <li class="nav-item">
+                    <a href="#object{{ opt_source.opt_id }}" class="nav-link {{ status }}" data-toggle="tab">Object{{ opt_source.opt_id }}</a>
+                </li>
+            {% endfor %}
         </ul>
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="object1">
+            {% for opt_source in source.opt_sources.all %}
+                {% if opt_source.opt_id == 1 %}
+                    {% define "fade show active" as status %}
+                {% else %}
+                    {% define "fade" as status %}
+                {% endif %}
 
-                <div class="table_opt_source">
-                    <table class="table table-bordered table-responsive-md w-auto">
-                      <thead class="thead-dark">
-                        <tr>
-                            <th>Head <br><small> object 234 </small> </th>
-                           <th>Legacy Survey</th>
-                           <th>GAIA</th>
-                           <th>Pan-STARRS</th>
-                           <th>SDSS</th>
-                           <th>WISE</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+                {%  comment %} Optical Source table with head:value(parameters) {% endcomment %}
+                <div class="tab-pane {{ status }}" id="object{{ opt_source.opt_id }}">
+                    <div class="table_opt_source">
+                        <table class="table table-bordered table-responsive-md">
+                          <thead class="thead-dark">
                             <tr>
-                                <th class="text-center th-dark">name</th>
-                                <td>None</td>
-                                <td>GAIA_TDE</td>
-                                <td>None</td>
-                                <td>SDSS_TDE</td>
-                                <td>WISE_TDE</td>
+                               <th>Head</th>
+                               <th>Value</th>
                             </tr>
-                            <tr>
-                                <th class="text-center th-dark">RA</th>
-                                <td>230.30</td>
-                                <td>220.10</td>
-                                <td>233.56</td>
-                                <td>225.15</td>
-                                <td>245.23</td>
-                            </tr>
-                            <tr>
-                                <th class="text-center th-dark">DEC</th>
-                                <td>50.30</td>
-                                <td>53.10</td>
-                                <td>49.56</td>
-                                <td>51.15</td>
-                                <td>52.23</td>
-                            </tr>
-                            <tr>
-                                <th class="text-center th-dark">sep_input</th>
-                                <td>25.66</td>
-                                <td>30.10</td>
-                                <td>21.14</td>
-                                <td>23.78</td>
-                                <td>24.44</td>
-                            </tr>
-                            <tr>
-                                <th class="text-center th-dark">source_class</th>
-                                <td>TDE</td>
-                                <td>TDE</td>
-                                <td>None</td>
-                                <td>TDE</td>
-                                <td>None</td>
-                            </tr>
-                            <tr>
-                                <th class="text-center th-dark">flux</th>
-                                <td>25.3</td>
-                                <td>20.15</td>
-                                <td>27.06</td>
-                                <td>None</td>
-                                <td>17.89</td>
-                            </tr>
-                      </tbody>
-                    </table>
+                          </thead>
+                          <tbody>
+                              {% for field,value in opt_source %}
+                                <tr>
+                                    <td>{{ field }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                              {% endfor %}
+                          </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="tab-pane fade" id="object2">
-                <p> Here should be table and Aladin-Lite for object2. </p>
-            </div>
-            <div class="tab-pane fade" id="object3">
-                <p> Here should be table and Aladin-Lite for object3. </p>
-            </div>
-            <div class="tab-pane fade" id="object4">
-                <p> Here should be table and Aladin-Lite for object4. </p>
-            </div>
-            <div class="tab-pane fade" id="object5">
-                <p> Here should be table and Aladin-Lite for object5. </p>
-            </div>
+            {% endfor %}
+
             {% comment %} General Aladin Lite {% endcomment %}
-            <div class="aladin_lite">
-                {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
-                <div id="aladin-lite-div" style="width:700px;height:400px;"></div>
-                <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+            {% if source.opt_sources.all %}
+                <div class="aladin_lite">
+                    {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
+                    <div id="aladin-lite-div" style="width:700px;height:400px;"></div>
+                    <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
 
-                {% comment %} Radio buttons with surveys {% endcomment %}
-                <input id="DSS" type="radio" name="survey" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
-                <input id="DSS-blue" type="radio" name="survey" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
-                <input id="2MASS" type="radio" name="survey" value="P/2MASS/color"><label for="2MASS">2MASS</label>
-                <input id="allwise" type="radio" name="survey" value="P/allWISE/color"><label for="allwise">AllWISE</label>
-                <input id="glimpse" type="radio" name="survey" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
+                    {% comment %} Radio buttons with surveys {% endcomment %}
+                    <input id="DSS" type="radio" name="survey" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
+                    <input id="DSS-blue" type="radio" name="survey" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
+                    <input id="2MASS" type="radio" name="survey" value="P/2MASS/color"><label for="2MASS">2MASS</label>
+                    <input id="allwise" type="radio" name="survey" value="P/allWISE/color"><label for="allwise">AllWISE</label>
+                    <input id="glimpse" type="radio" name="survey" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
 
-                {% comment %} Creation of Aladin Lite instance {% endcomment %}
-                <script type="text/javascript">
-                    var aladin = A.aladin('#aladin-lite-div', {survey: "P/DSS2/color", fov:1.5, target: "270.61 -23.03"});
-                    $('input[name=survey]').change(function() {
-                        aladin.setImageSurvey($(this).val());
-                    });
+                    {% comment %} Creation of Aladin Lite instance {% endcomment %}
+                    <script type="text/javascript">
+                        var aladin = A.aladin('#aladin-lite-div', {survey: "P/DSS2/color", fov:1.5, target: "270.61 -23.03"});
+                        $('input[name=survey]').change(function() {
+                            aladin.setImageSurvey($(this).val());
+                        });
 
-                    var markers = A.catalog({name: 'Some markers'})
-                    aladin.addCatalog(markers);
-                    markers.addSources([A.marker(270.332621, -23.078944, {popupTitle: 'Object 234',
-                        popupDesc: '<em>RA:</em> 230.3<br/><em>DEC:</em> 50.3<br/><em>class:</em> TDE<br/>More info <a target="_blank" href="#">in Simbad</a>'})]);
-                </script>
-            </div>
+                        var markers = A.catalog({name: 'Some markers'})
+                        aladin.addCatalog(markers);
+                        markers.addSources([A.marker(270.332621, -23.078944, {popupTitle: 'Object 234',
+                            popupDesc: '<em>RA:</em> 230.3<br/><em>DEC:</em> 50.3<br/><em>class:</em> TDE<br/>More info <a target="_blank" href="#">in Simbad</a>'})]);
+                    </script>
+                </div>
+            {% endif %}
         </div>
 
     </div>

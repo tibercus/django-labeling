@@ -4,7 +4,10 @@ from .models import *
 from .forms import CustomImportForm # CustomConfirmImportForm
 from import_export.admin import ImportMixin
 from import_export.fields import Field
+from import_export.widgets import ForeignKeyWidget
 
+
+# X-Ray Sources
 class SourceResource(resources.ModelResource):
     dup_id = Field(attribute='dup_id', column_name='id')
 
@@ -21,6 +24,7 @@ class SourceResource(resources.ModelResource):
         import_id_fields = ('name', 'RA', 'DEC')  # TODO: add survey field?
         exclude = ('id',)
         skip_unchanged = True
+        report_skipped = True
         # fields = ('name', 'RA', 'DEC', 'ztf_name', 'source_class', 'survey')
 
 
@@ -52,7 +56,30 @@ class CustomSourceAdmin(ImportMixin, admin.ModelAdmin):
             rk['survey'] = survey
         return rk
 
+
+# Optical Sources
+class OptSourceResource(resources.ModelResource):
+    # get ForeignKey as XRay Source name in csv table
+    xray_source = Field(
+        column_name='name',
+        attribute='xray_source',
+        widget=ForeignKeyWidget(Source, 'name'))
+
+    class Meta:
+        model = OptSource
+        import_id_fields = ('opt_id', 'name', 'RA', 'DEC',  'ls_ra', 'ls_dec')  # TODO: change this list(ls_ra, ls_dec)?
+        exclude = ('id',)
+        skip_unchanged = True
+        report_skipped = True
+
+
+class CustomOptSourceAdmin(ImportMixin, admin.ModelAdmin):
+    resource_class = OptSourceResource
+
 admin.site.register(Survey)
 admin.site.register(Comment)
+admin.site.register(OptComment)
+
+admin.site.register(OptSource, CustomOptSourceAdmin)
 admin.site.register(Source, CustomSourceAdmin)
 
