@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import Truncator
 from django.contrib.auth.models import User
+from itertools import zip_longest
 
 
 class Survey(models.Model):
@@ -238,10 +239,10 @@ class OptSource(models.Model):
     # gaiaedr3_pmdec_error = models.FloatField(blank=True, null=True)
 
     # WISE attributes
-    ls_flux_w1 = models.FloatField(blank=True, null=True)
-    ls_flux_w2 = models.FloatField(blank=True, null=True)
-    ls_flux_w3 = models.FloatField(blank=True, null=True)
-    ls_flux_w4 = models.FloatField(blank=True, null=True)
+    wise_flux_w1 = models.FloatField(blank=True, null=True)
+    wise_flux_w2 = models.FloatField(blank=True, null=True)
+    wise_flux_w3 = models.FloatField(blank=True, null=True)
+    wise_flux_w4 = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return 'OptSource: {}'.format(self.name)
@@ -252,12 +253,41 @@ class OptSource(models.Model):
     def get_last_comment(self):
         return Comment.objects.filter(source=self).order_by('-created_at').first()
 
-    def __iter__(self):
-        f_list = ['comments', 'master_source', 'probable_source', 'opt_id']  # TODO: how to not show fields smarter
+    # For Optical Objects Table
+    def get_survey_zip_fields(self):
+        f_list = ['comments', 'master_source', 'probable_source', 'opt_id']
+        base_fields = []
+        ls_fields = []; sdss_fields = []; ps_fields = []; gaia_fields = []; wise_fields = []
         for field in self._meta.get_fields():
             if field.name not in f_list:
-                value = getattr(self, field.name, None)
-                yield (field.name, value)
+                if 'ls_' in field.name:
+                    ls_fields.append(field.name)
+                elif 'sdss_' in field.name:
+                    sdss_fields.append(field.name)
+                elif 'ps_'in field.name:
+                    ps_fields.append(field.name)
+                elif 'gaiaedr3_'in field.name:
+                    gaia_fields.append(field.name)
+                elif 'wise_' in field.name:
+                    wise_fields.append(field.name)
+                else:
+                    base_fields.append(field.name)
+        return zip_longest(ls_fields, sdss_fields, ps_fields, gaia_fields, wise_fields)
+
+    # For Optical Objects Table
+    def get_field_name_value(self, field_name):
+        if field_name:
+            start = field_name.find('_')+1
+            value = getattr(self, field_name, None)
+            return field_name[start:], value
+        else:
+            return (' ', ' ')
+
+    # Return tuples for Optical Objects Table
+    def __iter__(self):
+        for field1,field2,field3,field4,field5 in self.get_survey_zip_fields():
+            yield (self.get_field_name_value(field1), self.get_field_name_value(field2), self.get_field_name_value(field3),\
+                self.get_field_name_value(field4), self.get_field_name_value(field5))
 
 
 class OptComment(models.Model):

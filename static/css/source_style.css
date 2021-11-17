@@ -87,9 +87,12 @@
 .table_opt_source
 {
     margin: 20px;
-    width: 40%;
+    width: 50%;
     height: 400px;
     overflow:auto;
+}
+th {
+  border: 1px solid black;
 }
 
 .aladin_lite
@@ -97,7 +100,7 @@
     position: absolute;
     top: 20px;
     margin: 40px;
-    right: 200px;
+    right: 150px;
     width: 35%;
 }
 

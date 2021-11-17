@@ -61,6 +61,6 @@ def source(request, pk):
             return redirect('source', pk=prim_source.pk)
     else:
         form = NewCommentForm()
-    # return render(request, 'source.html', {'surveys': surveys, 'source_f': source_f, 'dup_sources': dup_sources, 'form': form})
+
     return render(request, 'source.html', {'surveys': surveys, 'source': prim_source, 'base_fields': base_fields,
                                            'dup_sources': dup_sources, 'form': form})

@@ -5,7 +5,7 @@
 {% load widget_tweaks %}
 {% load humanize %}
 
-{% block title %} {{ source_f.name }} {% endblock %}
+{% block title %} {{ source.name }} {% endblock %}
 
 {% block style %}
     <link rel="stylesheet" href="{% static "css/source_style.css" %}" />
@@ -140,21 +140,54 @@
                 {%  comment %} Optical Source table with head:value(parameters) {% endcomment %}
                 <div class="tab-pane {{ status }}" id="object{{ opt_source.opt_id }}">
                     <div class="table_opt_source">
-                        <table class="table table-bordered table-responsive-md">
-                          <thead class="thead-dark">
-                            <tr>
-                               <th>Head</th>
-                               <th>Value</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                              {% for field,value in opt_source %}
+                        <table class="table table-sm table-bordered table-responsive">
+                            <thead class="thead-dark p-0 m-0">
                                 <tr>
-                                    <td>{{ field }}</td>
-                                    <td>{{ value }}</td>
+                                    <th class="text-center" rowspan="1" colspan="2" >
+                                        Legacy Survey
+                                    </th>
+                                    <th class="text-center" rowspan="1" colspan="2">
+                                        SDSS
+                                    </th>
+                                    <th class="text-center" rowspan="1" colspan="2">
+                                        Pan-STARRS
+                                    </th>
+                                    <th class="text-center" rowspan="1" colspan="2" >
+                                        GAIA
+                                    </th>
+                                    <th class="text-center" rowspan="1" colspan="2" >
+                                         WISE
+                                    </th>
                                 </tr>
-                              {% endfor %}
-                          </tbody>
+                                <tr>
+                                    <th class="text-center">name</th>
+                                    <th class="text-center">value</th>
+                                    <th class="text-center">name</th>
+                                    <th class="text-center">value</th>
+                                    <th class="text-center">name</th>
+                                    <th class="text-center">value</th>
+                                    <th class="text-center">name</th>
+                                    <th class="text-center">value</th>
+                                    <th class="text-center">name</th>
+                                    <th class="text-center">value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for field_val1,field_val2,field_val3,field_val4,field_val5 in opt_source %}
+                                    <tr>
+                                        <th scope="row">{{ field_val1.0 }}</th>
+                                        <td>{{ field_val1.1 }}</td>
+                                        <th scope="row">{{ field_val2.0 }}</th>
+                                        <td>{{ field_val2.1 }}</td>
+                                        <th scope="row">{{ field_val3.0 }}</th>
+                                        <td>{{ field_val3.1 }}</td>
+                                        <th scope="row">{{ field_val4.0 }}</th>
+                                        <td>{{ field_val4.1 }}</td>
+                                        <th scope="row">{{ field_val5.0 }}</th>
+                                        <td>{{ field_val5.1 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
                         </table>
                     </div>
                 </div>
