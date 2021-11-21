@@ -247,12 +247,6 @@ class OptSource(models.Model):
     def __str__(self):
         return 'OptSource: {}'.format(self.name)
 
-    def get_comment_count(self):
-        return Comment.objects.filter(source=self).count()
-
-    def get_last_comment(self):
-        return Comment.objects.filter(source=self).order_by('-created_at').first()
-
     # For Optical Objects Table
     def get_survey_zip_fields(self):
         f_list = ['comments', 'master_source', 'probable_source', 'opt_id']

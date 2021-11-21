@@ -73,7 +73,7 @@
 {
     position: absolute;
     right:45%;
-    top: 70%;
+    top: 75%;
 }
 
 /* This is for optical surveys */
@@ -87,12 +87,9 @@
 .table_opt_source
 {
     margin: 20px;
-    width: 50%;
+    width: 45%;
     height: 400px;
     overflow:auto;
-}
-th {
-  border: 1px solid black;
 }
 
 .aladin_lite
@@ -102,6 +99,13 @@ th {
     margin: 40px;
     right: 150px;
     width: 35%;
+}
+
+.opt_comment_section
+{
+    margin: 20px;
+    width: 300px;
+    height: 200px;
 }
 
 

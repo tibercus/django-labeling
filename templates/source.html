@@ -77,42 +77,44 @@
                     </table>
                 </div>
 
-                {%  comment %} Comment form and 'Master' form {% endcomment %}
-                <div class = "comment_section">
-                    <div id="form-wrapper">
-                        {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
-                        <form id="comment_form" method="post">
-                            {% csrf_token %}
-                            <input id="com_field" type="hidden" name="source_id" value={{ source.pk }}>
-                            {% include 'includes/form.html' %}
-                            <button type="submit" class="btn btn-success">Create/Edit</button>
-                        </form>
-                        <form id="master_form" method="post" novalidate>
-                            {% csrf_token %}
-                            <input id="mas_field" type="hidden" name="source_id" value={{ source.pk }}>
-                            <input type="submit" class="btn btn-primary" value="Master" name="master"> </input>
-                        </form>
-                    </div>
-                </div>
-
-                {%  comment %} List of comments for this source {% endcomment %}
-                <div class="comments" style="width: 30rem;">
-                    {% include 'includes/list_comments.html' %}
-                </div>
             </div>
 
         {% endfor %}
 
         {%  comment %} Summary of all sources {% endcomment %}
         <div class="tab-pane fade" id="summary">
-            <div class = "mx-auto text-center mt-5">
+            <div class = "mx-auto text-center">
                 {% with source.dup_id|to_str as img_num %}
                     <iframe src="{% static 'images/lc_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
                 {% endwith %}
             </div>
         </div>
 
+        {%  comment %} Comment form and 'Master' form {% endcomment %}
+        <div class = "comment_section">
+            <div id="form-wrapper">
+                {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
+                <form id="comment_form" method="post">
+                    {% csrf_token %}
+                    {% include 'includes/form.html' %}
+                    <input id="com_field" type="hidden" name="source_id" value={{ source.pk }}>
+                    <button type="submit" class="btn btn-success" value="button" name="x_comment">Create/Edit</button>
+                </form>
+                <form id="master_form" method="post" novalidate>
+                    {% csrf_token %}
+                    <input id="mas_field" type="hidden" name="source_id" value={{ source.pk }}>
+                    <button type="submit" class="btn btn-primary" value="button" name="master">Master</button>
+                </form>
+            </div>
+        </div>
+
+        {%  comment %} List of comments for this source {% endcomment %}
+        <div class="comments" style="width: 30rem;">
+            {% include 'includes/list_comments.html' %}
+        </div>
+
     </div>
+
 
     {% comment %} OPTICAL SURVEYS {% endcomment %}
     <div class="opticalSurveys">
@@ -137,39 +139,23 @@
                     {% define "fade" as status %}
                 {% endif %}
 
-                {%  comment %} Optical Source table with head:value(parameters) {% endcomment %}
+                {%  comment %} Optical Source table {% endcomment %}
                 <div class="tab-pane {{ status }}" id="object{{ opt_source.opt_id }}">
                     <div class="table_opt_source">
-                        <table class="table table-sm table-bordered table-responsive">
+                        <table class="table table-bordered table-responsive">
                             <thead class="thead-dark p-0 m-0">
                                 <tr>
-                                    <th class="text-center" rowspan="1" colspan="2" >
-                                        Legacy Survey
-                                    </th>
-                                    <th class="text-center" rowspan="1" colspan="2">
-                                        SDSS
-                                    </th>
-                                    <th class="text-center" rowspan="1" colspan="2">
-                                        Pan-STARRS
-                                    </th>
-                                    <th class="text-center" rowspan="1" colspan="2" >
-                                        GAIA
-                                    </th>
-                                    <th class="text-center" rowspan="1" colspan="2" >
-                                         WISE
-                                    </th>
+                                    {% for opt_s in opt_surveys %}
+                                        <th class="text-center" rowspan="1" colspan="2" >
+                                            {{ opt_s }}
+                                        </th>
+                                    {% endfor %}
                                 </tr>
                                 <tr>
-                                    <th class="text-center">name</th>
-                                    <th class="text-center">value</th>
-                                    <th class="text-center">name</th>
-                                    <th class="text-center">value</th>
-                                    <th class="text-center">name</th>
-                                    <th class="text-center">value</th>
-                                    <th class="text-center">name</th>
-                                    <th class="text-center">value</th>
-                                    <th class="text-center">name</th>
-                                    <th class="text-center">value</th>
+                                    {% for opt_s in opt_surveys %}
+                                        <th class="text-center">name</th>
+                                        <th class="text-center">value</th>
+                                    {% endfor %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -190,6 +176,27 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {%  comment %} Optical Comment form {% endcomment %}
+                    <div class = "opt_comment_section">
+                        {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
+                        <form id="opt_comment_form" method="post">
+                            {% with opt_form as form %}
+                                {% csrf_token %}
+                                {% include 'includes/form.html' %}
+                            {% endwith %}
+                            <input id="opt_com_field" type="hidden" name="opt_source_id" value={{ opt_source.opt_id }}>
+                            <button type="submit" class="btn btn-success" value="button" name="opt_comment">Create/Edit</button>
+                        </form>
+                    </div>
+
+                    {%  comment %} List of comments for this source {% endcomment %}
+                    <div class="comments" style="width: 30rem;">
+                        {% with opt_source as source %}
+                            {% include 'includes/list_comments.html' %}
+                        {% endwith %}
+                    </div>
+
                 </div>
             {% endfor %}
 
@@ -209,18 +216,22 @@
 
                     {% comment %} Creation of Aladin Lite instance {% endcomment %}
                     <script type="text/javascript">
-                        var aladin = A.aladin('#aladin-lite-div', {survey: "P/DSS2/color", fov:1.5, target: "270.61 -23.03"});
+                        var aladin = A.aladin('#aladin-lite-div', {survey: "P/DSS2/color", fov:0.5, target: "{{ source.RA }} {{ source.DEC }}"});
                         $('input[name=survey]').change(function() {
                             aladin.setImageSurvey($(this).val());
                         });
 
                         var markers = A.catalog({name: 'Some markers'})
                         aladin.addCatalog(markers);
-                        markers.addSources([A.marker(270.332621, -23.078944, {popupTitle: 'Object 234',
-                            popupDesc: '<em>RA:</em> 230.3<br/><em>DEC:</em> 50.3<br/><em>class:</em> TDE<br/>More info <a target="_blank" href="#">in Simbad</a>'})]);
+                        {% for opt_s in source.opt_sources.all %}
+                            markers.addSources([A.marker({{ opt_s.ls_ra }}, {{ opt_s.ls_dec }}, {popupTitle: '{{opt_s.name}}',
+                                popupDesc: '<em>RA:</em> {{ opt_s.ls_ra }} <br/><em>DEC:</em> {{ opt_s.ls_dec }} <br/>\
+                                    <em><class:</em> {{ opt_s.ls_type }} <br/>More info <a target="_blank" href="#">in Simbad</a>'})]);
+                        {% endfor %}
                     </script>
                 </div>
             {% endif %}
+
         </div>
 
     </div>

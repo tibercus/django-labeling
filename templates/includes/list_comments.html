@@ -20,7 +20,7 @@
             </div>
             <div class="row ml-0">
                 {{ comment.comment }}
-                {% if comment.created_by.is_superuser %}
+                {% if comment.created_by.is_superuser and user.is_superuser %}
                   <div class="btn ml-auto">
                     <a href="#" class="btn btn-sm btn-outline-success" role="button">Final</a>
                   </div>
