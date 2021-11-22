@@ -18,7 +18,7 @@ class Survey(models.Model):
 
 
 class Source(models.Model):
-    name = models.CharField(max_length=150, unique=True)
+    name = models.CharField(max_length=150)
 
     RA = models.DecimalField(max_digits=9, decimal_places=5)
     DEC = models.DecimalField(max_digits=9, decimal_places=5)
