@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from .models import *
 
+@login_required
 def home(request):
     # surveys = get_list_or_404(Survey)
     surveys = Survey.objects.all()
