@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from .models import *
 
+
 @login_required
 def home(request):
     # surveys = get_list_or_404(Survey)
@@ -14,6 +15,7 @@ def home(request):
     f_list = ['comments', 'survey', 'opt_sources']
     fields = [field.name for field in Source._meta.get_fields() if not field.name in f_list]
     return render(request, 'home.html', {'surveys': surveys, 'fields': fields})
+
 
 @login_required
 def source(request, pk):
@@ -34,6 +36,15 @@ def source(request, pk):
 
             return redirect('source', pk=prim_source.pk)
 
+        # Make superuser comment final for xray_source by superuser
+        elif 'final' in request.POST and request.user.is_superuser:
+            comment = prim_source.comments.get(created_by=request.user)
+            prim_source.comment = comment.comment
+            prim_source.source_class = comment.source_class
+            prim_source.save()
+
+            return redirect('source', pk=prim_source.pk)
+
         # Create/Edit comment for XRAY SOURCE
         elif 'x_comment' in request.POST:
             # Edit existing comment or create new one
@@ -47,11 +58,6 @@ def source(request, pk):
             if form.is_valid():
                 form.save()
                 comment.save()
-
-                if request.user.is_superuser:
-                    prim_source.comment = form.cleaned_data.get('comment')
-                    prim_source.source_class = comment.source_class
-                    prim_source.save()
 
             return redirect('source', pk=prim_source.pk)
 
