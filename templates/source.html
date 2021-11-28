@@ -20,22 +20,23 @@
             {% else %}
                 {% define "" as status %}
             {% endif %}
-            {% comment %} For mark of 'master' sources {% endcomment %}
-            {% if  source and source.master_source and survey == source.survey %}
-                <li class="nav-item">
+
+            <li class="nav-item">
+            {% if survey.name == 9 %}
+                <a href="#summary" class="nav-link {{ status }}" data-toggle="tab">Summary</a>
+            {% else %}
+                {% comment %} For mark of 'master' sources {% endcomment %}
+                {% if  source and source.master_source and status == "active" %}
                     <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}
                         <span class="badge">M</span>
                     </a>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}</a>
-                </li>
+                {% else %}
+                    <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">Survey{{ survey.name }}</a>
+                {% endif %}
             {% endif %}
+            </li>
+
         {% endfor %}
-        <li class="nav-item">
-            <a href="#summary" class="nav-link" data-toggle="tab">Summary</a>
-        </li>
     </ul>
 
     <div class="tab-content">
@@ -46,45 +47,46 @@
                 {% define "fade" as status %}
             {% endif %}
 
-            <div class="tab-pane {{ status }}" id="survey{{ survey.name }}">
+            {% if survey.name < 9 %}
+                <div class="tab-pane {{ status }}" id="survey{{ survey.name }}">
 
-                {%  comment %} Source X-ray images {% endcomment %}
-                <div id = "container" >
-                    {% include 'includes/xray_images.html' %}
-                </div>
+                    {%  comment %} Source X-ray images {% endcomment %}
+                    <div id = "container" >
+                        {% include 'includes/xray_images.html' %}
+                    </div>
 
-                {%  comment %} Source table with head:value(parameters) {% endcomment %}
-                <div class="table_source">
-                    <table class="table table-bordered table-responsive-md">
-                      <thead class="thead-dark">
-                        <tr>
-                           <th>Head</th>
-                           <th>Value</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                          {% for field,value in source %}
+                    {%  comment %} Source table with head:value(parameters) {% endcomment %}
+                    <div class="table_source">
+                        <table class="table table-bordered table-responsive-md">
+                          <thead class="thead-dark">
                             <tr>
-                            {% with sur_num=survey.name|to_str%}
-                                {% if field in base_fields or 'e'|add:sur_num in field%}
-                                    <td>{{ field }}</td>
-                                    <td>{{ value }}</td>
-                                {% endif %}
-                            {% endwith %}
+                               <th>Head</th>
+                               <th>Value</th>
                             </tr>
-                          {% endfor %}
-                      </tbody>
-                    </table>
+                          </thead>
+                          <tbody>
+                              {% for field,value in source %}
+                                <tr>
+                                {% with sur_num=survey.name|to_str%}
+                                    {% if field in base_fields or 'e'|add:sur_num in field%}
+                                        <td>{{ field }}</td>
+                                        <td>{{ value }}</td>
+                                    {% endif %}
+                                {% endwith %}
+                                </tr>
+                              {% endfor %}
+                          </tbody>
+                        </table>
+                    </div>
+
                 </div>
-
-            </div>
-
+            {% endif %}
         {% endfor %}
 
         {%  comment %} Summary of all sources {% endcomment %}
         <div class="tab-pane fade" id="summary">
             <div class = "mx-auto text-center">
-                {% with source.dup_id|to_str as img_num %}
+                {% with source.row_num|to_str as img_num %}
                     <iframe src="{% static 'images/lc_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
                 {% endwith %}
             </div>

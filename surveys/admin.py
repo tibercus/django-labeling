@@ -76,6 +76,8 @@ class OptSourceResource(resources.ModelResource):
 class CustomOptSourceAdmin(ImportMixin, admin.ModelAdmin):
     resource_class = OptSourceResource
 
+
+admin.site.register(MetaSource)
 admin.site.register(Survey)
 admin.site.register(Comment)
 admin.site.register(OptComment)

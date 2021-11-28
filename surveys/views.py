@@ -11,10 +11,7 @@ from .models import *
 def home(request):
     # surveys = get_list_or_404(Survey)
     surveys = Survey.objects.all()
-    # TODO: Think about summary survey
-    f_list = ['comments', 'survey', 'opt_sources']
-    fields = [field.name for field in Source._meta.get_fields() if not field.name in f_list]
-    return render(request, 'home.html', {'surveys': surveys, 'fields': fields})
+    return render(request, 'home.html', {'surveys': surveys, 'fields': Survey.get_fields_to_show()})
 
 
 @login_required

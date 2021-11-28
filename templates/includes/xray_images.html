@@ -3,19 +3,19 @@
 {% load widget_tweaks %}
 
 <div class = "trans_image">
-    {% with img_num=source.dup_id|to_str sur_num=survey.name|to_str %}
+    {% with img_num=source.row_num|to_str sur_num=survey.name|to_str %}
         <img src="{% static 'images/trans_'|add:img_num|add:'_e'|add:sur_num|add:'.png' %}" />
     {% endwith %}
 </div>
 
 <div class = "light_curve">
-    {% with source.dup_id|to_str as img_num %}
+    {% with source.row_num|to_str as img_num %}
         <iframe src="{% static 'images/lc_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
     {% endwith %}
 </div>
 
 <div class = "spectrum">
-    {% with source.dup_id|to_str as img_num %}
+    {% with source.row_num|to_str as img_num %}
         <iframe src="{% static 'images/spec_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
     {% endwith %}
 </div>
