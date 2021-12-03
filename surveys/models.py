@@ -25,12 +25,11 @@ class Survey(models.Model):
     @staticmethod
     def get_fields_to_show():
         fields = ['name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'dup_id', 'L', 'B',
-                  'R98', 'g_d2d', 'g_s', 'g_nsrc', 'g_gmag', 's_d2d', 's_id', 's_z', 's_otype', 'w_e1', 'w_e2', 'w_e3',
-                  'w_snr_e1', 'w_snr_e2', 'w_snr_e3', 'w_nsrc', 'flag_agn_wise', 'flag_xray', 'flag_radio', 'sdss_p',
-                  'sdss_nsrc', 'RATIO_e2e1', 'FLUX_e1', 'FLUX_e2', 'FLUX_e3', 'CTS_e1', 'CTS_e2', 'CTS_e3', 'EXP_e1',
-                  'EXP_e2', 'EXP_e3', 'LIKE_e1', 'LIKE_e2', 'LIKE_e3', 'G_L_e2', 'G_e2', 'G_U_e2', 'Tin_L_e2', 'Tin_e2',
-                  'Tin_U_e2', 'NH_L_e2', 'NH_e2', 'NH_U_e2', 'UPLIM_e1', 'UPLIM_e2', 'UPLIM_e3', 'TSTART_e1',
-                  'TSTART_e2', 'TSTART_e3', 'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3']
+                  'R98', 'g_d2d', 'g_s', 'g_nsrc', 'g_gmag', 's_d2d', 's_id', 's_z', 's_otype', 'flag_agn_wise',
+                  'flag_xray', 'flag_radio', 'sdss_p', 'sdss_nsrc', 'RATIO_e2e1', 'FLUX_e1', 'FLUX_e2', 'FLUX_e3',
+                  'CTS_e1', 'CTS_e2', 'CTS_e3', 'EXP_e1', 'EXP_e2', 'EXP_e3', 'LIKE_e1', 'LIKE_e2', 'LIKE_e3', 'G_L_e2',
+                  'G_e2', 'G_U_e2', 'Tin_L_e2', 'Tin_e2', 'Tin_U_e2', 'NH_L_e2', 'NH_e2', 'NH_U_e2', 'UPLIM_e1',
+                  'UPLIM_e2', 'UPLIM_e3', 'TSTART_e1', 'TSTART_e2', 'TSTART_e3', 'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3']
         return fields
 
     def get_sources_count(self):
@@ -73,15 +72,15 @@ class Source(models.Model):
     s_id = models.FloatField(blank=True, null=True)
     s_z = models.FloatField(blank=True, null=True)
     s_otype = models.FloatField(blank=True, null=True)
-    # w1,2,3
-    w_e1 = models.FloatField(blank=True, null=True)
-    w_e2 = models.FloatField(blank=True, null=True)
-    w_e3 = models.FloatField(blank=True, null=True)
-
-    # w1_snr,2,3
-    w_snr_e1 = models.FloatField(blank=True, null=True)
-    w_snr_e2 = models.FloatField(blank=True, null=True)
-    w_snr_e3 = models.FloatField(blank=True, null=True)
+    # # w1,2,3
+    # w_e1 = models.FloatField(blank=True, null=True)
+    # w_e2 = models.FloatField(blank=True, null=True)
+    # w_e3 = models.FloatField(blank=True, null=True)
+    #
+    # # w1_snr,2,3
+    # w_snr_e1 = models.FloatField(blank=True, null=True)
+    # w_snr_e2 = models.FloatField(blank=True, null=True)
+    # w_snr_e3 = models.FloatField(blank=True, null=True)
 
     w_nsrc = models.FloatField(blank=True, null=True)
     flag_agn_wise = models.FloatField(blank=True, null=True)
