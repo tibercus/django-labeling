@@ -13,6 +13,33 @@
 
 {% block content %}
 
+    <div class="table-dup_sources">
+        <table id = "dup_table" class="table small table-bordered" cellspacing="0">
+          <thead>
+            <tr>
+            {% for survey in surveys %}
+                {% if survey.name < 9 and dup_sources|is_in_survey:survey%}
+                    <th scope="col">Survey {{ survey.name }}</th>
+                {% endif %}
+            {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {% for source in dup_sources %}
+                <td class="align-middle">
+                {% if source.master_source %}
+                    <a href="{% url 'source' source.pk %}"> <span class="badge">M</span> {{ source.name }} </a>
+                {% else %}
+                    <a href="{% url 'source' source.pk %}">{{ source.name }} </a>
+                {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          </tbody>
+        </table>
+    </div>
+
     <ul class="nav nav-tabs" id="myTab">
         {% for survey in surveys %}
             {% if survey == source.survey %}
@@ -86,7 +113,7 @@
         {%  comment %} Summary of all sources {% endcomment %}
         <div class="tab-pane fade" id="summary">
             <div class = "mx-auto text-center">
-                {% with source.row_num|to_str as img_num %}
+                {% with source.dup_id|to_str as img_num %}
                     <iframe src="{% static 'images/lc_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
                 {% endwith %}
             </div>
@@ -142,6 +169,7 @@
                 {% endif %}
 
                 {%  comment %} Optical Source table {% endcomment %}
+
                 <div class="tab-pane {{ status }}" id="object{{ opt_source.opt_id }}">
                     <div class="table_opt_source">
                         <table class="table table-bordered table-responsive">
@@ -210,11 +238,10 @@
                     <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
 
                     {% comment %} Radio buttons with surveys {% endcomment %}
-                    <input id="DSS" type="radio" name="survey" value="P/DSS2/color" checked><label for="DSS">DSS color</label>
-                    <input id="DSS-blue" type="radio" name="survey" value="P/DSS2/blue"><label for="DSS-blue">DSS blue</label>
-                    <input id="2MASS" type="radio" name="survey" value="P/2MASS/color"><label for="2MASS">2MASS</label>
+                    <input id="SDSS9" type="radio" name="survey" value="P/SDSS9/color" checked><label for="SDSS9">SDSS9 color</label>
+                    <input id="PS_DR1" type="radio" name="survey" value="P/PanSTARRS/DR1/color-i-r-g"><label for="PS_DR1">PS_DR1 color</label>
+                    <input id="GAIAedr3" type="radio" name="survey" value="P/DM/flux-Bp/I/350/gaiaedr3"><label for="GAIAedr3">gaiaedr3</label>
                     <input id="allwise" type="radio" name="survey" value="P/allWISE/color"><label for="allwise">AllWISE</label>
-                    <input id="glimpse" type="radio" name="survey" value="P/GLIMPSE360"><label for="glimpse">GLIMPSE 360</label>
 
                     {% comment %} Creation of Aladin Lite instance {% endcomment %}
                     <script type="text/javascript">

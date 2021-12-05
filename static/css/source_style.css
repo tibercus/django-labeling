@@ -1,3 +1,16 @@
+/* Table with dup_sources for current source */
+.table-dup_sources
+{
+    margin-left: 20px;
+    max-width: 70%;
+    overflow:auto;
+}
+#dup_table
+{
+    width: auto;
+}
+
+/* Table with source attributes and values */
 .table_source
 {
     margin: 20px;
@@ -73,7 +86,7 @@
 {
     position: absolute;
     right:45%;
-    top: 75%;
+    top: 90%;
 }
 
 /* This is for OPTICAL SURVEYS */

@@ -58,6 +58,8 @@
                                         {% else %}
                                             <a href="{% url 'source' source.pk %}">{{ value }} </a>
                                         {% endif %}
+                                    {% elif field == 'ztf_name' and value%}
+                                        <a href=https://lasair.roe.ac.uk/object/{{ value }}> {{ value }} </a>
                                     {% else %}
                                         {{ value }}
                                     {% endif %}

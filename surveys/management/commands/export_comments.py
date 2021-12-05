@@ -34,6 +34,8 @@ class Command(BaseCommand):
 
         print(comment_df)
 
+        comment_df.to_parquet('surveys/test_xray_data/saved_comments.parquet', engine='fastparquet')
+
         self.stdout.write(f'End saving comments')
         end_time = timezone.now()
         self.stdout.write(self.style.SUCCESS(f'Saving took: {(end_time - start_time).total_seconds()} seconds.'))

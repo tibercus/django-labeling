@@ -34,7 +34,8 @@ class Command(BaseCommand):
                                             'notes': 'comment'
                                             })
         # TODO: change this later
-        xray_sources['row_num'] = xray_sources.index
+        xray_sources['dup_id'] = xray_sources.index
+        xray_sources['row_num'] = range(len(xray_sources.index))
         xray_sources.drop(columns=['w1', 'w2', 'w3', 'w1snr', 'w2snr', 'w3snr', 'w_nsrc',
                                    'FLUX_e4', 'CTS_e4', 'EXP_e4', 'LIKE_e4', 'UPLIM_e4',
                                    'ID_e2', 'ID_e3', 'ID_e4', 'TSTART_e4', 'TSTOP_e4', 'added'], inplace=True)
@@ -52,7 +53,7 @@ class Command(BaseCommand):
         xray_sources = xray_sources[fields]
         self.stdout.write(f'New table attributes:\n{dict(xray_sources.dtypes)}')
 
-        xray_sources.to_parquet('surveys/xray_data/xray_sources.parquet', engine='fastparquet')
+        xray_sources.to_parquet('surveys/test_xray_data/xray_sources.parquet', engine='fastparquet')
 
         self.stdout.write(f'End converting pkl')
         end_time = timezone.now()
