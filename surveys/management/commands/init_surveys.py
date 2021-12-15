@@ -10,6 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = timezone.now()
+        # Survey 9 = Summary survey
         for i in range(1, 10):
             # self.stdout.write(f'Create survey {i}')
             survey, create = Survey.objects.get_or_create(name=i)

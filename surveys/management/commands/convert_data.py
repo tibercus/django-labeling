@@ -2,6 +2,8 @@ from django.core.management import BaseCommand
 from django.utils import timezone
 import pandas as pd
 import pickle
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 # from surveys.models import *
 
@@ -23,6 +25,72 @@ class Command(BaseCommand):
                   'survey', 'file', 'row_num']
         return fields
 
+    @staticmethod
+    def get_table_schema():
+        fields = [
+            pa.field("name", pa.string(), False),
+            pa.field("RA", pa.float64(), False),
+            pa.field("DEC", pa.float64(), False),
+            pa.field("ztf_name", pa.string()),
+            pa.field("comment", pa.string()),
+            pa.field("source_class", pa.string()),
+            pa.field("master_source", pa.bool_()),
+            pa.field("dup_id", pa.int64()),
+            pa.field("L", pa.float64()),
+            pa.field("B", pa.float64()),
+            pa.field("R98", pa.float64()),
+            pa.field("g_d2d", pa.float64()),
+            pa.field("g_s", pa.float64()),
+            pa.field("g_nsrc", pa.float64()),
+            pa.field("g_gmag", pa.float64()),
+            pa.field("s_d2d", pa.float64()),
+            pa.field("s_id", pa.float64()),
+            pa.field("s_z", pa.float64()),
+            pa.field("s_otype", pa.float64()),
+            pa.field("flag_agn_wise", pa.float64()),
+            pa.field("flag_xray", pa.float64()),
+            pa.field("flag_radio", pa.float64()),
+            pa.field("sdss_p", pa.float64()),
+            pa.field("sdss_nsrc", pa.float64()),
+            pa.field("RATIO_e2e1", pa.float64()),
+            pa.field("FLUX_e1", pa.float64()),
+            pa.field("FLUX_e2", pa.float64()),
+            pa.field("FLUX_e3", pa.float64()),
+            pa.field("CTS_e1", pa.float64()),
+            pa.field("CTS_e2", pa.float64()),
+            pa.field("CTS_e3", pa.float64()),
+            pa.field("EXP_e1", pa.float64()),
+            pa.field("EXP_e2", pa.float64()),
+            pa.field("EXP_e3", pa.float64()),
+            pa.field("LIKE_e1", pa.float64()),
+            pa.field("LIKE_e2", pa.float64()),
+            pa.field("LIKE_e3", pa.float64()),
+            pa.field("G_L_e2", pa.float64()),
+            pa.field("G_e2", pa.float64()),
+            pa.field("G_U_e2", pa.float64()),
+            pa.field("Tin_L_e2", pa.float64()),
+            pa.field("Tin_e2", pa.float64()),
+            pa.field("Tin_U_e2", pa.float64()),
+            pa.field("NH_L_e2", pa.float64()),
+            pa.field("NH_e2", pa.float64()),
+            pa.field("NH_U_e2", pa.float64()),
+            pa.field("UPLIM_e1", pa.float64()),
+            pa.field("UPLIM_e2", pa.float64()),
+            pa.field("UPLIM_e3", pa.float64()),
+            pa.field("TSTART_e1", pa.string()),
+            pa.field("TSTART_e2", pa.string()),
+            pa.field("TSTART_e3", pa.string()),
+            pa.field("TSTOP_e1", pa.string()),
+            pa.field("TSTOP_e2", pa.string()),
+            pa.field("TSTOP_e3", pa.string()),
+            pa.field("survey", pa.int64()),
+            pa.field("file", pa.string()),
+            pa.field("row_num", pa.int64()),
+        ]
+        schema = pa.schema(fields)
+
+        return schema
+
     def handle(self, *args, **options):
         # self.stdout.write(f'Pandas version: {pd.__version__}')
         start_time = timezone.now()
@@ -35,14 +103,19 @@ class Command(BaseCommand):
                                             })
         # TODO: change this later
         xray_sources['dup_id'] = xray_sources.index
+        xray_sources['master_source'] = True
         xray_sources['row_num'] = range(len(xray_sources.index))
+
+        xray_sources.reset_index(drop=True, inplace=True)
         xray_sources.drop(columns=['w1', 'w2', 'w3', 'w1snr', 'w2snr', 'w3snr', 'w_nsrc',
                                    'FLUX_e4', 'CTS_e4', 'EXP_e4', 'LIKE_e4', 'UPLIM_e4',
                                    'ID_e2', 'ID_e3', 'ID_e4', 'TSTART_e4', 'TSTOP_e4', 'added'], inplace=True)
         xray_sources['survey'] = 1
         xray_sources[4:8]['survey'] = 2
         xray_sources[8:]['survey'] = 3
-        xray_sources['file'] = file_path[-15:]
+        # Write to column 'file' name of converted file
+        start = file_path.rfind('\\')
+        xray_sources['file'] = file_path[start+1:-4]
 
         # Check if all field names in dataframe - add them
         fields = Command.get_fields()
@@ -50,10 +123,13 @@ class Command(BaseCommand):
             if field not in xray_sources.columns:
                 xray_sources[field] = None
 
-        xray_sources = xray_sources[fields]
-        self.stdout.write(f'New table attributes:\n{dict(xray_sources.dtypes)}')
+        # Save parquet table with specified schema
+        schema = Command.get_table_schema()
+        table = pa.Table.from_pandas(xray_sources, schema=schema)
+        pq.write_table(table, 'surveys/test_xray_data/xray_sources1.parquet')
 
-        xray_sources.to_parquet('surveys/test_xray_data/xray_sources.parquet', engine='fastparquet')
+        # xray_sources = xray_sources[fields]
+        # xray_sources.to_parquet('surveys/test_xray_data/xray_sources.parquet', engine='fastparquet')
 
         self.stdout.write(f'End converting pkl')
         end_time = timezone.now()

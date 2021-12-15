@@ -2,20 +2,22 @@
 {% load filters_tags %}
 {% load widget_tweaks %}
 
-<div class = "trans_image">
-    {% with img_num=source.dup_id|to_str sur_num=survey.name|to_str %}
-        <img src="{% static 'images/trans_'|add:img_num|add:'_e'|add:sur_num|add:'.png' %}" />
-    {% endwith %}
-</div>
+{% with  survey=survey.name|to_str file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
+    <div class = "trans_image">
+        {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
+            <img src="{% static 'images/e'|add:survey|add:'/'|add:'trans_'|add:file_name|add:num|add:'.png'%}" />
+        {% endwith %}
+    </div>
 
-<div class = "light_curve">
-    {% with source.dup_id|to_str as img_num %}
-        <iframe src="{% static 'images/lc_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
-    {% endwith %}
-</div>
+    <div class = "light_curve">
+        {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
+            <img src="{% static 'images/e'|add:survey|add:'/'|add:'lc_'|add:file_name|add:num|add:'.pdf'%}" />
+        {% endwith %}
+    </div>
 
-<div class = "spectrum">
-    {% with source.dup_id|to_str as img_num %}
-        <iframe src="{% static 'images/spec_'|add:img_num|add:'_e2.pdf' %}" width="500px" height="410px"></iframe>
-    {% endwith %}
-</div>
+    <div class = "spectrum">
+        {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
+            <img src="{% static 'images/e'|add:survey|add:'/'|add:'spec_'|add:file_name|add:num|add:'.pdf'%}" />
+        {% endwith %}
+    </div>
+{% endwith %}

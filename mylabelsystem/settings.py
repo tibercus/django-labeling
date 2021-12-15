@@ -131,6 +131,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+# Path of source's image data
+IMAGE_DATA_PATH = os.path.join(BASE_DIR, 'static', 'images')
+# Path of Pavel's dir with files
+# PAVEL_DIR = 'C:/Users/fedor/Desktop/LabelSystem/dir_load_sources'
+PAVEL_DIR = os.path.join(BASE_DIR, 'test_xray_data')
+
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),

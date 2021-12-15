@@ -15,8 +15,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_fields():
-        fields = ['comment', 'follow_up', 'source_class', 'created_at', 'created_by', 'updated_at',
-                  'source_file', 'source_row']
+        fields = ['comment', 'follow_up', 'source_class', 'created_at', 'created_by', 'updated_at', 'source']
         return fields
 
     def handle(self, *args, **options):
@@ -27,14 +26,16 @@ class Command(BaseCommand):
         comment_df = pd.DataFrame.from_records(Comment.objects.all().values('comment', 'follow_up', 'source_class',
                                                                             'created_at', 'created_by', 'updated_at',
                                                                             'source'))
-        for i in comment_df.index:
-            comment_df.at[i, 'by_user'] = User.objects.get(pk=comment_df.at[i, 'created_by']).username
-            comment_df.at[i, 'source_file'] = Source.objects.get(pk=comment_df.at[i, 'source']).meta_data.file_name
-            comment_df.at[i, 'file_row'] = Source.objects.get(pk=comment_df.at[i, 'source']).row_num
+        # Add metadata fields
+        if not comment_df.empty:
+            for i in comment_df.index:
+                comment_df.at[i, 'by_user'] = User.objects.get(pk=comment_df.at[i, 'created_by']).username
+                comment_df.at[i, 'source_name'] = Source.objects.get(pk=comment_df.at[i, 'source']).name
+                comment_df.at[i, 'source_file'] = Source.objects.get(pk=comment_df.at[i, 'source']).meta_data.file_name
+                comment_df.at[i, 'file_row'] = Source.objects.get(pk=comment_df.at[i, 'source']).row_num
 
-        print(comment_df)
-
-        comment_df.to_parquet('surveys/test_xray_data/saved_comments.parquet', engine='fastparquet')
+            print('Saved comments:\n', comment_df)
+            comment_df.to_parquet('surveys/test_xray_data/saved_comments.parquet', engine='fastparquet')
 
         self.stdout.write(f'End saving comments')
         end_time = timezone.now()

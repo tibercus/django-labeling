@@ -1,16 +1,21 @@
-import csv
 from django.core.management import BaseCommand, CommandError
 from django.utils import timezone
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 from surveys.models import *
+from django.conf import settings
+import shutil
+import os
+
 
 
 class Command(BaseCommand):
     help = "Loads data from Parquet file."
 
     def add_arguments(self, parser):
-        parser.add_argument("file_path", type=str, help='path for csv file')
+        parser.add_argument("file_path", type=str, help='path for parquet file')
 
     @staticmethod
     def get_fields():
@@ -29,9 +34,18 @@ class Command(BaseCommand):
         # Field list in the order in which the columns should be in the table
         field_list = Command.get_fields()
 
-        data = pd.read_parquet(file_path, engine='fastparquet')
+        table = pq.read_table(file_path)
+        data = table.to_pandas()
+
+        # Make Survey dirs for image data
+        for i in range(1, 10):
+            if not os.path.exists(os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i))):
+                os.makedirs(os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i)))
+
+        # data = pd.read_parquet(file_path, engine='fastparquet')
         self.stdout.write(f'Start reading data')
         # sources = []
+        print(data)
         for row in data.itertuples():
             meta_data, m_created = MetaSource.objects.get_or_create(file_name=row.file)
             if m_created:
@@ -43,7 +57,7 @@ class Command(BaseCommand):
                 raise CommandError(f'Survey{row.survey} not found')
 
             self.stdout.write(f'Source name: {row.name} RA: {row.RA} DEC: {row.DEC}, survey: {row.survey}')
-            # TODO: think about RA, DEC - dont work because it's float
+            # TODO: think about unique sources
             source, created = Source.objects.get_or_create(name=row.name, survey=survey,
                                                            defaults={'RA': row.RA, 'DEC': row.DEC,
                                                                      'meta_data': meta_data, 'row_num': row.row_num})
@@ -63,17 +77,43 @@ class Command(BaseCommand):
 
                     # sources.append(source)
                     source.save()
+
                 except Exception as e:
                     # Delete created source if there was ERROR while filling fields
                     if created: source.delete()
                     raise CommandError(e)
 
+            # Rename and Copy images to static/images
+            images_path = os.path.join(settings.PAVEL_DIR, 'pavel_images')
+            for i in range(1, 10):
+                # Copy Light Curve
+                old_path = os.path.join(images_path, 'lc_'+str(source.dup_id)+'_e'+str(i) + '.pdf')
+                if os.path.isfile(old_path):
+                    new_file_name = 'lc_' + row.file + str(row.row_num) + '.pdf'
+                    new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
+                    shutil.copy(old_path, new_path)
+
+                # Copy Spectrum
+                old_path = os.path.join(images_path, 'spec_' + str(source.dup_id) + '_e' + str(i) + '.pdf')
+                if os.path.isfile(old_path):
+                    new_file_name = 'spec_' + row.file + str(row.row_num) + '.pdf'
+                    new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
+                    shutil.copy(old_path, new_path)
+
+                # Copy Trans Image
+                old_path = os.path.join(images_path, 'trans_' + str(source.dup_id) + '_e' + str(i) + '.png')
+                if os.path.isfile(old_path):
+                    new_file_name = 'trans_' + row.file + str(row.row_num) + '.png'
+                    new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
+                    shutil.copy(old_path, new_path)
+
             # if len(sources) > 500:
             #     Source.objects.bulk_create(sources)
             #     sources = []
             #
-            # if sources:
-            #     Source.objects.bulk_create(sources)
+
+        # if sources:
+        #     Source.objects.bulk_create(sources)
 
         self.stdout.write(f'End reading table')
         end_time = timezone.now()
