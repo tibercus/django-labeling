@@ -135,7 +135,7 @@ STATIC_URL = '/static/'
 IMAGE_DATA_PATH = os.path.join(BASE_DIR, 'static', 'images')
 # Path of Pavel's dir with files
 # PAVEL_DIR = 'C:/Users/fedor/Desktop/LabelSystem/dir_load_sources'
-PAVEL_DIR = os.path.join(BASE_DIR, 'test_xray_data')
+PAVEL_DIR = os.path.join(BASE_DIR, 'surveys', 'test_xray_data')
 
 
 STATICFILES_DIRS = [

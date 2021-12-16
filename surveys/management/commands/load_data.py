@@ -46,7 +46,7 @@ class Command(BaseCommand):
         # data = pd.read_parquet(file_path, engine='fastparquet')
         self.stdout.write(f'Start reading data')
         # sources = []
-        print(data)
+        # print(data)
         for row in data.itertuples():
             meta_data, m_created = MetaSource.objects.get_or_create(file_name=row.file)
             if m_created:
