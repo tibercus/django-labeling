@@ -14,8 +14,8 @@ import os
 class Command(BaseCommand):
     help = "Loads data from Parquet file."
 
-    def add_arguments(self, parser):
-        parser.add_argument("file_path", type=str, help='path for parquet file')
+    # def add_arguments(self, parser):
+    #     parser.add_argument("file_path", type=str, help='path for parquet file')
 
     @staticmethod
     def get_fields():
@@ -30,7 +30,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = timezone.now()
-        file_path = options["file_path"]
+        # file_path = options["file_path"]
+        file_path = os.path.join(settings.PAVEL_DIR, 'xray_sources1.parquet')
         # Field list in the order in which the columns should be in the table
         field_list = Command.get_fields()
 
