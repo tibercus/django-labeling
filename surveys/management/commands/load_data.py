@@ -31,7 +31,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start_time = timezone.now()
         # file_path = options["file_path"]
-        file_path = os.path.join(settings.PAVEL_DIR, 'xray_sources1.parquet')
+        file_path = os.path.join(settings.PAVEL_DIR, 'xray_sources.parquet')
         # Field list in the order in which the columns should be in the table
         field_list = Command.get_fields()
 
@@ -46,7 +46,7 @@ class Command(BaseCommand):
         # data = pd.read_parquet(file_path, engine='fastparquet')
         self.stdout.write(f'Start reading data')
         # sources = []
-        # print(data)
+
         for row in data.itertuples():
             meta_data, m_created = MetaSource.objects.get_or_create(file_name=row.file)
             if m_created:

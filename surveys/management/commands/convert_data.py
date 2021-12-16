@@ -5,14 +5,17 @@ import pickle
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from django.conf import settings
+import os
+
 # from surveys.models import *
 
 
 class Command(BaseCommand):
     help = "Convert data from PKL to Parquet file."
 
-    def add_arguments(self, parser):
-        parser.add_argument("file_path", type=str, help='path for pkl file')
+    # def add_arguments(self, parser):
+    #     parser.add_argument("file_path", type=str, help='path for pkl file')
 
     @staticmethod
     def get_fields():
@@ -94,7 +97,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # self.stdout.write(f'Pandas version: {pd.__version__}')
         start_time = timezone.now()
-        file_path = options["file_path"]
+        # file_path = options["file_path"]
+        file_path = os.path.join(settings.PAVEL_DIR, 'pavel_file.pkl')
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
 
@@ -113,8 +117,8 @@ class Command(BaseCommand):
         xray_sources['survey'] = 1
         xray_sources[4:8]['survey'] = 2
         xray_sources[8:]['survey'] = 3
-        # Write to column 'file' name of converted file
-        start = file_path.rfind('\\')
+        # Write to column 'file' name of converted file without '/'
+        start = file_path.rfind('\\') if os.name == 'nt' else file_path.rfind('/')
         xray_sources['file'] = file_path[start+1:-4]
 
         # Check if all field names in dataframe - add them
@@ -126,10 +130,10 @@ class Command(BaseCommand):
         # Save parquet table with specified schema
         schema = Command.get_table_schema()
         table = pa.Table.from_pandas(xray_sources, schema=schema)
-        pq.write_table(table, 'surveys/test_xray_data/xray_sources1.parquet')
+        pq.write_table(table, 'surveys/test_xray_data/xray_sources.parquet')
 
-        # xray_sources = xray_sources[fields]
-        # xray_sources.to_parquet('surveys/test_xray_data/xray_sources.parquet', engine='fastparquet')
+        xray_sources = xray_sources[fields]
+        xray_sources.to_parquet('surveys/test_xray_data/xray_sources.parquet', engine='fastparquet')
 
         self.stdout.write(f'End converting pkl')
         end_time = timezone.now()
