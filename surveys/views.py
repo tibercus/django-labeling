@@ -24,7 +24,9 @@ def source(request, pk):
 
     surveys = get_list_or_404(Survey)
     prim_source = get_object_or_404(Source, pk=pk)  # get object-source chosen by user on main page
-    dup_sources = Source.objects.filter(dup_id=prim_source.dup_id)  # get all object-sources related to this source
+    dup_sources = None  # to prevent using dup_id == None
+    if prim_source.dup_id:
+        dup_sources = Source.objects.filter(dup_id=prim_source.dup_id)  # get all object-sources related to this source
     if request.method == 'POST':
         # Make master source-object or make normal
         if 'master' in request.POST and request.user.is_superuser:

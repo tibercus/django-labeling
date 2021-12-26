@@ -12,14 +12,14 @@
     <div class = "light_curve">
         {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
             <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'lc_'|add:file_name|add:num|add:'.pdf'%}"
-                                                                        width="500px" height="410px"></iframe>
+                                                                        width="500px" height="420px"></iframe>
         {% endwith %}
     </div>
 
     <div class = "spectrum">
         {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
             <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'spec_'|add:file_name|add:num|add:'.pdf'%}"
-                                                                        width="500px" height="410px"></iframe>
+                                                                        width="500px" height="420px"></iframe>
         {% endwith %}
     </div>
 {% endwith %}

@@ -33,17 +33,20 @@ class Command(BaseCommand):
             try:
                 user = User.objects.get(pk=row.created_by)
             except User.DoesNotExist:
-                raise CommandError(f'User {row.by_user} not found')
+                self.stdout.write(f'NOTE: User {row.by_user} not found')
+                continue
             # Find source file
             try:
                 meta = MetaSource.objects.get(file_name=row.source_file)
             except MetaSource.DoesNotExist:
-                raise CommandError(f'Meta Source for {row.source_file} not found')
+                self.stdout.write(f'NOTE: Meta Source for {row.source_file} not found')
+                continue
             # Find comment's source
             try:
                 source = Source.objects.get(meta_data=meta, row_num=row.file_row)
             except Source.DoesNotExist:
-                raise CommandError(f'Source {row.source} not found')
+                self.stdout.write(f'WARNING: Source from {row.source_file}, line: {row.source} not found')
+                continue
 
             comment, create = Comment.objects.get_or_create(created_by=user, source=source)
             if not create:
