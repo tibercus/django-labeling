@@ -45,7 +45,7 @@ class Survey(models.Model):
 
     @staticmethod
     def get_max_dup_id():
-        max_dir = Source.objects.aggregate(Max('dup_id'))  # {'dup_id__max': 5}
+        max_dir = Source.objects.aggregate(Max('dup_id'))  # {'dup_id__max': value}
         max_dup_id = max_dir['dup_id__max'] if max_dir['dup_id__max'] else 0
         return max_dup_id
 

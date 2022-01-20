@@ -2,7 +2,7 @@
 {% load filters_tags %}
 {% load widget_tweaks %}
 
-{%  comment %} TODO: size of pdf files? {% endcomment %}
+{%  comment %} TODO: size of pdf files?? {% endcomment %}
 {% with  survey=survey.name|to_str file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
     <div class = "trans_image">
         {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
