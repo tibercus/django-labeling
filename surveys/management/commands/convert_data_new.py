@@ -245,7 +245,7 @@ class Command(BaseCommand):
                 master_xray_sources[field] = None
 
         master_xray_sources = master_xray_sources[fields]
-        print(master_xray_sources)
+        # print(master_xray_sources)
 
         # Save parquet table with specified schema
         schema = Command.get_table_schema()
