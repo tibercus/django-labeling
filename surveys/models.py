@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import Truncator
 from django.contrib.auth.models import User
 from itertools import zip_longest
+from django.db.models import Max
 
 
 class MetaSource(models.Model):
@@ -41,6 +42,12 @@ class Survey(models.Model):
                   'RATIO_e3e2', 'TSTART_e1', 'TSTART_e2', 'TSTART_e3', 'TSTART_e4',
                   'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3', 'TSTOP_e4', 'g_b', 'ps_p']
         return fields
+
+    @staticmethod
+    def get_max_dup_id():
+        max_dir = Source.objects.aggregate(Max('dup_id'))  # {'dup_id__max': 5}
+        max_dup_id = max_dir['dup_id__max'] if max_dir['dup_id__max'] else 0
+        return max_dup_id
 
     def get_sources_count(self):
         return Source.objects.filter(survey=self).count()

@@ -2,6 +2,7 @@
 {% load filters_tags %}
 {% load widget_tweaks %}
 
+{%  comment %} TODO: size of pdf files? {% endcomment %}
 {% with  survey=survey.name|to_str file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
     <div class = "trans_image">
         {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
@@ -12,7 +13,7 @@
     <div class = "light_curve">
         {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
             <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'lc_'|add:file_name|add:num|add:'.pdf'%}"
-                                                                        width="500px" height="420px"></iframe>
+                                                                        width="500px" height="440px"></iframe>
         {% endwith %}
     </div>
 
