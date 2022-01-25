@@ -5,15 +5,27 @@ from itertools import zip_longest
 from django.db.models import Max
 
 
+# Class for files from where the xray sources were loaded
 class MetaSource(models.Model):
     file_name = models.CharField(max_length=200)
     version = models.PositiveIntegerField(default=1, blank=True, null=True)
     description = models.TextField(max_length=500, blank=True, null=True)  # Maybe dont need it
 
     def __str__(self):
-        return 'Meta: {}'.format(self.file_name)
+        return 'MetaSource: {}'.format(self.file_name)
 
 
+# Class for sources that are considered one space object
+class MetaObject(models.Model):
+    master_name = models.CharField(max_length=200)
+    unchange_flag = models.BooleanField(default=False, blank=True, null=True)
+    description = models.TextField(max_length=500, blank=True, null=True)  # Maybe dont need it
+
+    def __str__(self):
+        return 'MetaObject: {}'.format(self.master_name)
+
+
+# Class for surveys where transients were detected
 class Survey(models.Model):
     name = models.PositiveIntegerField(unique=True)
     started_at = models.DateTimeField(auto_now_add=True)
@@ -43,16 +55,11 @@ class Survey(models.Model):
                   'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3', 'TSTOP_e4', 'g_b', 'ps_p']
         return fields
 
-    @staticmethod
-    def get_max_dup_id():
-        max_dir = Source.objects.aggregate(Max('dup_id'))  # {'dup_id__max': value}
-        max_dup_id = max_dir['dup_id__max'] if max_dir['dup_id__max'] else 0
-        return max_dup_id
-
     def get_sources_count(self):
         return Source.objects.filter(survey=self).count()
 
 
+# Class for xray sources from all surveys
 class Source(models.Model):
     name = models.CharField(max_length=150)
 
@@ -86,7 +93,7 @@ class Source(models.Model):
 
     g_d2d = models.FloatField(blank=True, null=True)
     g_s = models.IntegerField(blank=True, null=True)
-    g_id = models.IntegerField(blank=True, null=True)
+    g_id = models.BigIntegerField(blank=True, null=True)
 
     s_d2d = models.FloatField(blank=True, null=True)
     s_id = models.CharField(max_length=100, blank=True, null=True)
@@ -111,8 +118,8 @@ class Source(models.Model):
     g_nsrc = models.IntegerField(blank=True, null=True)
     sdss_nsrc = models.IntegerField(blank=True, null=True)
     sdss_p = models.IntegerField(blank=True, null=True)
-    sdss_id = models.IntegerField(blank=True, null=True)
-    sdss_sp = models.IntegerField(blank=True, null=True)
+    sdss_id = models.BigIntegerField(blank=True, null=True)
+    sdss_sp = models.BigIntegerField(blank=True, null=True)
     sdss_d2d = models.FloatField(blank=True, null=True)
     added = models.CharField(max_length=100, blank=True, null=True)
 
@@ -172,11 +179,11 @@ class Source(models.Model):
     G_e3 = models.FloatField(blank=True, null=True)
 
     # ID_e1,2,3,4
-    ID_e1 = models.IntegerField(blank=True, null=True)
-    ID_e2 = models.IntegerField(blank=True, null=True)
-    ID_e3 = models.IntegerField(blank=True, null=True)
-    ID_e4 = models.IntegerField(blank=True, null=True)
-    ID_e123 = models.IntegerField(blank=True, null=True)
+    ID_e1 = models.BigIntegerField(blank=True, null=True)
+    ID_e2 = models.BigIntegerField(blank=True, null=True)
+    ID_e3 = models.BigIntegerField(blank=True, null=True)
+    ID_e4 = models.BigIntegerField(blank=True, null=True)
+    ID_e123 = models.BigIntegerField(blank=True, null=True)
 
     # NH_L_e1,2,3
     NH_L_e1 = models.FloatField(blank=True, null=True)
@@ -242,6 +249,8 @@ class Source(models.Model):
     # For ability to rebuild lost Data: expert's comments for sources
     meta_data = models.ForeignKey(MetaSource, on_delete=models.CASCADE, related_name='file_sources')
     row_num = models.PositiveIntegerField()  # row number in load file
+    # to find sources that are considered one space object
+    meta_object = models.ForeignKey(MetaObject, on_delete=models.CASCADE, related_name='object_sources')
 
     def __str__(self):
         return 'Source: {}'.format(self.name)
@@ -258,6 +267,7 @@ class Source(models.Model):
             yield (field, value)
 
 
+# Class for comments on xray sources
 class Comment(models.Model):
     comment = models.TextField(max_length=2000)
     follow_up = models.TextField(max_length=1000, blank=True, null=True)
@@ -280,6 +290,7 @@ class Comment(models.Model):
         return 'Comment: {}'.format(truncated_comment.chars(10))
 
 
+# Class for optical sources
 class OptSource(models.Model):
     opt_id = models.PositiveIntegerField()
     name = models.CharField(max_length=150)
@@ -409,6 +420,7 @@ class OptSource(models.Model):
                    self.get_field_name_value(field4), self.get_field_name_value(field5))
 
 
+# Class for comments on optical sources
 class OptComment(models.Model):
     comment = models.TextField(max_length=1500)
     follow_up = models.TextField(max_length=500, blank=True, null=True)

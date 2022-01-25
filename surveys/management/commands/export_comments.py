@@ -6,6 +6,9 @@ import pickle
 from surveys.models import *
 from django.contrib.auth.models import User
 
+from django.conf import settings
+import os
+
 
 class Command(BaseCommand):
     help = "Save Comments as Parquet table."
@@ -35,7 +38,8 @@ class Command(BaseCommand):
                 comment_df.at[i, 'file_row'] = Source.objects.get(pk=comment_df.at[i, 'source']).row_num
 
             print('Saved comments:\n', comment_df)
-            comment_df.to_parquet('surveys/test_xray_data/saved_comments.parquet', engine='fastparquet')
+            # TODO: add date to file name
+            comment_df.to_parquet(os.path.join(settings.WORK_DIR, 'saved_comments.parquet'), engine='fastparquet')
 
         self.stdout.write(f'End saving comments')
         end_time = timezone.now()

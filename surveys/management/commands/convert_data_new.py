@@ -17,10 +17,6 @@ import os
 class Command(BaseCommand):
     help = "Convert master data from PKL to Parquet file."
 
-    # @staticmethod
-    # def add_arguments(parser):
-    #     parser.add_argument("file_path", type=str, help='path for pkl file')
-
     @staticmethod
     def get_fields():  # add img_id to identify images in load_data
         fields = ['img_id', 'name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'master_source', 'dup_id', 'L', 'B',
@@ -206,8 +202,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # self.stdout.write(f'Pandas version: {pd.__version__}')
         start_time = timezone.now()
-        # file_path = options["file_path"]
-        file_path = 'C:/Users/fedor/Desktop/4 курс/Diploma/Научная работа/sources_Xray_data/xray_master_data/uniq_master_45930_47023_03_22_18.pkl'
+        file_path = os.path.join(settings.MASTER_DIR, 'uniq_master_45930_47023_03_22_18.pkl')
+        # file_path = os.path.join(settings.MASTER_DIR, 'test_dup_id.pkl')
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
 
@@ -223,7 +219,7 @@ class Command(BaseCommand):
                 master_xray_sources[col] = pd.to_datetime(master_xray_sources[col]).dt.date
                 master_xray_sources[col] = master_xray_sources[col].astype(str)
 
-        master_xray_sources['master_source'] = True
+        # master_xray_sources['master_source'] = True
         master_xray_sources['row_num'] = range(len(master_xray_sources.index))
         master_xray_sources['img_id'] = master_xray_sources.index
         # TODO: remove this later (set survey)
@@ -250,7 +246,8 @@ class Command(BaseCommand):
         # Save parquet table with specified schema
         schema = Command.get_table_schema()
         table = pa.Table.from_pandas(master_xray_sources, schema=schema)
-        pq.write_table(table, 'surveys/test_xray_data/master_xray_sources.parquet')
+        pq.write_table(table, os.path.join(settings.WORK_DIR, 'master_xray_sources.parquet'))
+        # pq.write_table(table, os.path.join(settings.WORK_DIR, 'test_dup_id.parquet'))
 
         self.stdout.write(f'End converting pkl')
         end_time = timezone.now()

@@ -42,67 +42,73 @@ class Command(BaseCommand):
         return fields
 
     @staticmethod
-    def change_dup_id(new_dup_id, close_dup_ids, sources):
-        if close_dup_ids.size == 0:
-            print('\n There is no close sources with dup_id <> {}'.format(new_dup_id))
+    def change_meta_object(new_meta_obj, close_meta_objs):
+        if len(close_meta_objs) == 0:
+            print('\n There is no close sources with meta object <> {}'.format(new_meta_obj))
         else:
-            print('\n Sources with dup_id: {} will have new dup_id: {}'.format(close_dup_ids, new_dup_id))
-            for dup_id in close_dup_ids:
-                # update source's dup_id
-                Source.objects.filter(dup_id=dup_id).update(dup_id=new_dup_id, master_source=False)
+            print('\n Sources with meta objs: {} will have new meta obj: {}'.format(close_meta_objs, new_meta_obj))
+            for meta_obj in close_meta_objs:
+                # update source's meta objects
+                Source.objects.filter(meta_object__master_name=meta_obj).update(meta_object=new_meta_obj, master_source=False)
+                # delete meta objects with no sources
+                MetaObject.objects.filter(master_name=meta_obj).delete()
 
     @staticmethod
-    def calculate_dup_id(source):
-        # take new source and find nearest sources by RA DEC
-        # return dup_id of the nearest source
-        # dup_id values start with 1 => 0 <=> no near source found
-        res_dup_id = 0
+    def find_or_create_mobject(s_name, s_ra, s_dec):
+        # take source and find nearest meta_object by RA DEC
+        # return nearest meta_object or create new
 
-        # TODO: think about UPDATE in change_dup_id(...), using all() to refresh queryset
-        sources = Source.objects.all().exclude(name=source.name)
-        # print('Source: {} RA: {} DEC: {}\n'.format(source.name, source.RA, source.DEC))
-        sources_ra = sources.values_list("RA", flat=True)
-        sources_dec = sources.values_list("DEC", flat=True)
-        sources_dup_id = np.array(list(sources.values_list("dup_id", flat=True)))
-        # print('Dup_id:\n', sources_dup_id)
+        sources = Source.objects.all().exclude(name=s_name)
+        print('\nMeta object for source: {} RA: {} DEC: {}\n'.format(s_name, s_ra, s_dec))
+        sources_ra = sources.values_list('RA', flat=True)
+        sources_dec = sources.values_list('DEC', flat=True)
+        sources_meta = np.array(list(sources.values_list('meta_object__master_name', flat=True)))
+        # print('Meta objects: ', sources_meta)
 
         # sources to np.array to use indices
-        sources = np.array(list(sources))
+        np_sources = np.array(list(sources))
 
-        if source and np.all(sources):
-            c1 = SkyCoord(source.RA * u.deg, source.DEC * u.deg, frame='icrs')
+        if np.all(np_sources):
+            c1 = SkyCoord(s_ra * u.deg, s_dec * u.deg, frame='icrs')
             c2 = SkyCoord(sources_ra * u.deg, sources_dec * u.deg, frame='icrs')
             sep = c1.separation(c2)
             # print('Separations in arcsec', sep.arcsec)
 
             # take sources closer then 30 arcsec
-            sep_ind = np.where(sep < 30*u.arcsec)
-            # sep_ind = np.where(sep < 0.1*u.deg)
-            # print(sep_ind)
+            sep_ind = np.where(sep < 30 * u.arcsec)
+            # print('Indices: ', sep_ind)
             if sep_ind[0].size > 0:
                 sep_arcsec = sep.arcsec[sep_ind]
                 sep_deg = sep.deg[sep_ind]
-                nearest_sources = sources[sep_ind]
+                nearest_sources = np_sources[sep_ind]
                 # print close sources and distance in arcseconds
-                for s, d, d1 in zip(nearest_sources[np.argsort(sep_arcsec)], np.sort(sep_arcsec), np.sort(sep_deg)):
-                    print('\n Close source: {} RA: {} DEC: {} dup_id: {}'.format(s.name, s.RA, s.DEC, s.dup_id))
-                    print('Separation in arcsec - {} '.format(d))
-                    print('Separation in deg - {}'.format(d1))
+                for s, a, d in zip(nearest_sources[np.argsort(sep_arcsec)], np.sort(sep_arcsec), np.sort(sep_deg)):
+                    print('\n Close source: {} RA: {} DEC: {} meta_obj: {}'.format(s.name, s.RA, s.DEC, s.meta_object))
+                    print('Separation in arcsec - {} '.format(a))
+                    print('Separation in deg - {}'.format(d))
 
-                nearest_dup_ids = np.unique(sources_dup_id[sep_ind])
-                print("Dup_id of the close sources: ", nearest_dup_ids)
-                # take close source with min dup_id
-                res_dup_id = np.min(nearest_dup_ids)
-                print('Found close source with dup_id: ', res_dup_id)
-                # Change dup_id of close sources to res_sup_id
-                Command.change_dup_id(res_dup_id, nearest_dup_ids[nearest_dup_ids > res_dup_id], sources)
+                meta_of_nearest = list(np.unique(sources_meta[sep_ind]))
+                print("Meta_objects names of the close sources: ", meta_of_nearest)
+                meta_obj = nearest_sources[np.argsort(sep_arcsec)][0].meta_object
+                print("Take meta object: ", meta_obj)
+                created = False
+                # change meta objects of close sources
+                meta_of_nearest.remove(meta_obj.master_name)
+                Command.change_meta_object(meta_obj, meta_of_nearest)
 
-        return res_dup_id
+            else:
+                meta_obj = MetaObject.objects.create(master_name=s_name)
+                print('Created new meta object: {}\n'.format(meta_obj.master_name))
+                created = True
+
+        return meta_obj, created
 
     def handle(self, *args, **options):
         start_time = timezone.now()
         # file_path = options["file_path"]
-        file_path = os.path.join(settings.PAVEL_DIR, 'master_xray_sources.parquet')
+        file_path = os.path.join(settings.WORK_DIR, 'master_xray_sources.parquet')
+        # file_path = os.path.join(settings.WORK_DIR, 'test_dup_id.parquet')
+
         # Field list in the order in which the columns should be in the table
         field_list = Command.get_fields()
 
@@ -124,22 +130,36 @@ class Command(BaseCommand):
         # print(data)
 
         for row in data.itertuples():
+            # find/create meta source - file
             meta_data, m_created = MetaSource.objects.get_or_create(file_name=row.file)
             if m_created:
                 self.stdout.write(f'Create new meta source for file: {row.file}')
 
+            # find source's survey
             try:
                 survey = Survey.objects.get(name=row.survey)
             except Survey.DoesNotExist:
                 raise CommandError(f'Survey{row.survey} not found')
 
-            self.stdout.write(f'\nSource name: {row.name} RA: {row.RA} DEC: {row.DEC}, survey: {row.survey}')
-            # TODO: think about unique sources
-            source, created = Source.objects.get_or_create(name=row.name, survey=survey,
-                                                           defaults={'RA': row.RA, 'DEC': row.DEC,
-                                                                     'meta_data': meta_data, 'row_num': row.row_num})
+            # find/create source and find/create meta_object
+            try:  # look for existing source
+                # TODO: think about unique sources
+                source = Source.objects.get(name=row.name, survey=survey, meta_data=meta_data, row_num=row.row_num)
+                created = False
+                self.stdout.write(f'\nSource name: {row.name} RA: {row.RA} DEC: {row.DEC}, survey: {row.survey}\n')
+
+            except Source.DoesNotExist:
+                meta_object, o_created = Command.find_or_create_mobject(row.name, row.RA, row.DEC)
+                print('Result - {} {}'.format(meta_object, o_created))
+                self.stdout.write(f'\n New source name: {row.name} RA: {row.RA} DEC: {row.DEC}, survey: {row.survey}\n')
+                # create new source
+                source = Source.objects.create(name=row.name, survey=survey, RA=row.RA, DEC=row.DEC,
+                                               meta_data=meta_data, row_num=row.row_num,
+                                               meta_object=meta_object, master_source=o_created)
+                created = True
+
             if created:
-                self.stdout.write(f'Create new source with name:{row.name}, RA: {row.RA}, '
+                self.stdout.write(f'Created new source with name:{row.name}, RA: {row.RA}, '
                                   f'DEC: {row.DEC}, file:{row.file}')
 
             # Check that it is new source or new file
@@ -149,18 +169,9 @@ class Command(BaseCommand):
                     self.stdout.write(f'Start filling fields...\n')
                     for i, field in enumerate(field_list):
                         # self.stdout.write(f'Num:{i} - {field} - {row[i+2]}')  # i+2 - skip index and img_id
-                        if field not in ['name', 'RA', 'DEC', 'survey', 'file', 'row_num']:
+                        filled_fields = ['name', 'RA', 'DEC', 'survey', 'file', 'row_num', 'master_source']
+                        if field not in filled_fields:
                             setattr(source, field, row[i+2])  # Similar to source.field = row[i+1]
-
-                    # Calculate dup_id
-                    ex_dup_id = Command.calculate_dup_id(source)
-                    if ex_dup_id > 0:
-                        source.dup_id = ex_dup_id
-                        source.master_source = False
-                    else:
-                        max_dup_id = Survey.get_max_dup_id()
-                        source.dup_id = max_dup_id + 1
-                        print('Create new dup_id: ', max_dup_id + 1)
 
                     # sources.append(source)
                     source.save()
@@ -171,8 +182,7 @@ class Command(BaseCommand):
                     raise CommandError(e)
 
             # Rename and Copy images to static/images
-            # images_path = os.path.join(settings.PAVEL_DIR, 'pavel_images')
-            images_path = 'C:/Users/fedor/Desktop/4 курс/Diploma/Научная работа/sources_Xray_data/xray_master_data/'
+            images_path = settings.MASTER_DIR
             for i in range(1, 10):
                 # Copy Light Curve
                 old_path = os.path.join(images_path, 'lc_' + str(row.img_id) + '_e' + str(i) + '.pdf')
@@ -196,6 +206,7 @@ class Command(BaseCommand):
                     new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
                     shutil.copy(old_path, new_path)
 
+            # maybe use this later
             # if len(sources) > 500:
             #     Source.objects.bulk_create(sources)
             #     sources = []
