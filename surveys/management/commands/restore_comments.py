@@ -6,6 +6,9 @@ import pyarrow.parquet as pq
 from surveys.models import *
 from django.contrib.auth.models import User
 
+from django.conf import settings
+import os
+
 
 class Command(BaseCommand):
     help = "Restore saved comments."
@@ -21,11 +24,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = timezone.now()
-        file_path = 'surveys/test_xray_data/saved_comments.parquet'
+        file_name = 'saved_comments.parquet'
 
-        table = pq.read_table(file_path)
+        table = pq.read_table(os.path.join(settings.WORK_DIR, file_name))
         saved_comments = table.to_pandas()
-        # print(saved_comments)
+
+        pd.set_option('display.width', 120)
+        print(saved_comments)
 
         self.stdout.write(f'Start reading saved comments')
         for row in saved_comments.itertuples():
@@ -43,7 +48,7 @@ class Command(BaseCommand):
                 continue
             # Find comment's source
             try:
-                source = Source.objects.get(meta_data=meta, row_num=row.file_row)
+                source = Source.objects.get(name=row.source_name, meta_data=meta, row_num=row.file_row)
             except Source.DoesNotExist:
                 self.stdout.write(f'WARNING: Source from {row.source_file}, line: {row.source} not found')
                 continue
@@ -60,6 +65,10 @@ class Command(BaseCommand):
                 comment.comment = row.comment
                 comment.follow_up = row.follow_up
                 comment.source_class = row.source_class
+                # save time to comment
+                comment.created_at = pd.Timestamp(row.created_at)
+                if row.updated_at:
+                    comment.updated_at = pd.Timestamp(row.updated_at)
                 comment.save()
 
         self.stdout.write(f'End restoring comments')

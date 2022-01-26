@@ -75,7 +75,7 @@ class Source(models.Model):
         ('NaN', 'Unknown Source'),
     ]
     source_class = models.CharField(
-        max_length=20,
+        max_length=100,
         choices=CLASS_CHOICES,
         default='NaN',
         blank=True, null=True,
@@ -273,7 +273,7 @@ class Comment(models.Model):
     follow_up = models.TextField(max_length=1000, blank=True, null=True)
 
     source_class = models.CharField(
-        max_length=20,
+        max_length=100,
         choices=Source.CLASS_CHOICES,
         default='NaN',
         blank=True, null=True,
@@ -301,7 +301,7 @@ class OptSource(models.Model):
     ztf_name = models.CharField(max_length=100, blank=True, null=True)
 
     source_class = models.CharField(
-        max_length=20,
+        max_length=100,
         choices=Source.CLASS_CHOICES,
         default='NaN',
         blank=True, null=True,

@@ -181,6 +181,7 @@ class Command(BaseCommand):
                     if created: source.delete()
                     raise CommandError(e)
 
+            # TODO: make method
             # Rename and Copy images to static/images
             images_path = settings.MASTER_DIR
             for i in range(1, 10):

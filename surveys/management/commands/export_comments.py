@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 from django.conf import settings
 import os
+import datetime
 
 
 class Command(BaseCommand):
@@ -37,9 +38,12 @@ class Command(BaseCommand):
                 comment_df.at[i, 'source_file'] = Source.objects.get(pk=comment_df.at[i, 'source']).meta_data.file_name
                 comment_df.at[i, 'file_row'] = Source.objects.get(pk=comment_df.at[i, 'source']).row_num
 
+            pd.set_option('display.width', 120)
             print('Saved comments:\n', comment_df)
-            # TODO: add date to file name
-            comment_df.to_parquet(os.path.join(settings.WORK_DIR, 'saved_comments.parquet'), engine='fastparquet')
+            # add date to file name
+            # file_name = 'saved_comments_' + str(datetime.date.today()) + '.parquet'
+            file_name = 'saved_comments.parquet'
+            comment_df.to_parquet(os.path.join(settings.WORK_DIR, file_name), engine='fastparquet')
 
         self.stdout.write(f'End saving comments')
         end_time = timezone.now()
