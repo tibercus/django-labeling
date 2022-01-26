@@ -247,10 +247,10 @@ class Source(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='sources')
 
     # For ability to rebuild lost Data: expert's comments for sources
-    meta_data = models.ForeignKey(MetaSource, on_delete=models.CASCADE, related_name='file_sources')
+    meta_data = models.ForeignKey(MetaSource, on_delete=models.CASCADE, related_name='file_sources', blank=True, null=True)
     row_num = models.PositiveIntegerField()  # row number in load file
     # to find sources that are considered one space object
-    meta_object = models.ForeignKey(MetaObject, on_delete=models.CASCADE, related_name='object_sources')
+    meta_object = models.ForeignKey(MetaObject, on_delete=models.CASCADE, related_name='object_sources', blank=True, null=True)
 
     def __str__(self):
         return 'Source: {}'.format(self.name)
