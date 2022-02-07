@@ -37,7 +37,7 @@ class Survey(models.Model):
 
     @staticmethod
     def get_fields_to_show():
-        fields = ['name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'dup_id', 'L', 'B', 'R98', 'FLAG', 'qual',
+        fields = ['name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'L', 'B', 'R98', 'FLAG', 'qual',
                   'g_d2d', 'g_s', 'g_id', 's_d2d', 's_id', 's_z', 's_otype', 's_nsrc', 'checked', 'flag_xray',
                   'flag_radio', 'flag_agn_wise', 'w1', 'w2', 'w3', 'w1snr', 'w2snr', 'w3snr', 'g_nsrc', 'sdss_nsrc',
                   'sdss_p', 'sdss_id', 'sdss_sp', 'sdss_d2d', 'added', '_15R98', 'g_gmag', 'g_maxLx', 'w_nsrc', 'R98c',
@@ -82,9 +82,9 @@ class Source(models.Model):
     )
 
     master_source = models.BooleanField(default=True, blank=True, null=True)
-    dup_id = models.PositiveIntegerField(blank=True, null=True)
+    # dup_id = models.PositiveIntegerField(blank=True, null=True)
 
-    # TODO: Think about formats and view of NEW fields
+    # TODO: Think about formats and view of fields
     L = models.FloatField(blank=True, null=True)
     B = models.FloatField(blank=True, null=True)
     R98 = models.FloatField(blank=True, null=True)
@@ -246,7 +246,7 @@ class Source(models.Model):
 
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='sources')
 
-    # For ability to rebuild lost Data: expert's comments for sources
+    # For ability to rebuild lost Data: expert's comments on sources
     meta_data = models.ForeignKey(MetaSource, on_delete=models.CASCADE, related_name='file_sources', blank=True, null=True)
     row_num = models.PositiveIntegerField()  # row number in load file
     # to find sources that are considered one space object

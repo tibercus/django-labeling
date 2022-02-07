@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_fields():  # add img_id to identify images in load_data
-        fields = ['name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'master_source', 'dup_id', 'L', 'B',
+        fields = ['name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'master_source', 'L', 'B',
                   'R98', 'FLAG', 'qual', 'g_d2d', 'g_s', 'g_id', 's_d2d', 's_id', 's_z', 's_otype', 's_nsrc', 'checked',
                   'flag_xray', 'flag_radio', 'flag_agn_wise', 'w1', 'w2', 'w3', 'w1snr', 'w2snr', 'w3snr',
                   'g_nsrc', 'sdss_nsrc', 'sdss_p', 'sdss_id', 'sdss_sp', 'sdss_d2d', 'added', '_15R98', 'g_gmag',
@@ -97,11 +97,41 @@ class Command(BaseCommand):
                 Command.change_meta_object(meta_obj, meta_of_nearest)
 
             else:
+                # Maybe better use - get_or_create?
                 meta_obj = MetaObject.objects.create(master_name=s_name)
                 print('Created new meta object: {}\n'.format(meta_obj.master_name))
                 created = True
 
         return meta_obj, created
+
+    @staticmethod
+    def rename_copy_images(img_id, row_num, file_name):
+        # Rename and Copy images to dir: static/images
+        # img_id, row_num, file_name - attributes of source table
+
+        images_path = settings.MASTER_DIR
+        for i in range(1, 10):
+            # Copy Light Curve
+            old_path = os.path.join(images_path, 'lc_' + str(img_id) + '_e' + str(i) + '.pdf')
+            if os.path.isfile(old_path):
+                new_file_name = 'lc_' + file_name + str(row_num) + '.pdf'
+                new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
+                shutil.copy(old_path, new_path)
+
+            # Copy Spectrum
+            # old_path = os.path.join(images_path, 'spec_' + str(source.img_id) + '_e' + str(i) + '.pdf')
+            old_path = os.path.join(images_path, 'src_' + str(img_id) + '_020_SourceSpec_00001' + '_e' + str(i) + '_rbkg_5_diskbb.pdf')
+            if os.path.isfile(old_path):
+                new_file_name = 'spec_' + file_name + str(row_num) + '.pdf'
+                new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
+                shutil.copy(old_path, new_path)
+
+            # Copy Trans Image
+            old_path = os.path.join(images_path, 'trans_' + str(img_id) + '_e' + str(i) + '.png')
+            if os.path.isfile(old_path):
+                new_file_name = 'trans_' + file_name + str(row_num) + '.png'
+                new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
+                shutil.copy(old_path, new_path)
 
     def handle(self, *args, **options):
         start_time = timezone.now()
@@ -181,31 +211,8 @@ class Command(BaseCommand):
                     if created: source.delete()
                     raise CommandError(e)
 
-            # TODO: make method
             # Rename and Copy images to static/images
-            images_path = settings.MASTER_DIR
-            for i in range(1, 10):
-                # Copy Light Curve
-                old_path = os.path.join(images_path, 'lc_' + str(row.img_id) + '_e' + str(i) + '.pdf')
-                if os.path.isfile(old_path):
-                    new_file_name = 'lc_' + row.file + str(row.row_num) + '.pdf'
-                    new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
-                    shutil.copy(old_path, new_path)
-
-                # Copy Spectrum
-                # old_path = os.path.join(images_path, 'spec_' + str(source.img_id) + '_e' + str(i) + '.pdf')
-                old_path = os.path.join(images_path, 'src_'+str(row.img_id)+'_020_SourceSpec_00001'+'_e' + str(i)+'_rbkg_5_diskbb.pdf')
-                if os.path.isfile(old_path):
-                    new_file_name = 'spec_' + row.file + str(row.row_num) + '.pdf'
-                    new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
-                    shutil.copy(old_path, new_path)
-
-                # Copy Trans Image
-                old_path = os.path.join(images_path, 'trans_' + str(row.img_id) + '_e' + str(i) + '.png')
-                if os.path.isfile(old_path):
-                    new_file_name = 'trans_' + row.file + str(row.row_num) + '.png'
-                    new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
-                    shutil.copy(old_path, new_path)
+            Command.rename_copy_images(row.img_id, row.row_num, row.file)
 
             # maybe use this later
             # if len(sources) > 500:

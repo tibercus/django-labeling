@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_fields():  # add img_id to identify images in load_data
-        fields = ['img_id', 'name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'master_source', 'dup_id', 'L', 'B',
+        fields = ['img_id', 'name', 'RA', 'DEC', 'ztf_name', 'comment', 'source_class', 'master_source', 'L', 'B',
                   'R98', 'FLAG', 'qual','g_d2d', 'g_s', 'g_id', 's_d2d', 's_id', 's_z', 's_otype', 's_nsrc', 'checked',
                   'flag_xray','flag_radio', 'flag_agn_wise', 'w1', 'w2', 'w3', 'w1snr', 'w2snr', 'w3snr',
                   'g_nsrc', 'sdss_nsrc', 'sdss_p', 'sdss_id', 'sdss_sp', 'sdss_d2d', 'added',  '_15R98', 'g_gmag',
@@ -49,7 +49,7 @@ class Command(BaseCommand):
             pa.field("comment", pa.string()),
             pa.field("source_class", pa.string()),
             pa.field("master_source", pa.bool_()),
-            pa.field("dup_id", pa.int64()),
+            # pa.field("dup_id", pa.int64()),
             # master table fields
             pa.field("L", pa.float64()),
             pa.field("B", pa.float64()),
@@ -200,7 +200,6 @@ class Command(BaseCommand):
         return schema
 
     def handle(self, *args, **options):
-        # self.stdout.write(f'Pandas version: {pd.__version__}')
         start_time = timezone.now()
         file_path = os.path.join(settings.MASTER_DIR, 'uniq_master_45930_47023_03_22_18.pkl')
         # file_path = os.path.join(settings.MASTER_DIR, 'test_dup_id.pkl')
@@ -219,7 +218,6 @@ class Command(BaseCommand):
                 master_xray_sources[col] = pd.to_datetime(master_xray_sources[col]).dt.date
                 master_xray_sources[col] = master_xray_sources[col].astype(str)
 
-        # master_xray_sources['master_source'] = True
         master_xray_sources['row_num'] = range(len(master_xray_sources.index))
         master_xray_sources['img_id'] = master_xray_sources.index
         # TODO: remove this later (set survey)
@@ -229,10 +227,8 @@ class Command(BaseCommand):
         master_xray_sources[25:40]['survey'] = 3
         master_xray_sources[40:]['survey'] = 4
 
-        # Write to column 'file' name of converted file without '/'
-        # start = file_path.rfind('\\') if os.name == 'nt' else file_path.rfind('/')
-        start = file_path.rfind('/')
-        master_xray_sources['file'] = file_path[start+1:-4]
+        file_name = os.path.splitext(os.path.basename(file_path))[0]
+        master_xray_sources['file'] = file_name
 
         # Check if all field names in dataframe - add them
         fields = Command.get_fields()

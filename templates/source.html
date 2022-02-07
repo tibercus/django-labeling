@@ -114,7 +114,8 @@
         <div class="tab-pane fade" id="summary">
             <div class = "mx-auto text-center">
                 {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
-                    <iframe src="{% static 'images/e9/lc_'|add:file_name|add:num|add:'.pdf' %}" width="500px" height="410px"></iframe>
+                    <iframe src="{% static 'images/e9/lc_'|add:file_name|add:num|add:'.pdf'|file_exists %}"
+                                                                    width="500px" height="410px"></iframe>
                 {% endwith %}
             </div>
         </div>

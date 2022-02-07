@@ -78,7 +78,9 @@ def source(request, pk):
             return redirect('source', pk=prim_source.pk)
 
     else:
+        # create form for xray source
         form = NewCommentForm()
+        # create form for optical source
         opt_form = OptCommentForm()
 
     return render(request, 'source.html', {'surveys': surveys, 'source': prim_source, 'base_fields': base_fields,

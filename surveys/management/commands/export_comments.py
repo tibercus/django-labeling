@@ -41,8 +41,8 @@ class Command(BaseCommand):
             pd.set_option('display.width', 120)
             print('Saved comments:\n', comment_df)
             # add date to file name
-            # file_name = 'saved_comments_' + str(datetime.date.today()) + '.parquet'
-            file_name = 'saved_comments.parquet'
+            file_name = 'saved_comments_' + str(datetime.date.today()) + '.parquet'
+            # file_name = 'saved_comments.parquet'
             comment_df.to_parquet(os.path.join(settings.WORK_DIR, file_name), engine='fastparquet')
 
         self.stdout.write(f'End saving comments')

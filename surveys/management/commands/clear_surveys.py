@@ -10,10 +10,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start_time = timezone.now()
 
-        # TODO: add meta objects removal
         print('Delete sources')
         sources = Source.objects.all()
         sources.delete()
+
+        print('Delete meta objects')
+        meta_objects = MetaObject.objects.all()
+        meta_objects.delete()
 
         print('Delete meta sources')
         meta_sources = MetaSource.objects.all()

@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 from django.conf import settings
 import os
+from django.utils.timezone import make_aware
 
 
 class Command(BaseCommand):
@@ -66,9 +67,7 @@ class Command(BaseCommand):
                 comment.follow_up = row.follow_up
                 comment.source_class = row.source_class
                 # save time to comment
-                comment.created_at = pd.Timestamp(row.created_at)
-                if row.updated_at:
-                    comment.updated_at = pd.Timestamp(row.updated_at)
+                comment.created_at = make_aware(pd.Timestamp(row.created_at))
                 comment.save()
 
         self.stdout.write(f'End restoring comments')
