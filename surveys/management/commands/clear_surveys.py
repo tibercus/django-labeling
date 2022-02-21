@@ -11,15 +11,15 @@ class Command(BaseCommand):
         start_time = timezone.now()
 
         print('Delete sources')
-        sources = Source.objects.all()
+        sources = eROSITA.objects.all()
         sources.delete()
 
         print('Delete meta objects')
         meta_objects = MetaObject.objects.all()
         meta_objects.delete()
 
-        print('Delete meta sources')
-        meta_sources = MetaSource.objects.all()
+        print('Delete origin files')
+        meta_sources = OriginFile.objects.all()
         meta_sources.delete()
 
         self.stdout.write(f'End clearing surveys')

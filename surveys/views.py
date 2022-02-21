@@ -10,79 +10,72 @@ from .models import *
 @login_required
 def home(request):
     # surveys = get_list_or_404(Survey)
-    surveys = Survey.objects.all()
-    return render(request, 'home.html', {'surveys': surveys, 'fields': Survey.get_fields_to_show()})
+    meta_objects = MetaObject.objects.all()
+    return render(request, 'home.html', {'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show()})
 
 
 @login_required
 def source(request, pk):
     # for parsing source fields on source page
     postfixes = ['_e1', '_e2', '_e3', '_e4', '_e5', '_e6', '_e7', '_e8']
-    base_fields = [field.name for field in Source._meta.get_fields() if not field.name[-3:] in postfixes]
-
-    opt_surveys = ['Legacy Survey', 'SDSS', 'Pan-STARRS', 'GAIA', 'WISE']
+    base_fields = [field.name for field in MetaObject._meta.get_fields() if not field.name[-3:] in postfixes]
 
     surveys = get_list_or_404(Survey)
-    prim_source = get_object_or_404(Source, pk=pk)  # get object-source chosen by user on main page
-    dup_sources = prim_source.meta_object.object_sources.all()  # get all object-sources related to this source
+    meta_object = get_object_or_404(MetaObject, pk=pk)  # get meta object chosen by user on main page
+    sources = meta_object.object_sources.all()
+    # TODO: refactor POST request
     if request.method == 'POST':
-        # Make master source-object or make normal
+        # Make source master/not master by superuser
         if 'master' in request.POST and request.user.is_superuser:
-            prim_source.master_source = False if prim_source.master_source else True
-            prim_source.save()
+            # get id of requested source
+            source_id = request.POST.get('source_id')
+            req_source = sources.get(pk=source_id)
+            if req_source.survey.name == meta_object.master_survey:
+                # make master source - source with max DET_LIKE_0
+                MetaObject.find_master_source(meta_object)
+            else:
+                meta_object.master_name = req_source.name
+                meta_object.master_survey = req_source.survey.name
+                # TODO: uncomment later
+                # meta_object.RA = req_source.RA
+                # meta_object.DEC = req_source.DEC
+                # meta_object.EXT = req_source.EXT
+                # meta_object.R98 = req_source.pos_r98
+                # meta_object.LIKE = req_source.DET_LIKE_0
+                meta_object.save()
 
-            return redirect('source', pk=prim_source.pk)
+            return redirect('source', pk=meta_object.pk)
 
         # Make superuser comment final for xray_source by superuser
         elif 'final' in request.POST and request.user.is_superuser:
-            comment = prim_source.comments.get(created_by=request.user)
-            prim_source.comment = comment.comment
-            prim_source.source_class = comment.source_class
-            prim_source.save()
+            comment = meta_object.comments.get(created_by=request.user)
+            meta_object.comment = comment.comment
+            meta_object.object_class = comment.source_class
+            meta_object.save()
 
-            return redirect('source', pk=prim_source.pk)
+            return redirect('source', pk=meta_object.pk)
 
         # Create/Edit comment for XRAY SOURCE
         elif 'x_comment' in request.POST:
             # Edit existing comment or create new one
             try:
-                comment = Comment.objects.get(source=prim_source, created_by=request.user)
+                comment = Comment.objects.get(meta_source=meta_object, created_by=request.user)
                 comment.updated_at = datetime.now()
             except Comment.DoesNotExist:
-                comment = Comment.objects.create(comment='create', source=prim_source, created_by=request.user)
+                comment = Comment.objects.create(comment='create', meta_source=meta_object, created_by=request.user)
 
             form = NewCommentForm(request.POST, instance=comment)  # use existing or created comment
             if form.is_valid():
                 form.save()
                 comment.save()
 
-            return redirect('source', pk=prim_source.pk)
-
-        # Create/Edit comment for OPTICAL OBJECT
-        elif 'opt_comment' in request.POST:
-            opt_id = request.POST.get('opt_source_id')
-            opt_source = get_object_or_404(OptSource, opt_id=opt_id, name=prim_source.name)
-            # Edit existing comment or create new one
-            try:
-                opt_comment = OptComment.objects.get(opt_source=opt_source, created_by=request.user)
-                opt_comment.updated_at = datetime.now()
-            except OptComment.DoesNotExist:
-                opt_comment = OptComment.objects.create(comment='create', opt_source=opt_source,
-                                                        created_by=request.user)
-
-            opt_form = OptCommentForm(request.POST, instance=opt_comment)
-            if opt_form.is_valid():
-                opt_form.save()
-                opt_comment.save()
-
-            return redirect('source', pk=prim_source.pk)
+            return redirect('source', pk=meta_object.pk)
 
     else:
         # create form for xray source
         form = NewCommentForm()
         # create form for optical source
-        opt_form = OptCommentForm()
+        # opt_form = OptCommentForm()
 
-    return render(request, 'source.html', {'surveys': surveys, 'source': prim_source, 'base_fields': base_fields,
-                                           'dup_sources': dup_sources, 'form': form,
-                                           'opt_form': opt_form, 'opt_surveys': opt_surveys})
+    return render(request, 'source.html', {'surveys': surveys, 'meta_object': meta_object, 'base_fields': base_fields,
+                                           'sources': sources, 'form': form})

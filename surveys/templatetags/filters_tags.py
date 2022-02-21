@@ -22,7 +22,7 @@ def is_in_survey(sources, survey):
     """add filter option in template"""
     try:
         source = sources.get(survey=survey)
-    except Source.DoesNotExist:
+    except eROSITA.DoesNotExist:
         source = None
     return source
 

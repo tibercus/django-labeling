@@ -14,7 +14,7 @@
 .table_source
 {
     margin: 20px;
-    width: 23%;
+    width: 25%;
     height: 600px;
     overflow:auto;
 }
@@ -31,7 +31,7 @@
 {
     position: absolute;
     margin: 10px;
-    right:50%;
+    right:45%;
     top: 0px;
 }
 .light_curve
@@ -49,6 +49,14 @@
     top: 430px;
 }
 /* This is for form fields */
+/* TODO: think about master_form location */
+#master_form
+{
+    position: absolute;
+    margin-left: 10%;
+    top: 1079px;
+}
+
 .comment_section
 {
     margin: 20px;
@@ -65,28 +73,12 @@
     width: 300px;
     height: 40px;
 }
-/* This is for two buttons ('Edit' 'Master') next to each other */
-#form-wrapper
-{
-    width: 100%;
-    margin: 0 auto;
-}
-#comment_form
-{
-    width: 65%;
-    display: inline-block;
-}
-#master_form
-{
-    width: 20%;
-    display: inline-block;
-}
 
 .comments
 {
     position: absolute;
-    right:42%;
-    top: 90%;
+    right:40%;
+    top: 75%;
 }
 
 /* This is for OPTICAL SURVEYS */

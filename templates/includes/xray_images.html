@@ -3,25 +3,19 @@
 {% load widget_tweaks %}
 
 {%  comment %} TODO: size of png/pdf files? {% endcomment %}
-{% with  survey=survey.name|to_str file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
+{% with  survey=survey.name|to_str id=meta_object.pk|to_str%}
     <div class = "trans_image">
-        {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
-            <img src="{% static 'images/e'|add:survey|add:'/'|add:'trans_'|add:file_name|add:num|add:'.png'|file_exists%}"
-                                                                        width="300px" height="300px"/>
-        {% endwith %}
+        <img src="{% static 'images/e'|add:survey|add:'/'|add:'trans_'|add:id|add:'.png'|file_exists%}"
+                                                                        width="360px" height="360px"/>
     </div>
 
     <div class = "light_curve">
-        {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
-            <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'lc_'|add:file_name|add:num|add:'.pdf'|file_exists%}"
+            <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'lc_'|add:id|add:'.pdf'|file_exists%}"
                                                                         width="500px" height="440px"></iframe>
-        {% endwith %}
     </div>
 
     <div class = "spectrum">
-        {% with file_name=source.meta_data.file_name|to_str num=source.row_num|to_str%}
-            <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'spec_'|add:file_name|add:num|add:'.pdf'|file_exists%}"
+            <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'spec_'|add:id|add:'.pdf'|file_exists%}"
                                                                         width="500px" height="420px"></iframe>
-        {% endwith %}
     </div>
 {% endwith %}

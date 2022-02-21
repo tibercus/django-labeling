@@ -29,14 +29,14 @@ class Command(BaseCommand):
 
         comment_df = pd.DataFrame.from_records(Comment.objects.all().values('comment', 'follow_up', 'source_class',
                                                                             'created_at', 'created_by', 'updated_at',
-                                                                            'source'))
+                                                                            'meta_source'))
         # Add metadata fields
         if not comment_df.empty:
             for i in comment_df.index:
                 comment_df.at[i, 'by_user'] = User.objects.get(pk=comment_df.at[i, 'created_by']).username
-                comment_df.at[i, 'source_name'] = Source.objects.get(pk=comment_df.at[i, 'source']).name
-                comment_df.at[i, 'source_file'] = Source.objects.get(pk=comment_df.at[i, 'source']).meta_data.file_name
-                comment_df.at[i, 'file_row'] = Source.objects.get(pk=comment_df.at[i, 'source']).row_num
+                comment_df.at[i, 'master_source_name'] = MetaObject.objects.get(pk=comment_df.at[i, 'meta_source']).master_name
+                # comment_df.at[i, 'source_file'] = MetaObject.objects.get(pk=comment_df.at[i, 'meta_source']).origin_file.file_name
+                comment_df.at[i, 'master_survey'] = MetaObject.objects.get(pk=comment_df.at[i, 'meta_source']).master_survey
 
             pd.set_option('display.width', 120)
             print('Saved comments:\n', comment_df)

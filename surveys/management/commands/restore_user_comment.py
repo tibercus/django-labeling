@@ -11,12 +11,12 @@ import os
 from django.utils.timezone import make_aware
 
 class Command(BaseCommand):
-    help = "Restore user saved comment on a specific source."
+    help = "Restore user saved comment on a specific meta source."
 
     @staticmethod
     def get_fields():
         fields = ['comment', 'follow_up', 'source_class', 'created_at', 'created_by', 'updated_at',
-                  'source', 'by_user', 'source_name', 'source_file', 'file_row']
+                  'meta_source', 'by_user', 'master_source_name', 'master_survey']
         return fields
 
     def handle(self, *args, **options):
@@ -24,9 +24,10 @@ class Command(BaseCommand):
         # file_name = 'saved_comments.parquet'
 
         # User request - to restore specific comment
-        user_name = 'admin'
-        source_name = 'SRGe J023517.2+052736'
-        comment_date = '2022-01-29'
+        user_name = 'user'
+        source_name = 'SRGe J192719.1+653355'
+        survey = 9
+        comment_date = '2022-02-21'
 
         file_name = 'saved_comments_' + comment_date + '.parquet'
         # Look for saved comments with request date
@@ -52,8 +53,8 @@ class Command(BaseCommand):
             print('Try to request another user.')
             exit()
 
-        # Look for user comment to specific source
-        user_source_comment = user_comments[user_comments['source_name'] == source_name]
+        # Look for user comment to specific meta source
+        user_source_comment = user_comments[(user_comments['master_source_name'] == source_name) & (user_comments['master_survey'] == survey)]
         if not user_source_comment.empty:
             print('Found {} comments to source: {}'.format(user_name, source_name))
             print(user_source_comment)
@@ -66,35 +67,29 @@ class Command(BaseCommand):
         self.stdout.write(f'Start restoring saved comments')
         # Find comment's user
         try:
-            user = User.objects.get(pk=user_source_comment['created_by'].values[0])
+            user = User.objects.get(username=user_source_comment['by_user'].values[0])
         except User.DoesNotExist:
             self.stdout.write(f"NOTE: User {user_name} not found")
             exit()
 
-        # Find source file
-        try:
-            meta = MetaSource.objects.get(file_name=user_source_comment['source_file'].values[0])
-        except MetaSource.DoesNotExist:
-            self.stdout.write(f"NOTE: Meta Source for {user_source_comment['source_file']} not found")
-            exit()
-
         # Find comment's source
         try:
-            source = Source.objects.get(name=source_name, meta_data=meta, row_num=user_source_comment['file_row'].values[0])
-        except Source.DoesNotExist:
-            self.stdout.write(f"WARNING: Source from {user_source_comment['source_file'].values[0]}, "
-                              f"line: {user_source_comment['file_row'].values[0]} not found")
+            meta_source = MetaObject.objects.get(pk=user_source_comment['meta_source'].values[0], master_name=source_name, master_survey=survey)
+        except MetaObject.DoesNotExist:
+            self.stdout.write(f"WARNING: Meta Source {user_source_comment['meta_source'].values[0]}, "
+                              f"name: {source_name} survey: {survey} not found")
             exit()
 
         # Find comment
         try:
-            comment = Comment.objects.get(created_by=user, source=source)
+            comment = Comment.objects.get(created_by=user, meta_source=meta_source)
         except Comment.DoesNotExist:
-            self.stdout.write(f"WARNING:Comment by {user_name} for source {source.name} not found")
-            exit()
+            self.stdout.write(f"NOTE:Comment by {user_name} for source {meta_source.master_name} not found")
+            self.stdout.write(f"NOTE:Create comment for source {meta_source.master_name} by {user_name}")
+            comment = Comment.objects.create(comment='create', created_by=user, meta_source=meta_source)
 
-        self.stdout.write(f'Restore Comment by {user_name} for source {source.name}'
-                          f' from file {meta.file_name}')
+        self.stdout.write(f'Restore Comment by {user_name} for source {meta_source.master_name}'
+                          f' from survey {meta_source.master_survey}')
         # fill Comment fields
         comment.comment = user_source_comment['comment'].values[0]
         comment.follow_up = user_source_comment['follow_up'].values[0]
