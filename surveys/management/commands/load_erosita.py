@@ -66,10 +66,11 @@ class Command(BaseCommand):
             except Survey.DoesNotExist:
                 raise CommandError(f'Survey{row.survey} not found')
 
-            source, created = eROSITA.objects.get_or_create(name=row.name, survey=survey, origin_file=origin_file,
+            source, created = eROSITA.objects.get_or_create(survey_ind=row.survey_ind, name=row.name,
+                                                            survey=survey, origin_file=origin_file,
                                                             defaults={'RA': row.RA, 'DEC': row.DEC})
             if created:
-                self.stdout.write(f'Create new source with name: {row.name}, survey: {row.survey}, survey_ind:{row.survey_ind}')
+                self.stdout.write(f'{row[0]} - Create new source {row.survey_ind} with name: {row.name}, survey: {row.survey}')
 
             # Check that it is new source or new file
             if f_created or created:
@@ -77,7 +78,7 @@ class Command(BaseCommand):
                     self.stdout.write(f'Start filling fields...\n')
                     for i, field in enumerate(field_list):
                         # self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+1 - skip index
-                        filled_fields = ['name', 'survey', 'file_name', 'RA', 'DEC']
+                        filled_fields = ['survey_ind', 'name', 'survey', 'file_name', 'RA', 'DEC']
                         if field not in filled_fields:
                             setattr(source, field, row[i+1])  # Similar to source.field = row[i+1]
 

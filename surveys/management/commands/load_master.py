@@ -14,6 +14,7 @@ import astropy.units as u
 from astropy.coordinates import SkyCoord
 
 from django.db.models import Max
+from django.db.models import Count
 
 
 class Command(BaseCommand):
@@ -24,7 +25,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_fields():  # add img_id to identify images in load_data
-        fields = ['RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
+        fields = ['master_ind', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e1234',
                   'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m',
@@ -71,7 +72,7 @@ class Command(BaseCommand):
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e1, survey=Survey.objects.get(name=1))
                 source.meta_objects.add(meta_object)
-                print(f'Add meta object: {row_values.img_id} - {meta_object} to source: {source.survey_ind} - {source}')
+                print(f'Link meta object: {meta_object} with source: {source.survey_ind} - {source}')
                 source.save()
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e1} from survey 1 not found')
@@ -80,7 +81,7 @@ class Command(BaseCommand):
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e2, survey=Survey.objects.get(name=2))
                 source.meta_objects.add(meta_object)
-                print(f'Add meta object: {row_values.img_id} - {meta_object} to source: {source.survey_ind} - {source}')
+                print(f'Link meta object: {meta_object} with source: {source.survey_ind} - {source}')
                 source.save()
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e2} from survey 2 not found')
@@ -89,7 +90,7 @@ class Command(BaseCommand):
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e3, survey=Survey.objects.get(name=3))
                 source.meta_objects.add(meta_object)
-                print(f'Add meta object: {row_values.img_id} - {meta_object} to source: {source.survey_ind} - {source}')
+                print(f'Link meta object: {meta_object} with source: {source.survey_ind} - {source}')
                 source.save()
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e3} from survey 3 not found')
@@ -98,7 +99,7 @@ class Command(BaseCommand):
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e4, survey=Survey.objects.get(name=4))
                 source.meta_objects.add(meta_object)
-                print(f'Add meta object: {row_values.img_id} - {meta_object} to source: {source.survey_ind} - {source}')
+                print(f'Link meta object: {meta_object} with source: {source.survey_ind} - {source}')
                 source.save()
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e4} from survey 4 not found')
@@ -107,7 +108,7 @@ class Command(BaseCommand):
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e1234, survey=Survey.objects.get(name=9))
                 source.meta_objects.add(meta_object)
-                print(f'Add meta object: {row_values.img_id} - {meta_object} to source: {source.survey_ind} - {source}')
+                print(f'Link meta object: {meta_object} with source: {source.survey_ind} - {source}')
                 source.save()
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e1234} from survey 9 not found')
@@ -118,7 +119,7 @@ class Command(BaseCommand):
         if sources:
             max_dl0 = sources.aggregate(Max('DET_LIKE_0'))['DET_LIKE_0__max']
             master_source = sources.get(DET_LIKE_0=max_dl0)
-            print(f'Found master_source  - {master_source.name} with DET_LIKE_0: {max_dl0}')
+            print(f'Found master_source  - {master_source.name} with DET_LIKE_0: {max_dl0} survey: {master_source.survey.name}')
             # take name, survey, RA, DEC, EXT, R98, LIKE from master_source
             meta_object.master_name = master_source.name
             meta_object.master_survey = master_source.survey.name
@@ -129,6 +130,126 @@ class Command(BaseCommand):
             # meta_object.R98 = master_source.pos_r98
             # meta_object.LIKE = master_source.DET_LIKE_0
             meta_object.save()
+
+    @staticmethod
+    def create_m_group_with_prime_obj(prime_obj):
+        meta_group = MetaGroup.objects.create(master_ind=prime_obj.master_ind,
+                                              master_name=prime_obj.master_name,
+                                              master_survey=prime_obj.master_survey,
+                                              max_sources_num=prime_obj.object_sources.count())
+        print(f'Create new meta group {meta_group}\n')
+        prime_obj.meta_group = meta_group
+        prime_obj.save()
+        return meta_group
+
+    @staticmethod
+    def change_prime_object(meta_group, new_prime_obj):
+        # change flag of old primary object
+        old_primary_obj = meta_group.meta_objects.get(primary_object=True)
+        old_primary_obj.primary_object = False
+        old_primary_obj.save()
+        # handle new primary object
+        meta_group.master_ind = new_prime_obj.master_ind
+        meta_group.master_name = new_prime_obj.master_name
+        meta_group.master_survey = new_prime_obj.master_survey
+        meta_group.max_sources_num = new_prime_obj.object_sources.count()
+        meta_group.save()
+        # change meta object flag
+        new_prime_obj.primary_object = True
+        return meta_group
+
+    @staticmethod
+    def union_meta_groups(meta_object, meta_groups):
+        # get meta group with max sources number
+        print(f'Choose primary object and join meta_groups: {meta_groups}')
+        max_meta_group = meta_groups.order_by('-max_sources_num')[0]
+        other_meta_groups = meta_groups.exclude(pk=max_meta_group.pk)
+        print(f'Found max source num meta group: {max_meta_group}')
+        print(
+            f'Meta_object source_num: {meta_object.object_sources.count()}, meta_group: {max_meta_group.max_sources_num}')
+        if max_meta_group.max_sources_num < meta_object.object_sources.count():
+            # make meta object - primary object for max meta group
+            Command.change_prime_object(max_meta_group, meta_object)
+        else:
+            meta_object.primary_object = False
+
+        # join meta group
+        meta_object.meta_group = max_meta_group
+        meta_object.save()
+        # change meta group and flag of meta objects from other meta groups
+        for meta_group in other_meta_groups.distinct():
+            other_meta_objects = meta_group.meta_objects.all()
+            other_meta_objects.update(meta_group=max_meta_group, primary_object=False)
+
+        # delete other meta groups
+        print(f'Delete meta groups: {other_meta_groups}\n')
+        other_meta_groups.delete()
+
+    @staticmethod
+    def find_or_create_meta_group(meta_object):
+        print(f'Find or create meta group for MetaObj: {meta_object}')
+        # dict with id: number of related source
+        sources_num = {meta_object.pk: meta_object.object_sources.count()}
+        sources = meta_object.object_sources.all()
+        # create empty queryset
+        dup_objects = MetaObject.objects.none()
+        for source in sources:
+            # union all linked meta_objects
+            dup_objects = dup_objects | source.meta_objects.all()
+
+        # get distinct queryset of dup meta objects without current object
+        dup_objects = dup_objects.distinct()
+        dup_objects_ = dup_objects.exclude(pk=meta_object.pk)
+        print(f'\n Get all meta objects with common sources: {dup_objects}')
+
+        # queryset is empty -> no meta objects with common sources
+        if not dup_objects_:
+            Command.create_m_group_with_prime_obj(meta_object)
+            return
+
+        # find all meta groups for dup_objects
+        meta_groups = MetaGroup.objects.none()
+        list_of_ids = []
+        for dup_obj in dup_objects_:
+            # get id: number of related sources for all dup meta objects
+            sources_num[dup_obj.pk] = dup_obj.object_sources.count()
+            # union all linked meta_groups
+            if dup_obj.meta_group: list_of_ids.append(dup_obj.meta_group.pk)
+
+        meta_groups = MetaGroup.objects.filter(pk__in=list_of_ids) if list_of_ids else MetaGroup.objects.none()
+        meta_groups_dist = meta_groups.distinct() if meta_groups else meta_groups
+        print(f'Get all meta groups for dup_objects: {meta_groups_dist}\n')
+
+        # queryset is empty -> no meta groups for meta_objects with common sources
+        # create meta group for these meta objects
+        if not meta_groups.exists():
+            # get master_ind and sources number of primary meta object
+            prime_pk = max(sources_num, key=sources_num.get)
+            prime_object = dup_objects.get(pk=prime_pk)
+            print(f'Found prime object {prime_object} with max sources number: {sources_num[prime_pk]}')
+            meta_group = Command.create_m_group_with_prime_obj(prime_object)
+            dup_objects.exclude(pk=prime_object.pk).update(meta_group=meta_group, primary_object=False)
+            return
+
+        # there is one meta group -> join it and check primary object
+        if len(meta_groups_dist) == 1:
+            meta_group = meta_groups_dist[0]
+            print(f'Found meta group: {meta_group} for {meta_object}')
+            print(f'Meta_object source_num: {meta_object.object_sources.count()}, meta_group: {meta_group.max_sources_num}\n')
+            if meta_group.max_sources_num < meta_object.object_sources.count():
+                # make meta object - primary object for meta group
+                Command.change_prime_object(meta_group, meta_object)
+            else:
+                meta_object.primary_object = False
+
+            # join meta group
+            meta_object.meta_group = meta_group
+            meta_object.save()
+            return
+        # there is several meta groups - > choose new primary source and union meta groups
+        else:
+            Command.union_meta_groups(meta_object, meta_groups)
+            return
 
     def handle(self, *args, **options):
         start_time = timezone.now()
@@ -156,20 +277,20 @@ class Command(BaseCommand):
 
         for row in data.itertuples():
             # find/create meta object
-            meta_object, created = MetaObject.objects.get_or_create(ID_e1=row.ID_e1, ID_e2=row.ID_e2,
-                                                                    ID_e3=row.ID_e3, ID_e4=row.ID_e4,
+            meta_object, created = MetaObject.objects.get_or_create(ID_e1=row.ID_e1, ID_e2=row.ID_e2, ID_e3=row.ID_e3,
+                                                                    ID_e4=row.ID_e4, ID_e1234=row.ID_e1234,
                                                                     defaults={'RA': row.RA, 'DEC': row.DEC})
 
             # Check that it is new meta object
             if created:
-                self.stdout.write(f'Create new meta object with img_id: {row.img_id}, RA: {row.RA}, DEC: {row.DEC}')
+                print(f'{row[0]} - Create new meta object with img_id: {row.img_id}, RA: {row.RA}, DEC: {row.DEC}')
                 try:
                     self.stdout.write(f'Start filling fields...\n')
                     for i, field in enumerate(field_list):
-                        self.stdout.write(f'Num:{i} - {field} - {row[i+2]}')  # i+2 - skip index and img_id
-                        filled_fields = ['RA', 'DEC', 'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4']
+                        # self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+2 - skip index
+                        filled_fields = ['RA', 'DEC', 'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e1234']
                         if field not in filled_fields:
-                            setattr(meta_object, field, row[i+2])  # Similar to source.field = row[i+1]
+                            setattr(meta_object, field, row[i+1])  # Similar to source.field = row[i+1]
 
                     # sources.append(source)
                     meta_object.save()
@@ -177,6 +298,10 @@ class Command(BaseCommand):
                     Command.link_source_with_meta(meta_object, row)
                     # find master_source and take name, survey, RA, DEC, EXT, R98, LIKE from it
                     Command.find_master_source(meta_object)
+                    # find or create meta group for created meta object
+                    if not meta_object.meta_group:
+                        Command.find_or_create_meta_group(meta_object)
+
                     # TODO: think about image names
                     Command.rename_copy_images(row.img_id, meta_object.pk)
 
@@ -184,9 +309,6 @@ class Command(BaseCommand):
                     # Delete created source if there was ERROR while filling fields
                     if created: meta_object.delete()
                     raise CommandError(e)
-
-            # Rename and Copy images to static/images
-            # Command.rename_copy_images(row.img_id, row.row_num, row.file)
 
             # maybe use this later
             # if len(sources) > 500:

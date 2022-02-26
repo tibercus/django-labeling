@@ -26,7 +26,7 @@
 
             <li class="nav-item">
             {% if survey.name == 9 %}
-                {% define "Summary" as tab_name %}
+                {% define "Survey1234" as tab_name %}
                 {% define "" as number %}
             {% else %}
                 {% define "Survey" as tab_name %}
@@ -46,6 +46,11 @@
             </li>
 
         {% endfor %}
+        {% comment %} For showing meta objects from same MetaGroup {% endcomment %}
+        <li class="nav-item">
+            <a href="#meta_group" class="nav-link" data-toggle="tab">Group</a>
+        </li>
+
     </ul>
 
     <div class="tab-content">
@@ -104,18 +109,61 @@
                     </form>
                 {% endif %}
 
+                {%  comment %} TODO: comment form in cycle! {% endcomment %}
+                {%  comment %} Comment form {% endcomment %}
+                <div class = "comment_section">
+                    {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
+                    <form id="comment_form" method="post">
+                        {% csrf_token %}
+                        {% include 'includes/form.html' %}
+                        <button type="submit" class="btn btn-success" value="button" name="x_comment">Create/Edit</button>
+                    </form>
+                </div>
+
             </div>
 
         {% endfor %}
 
-        {%  comment %} Comment form {% endcomment %}
-        <div class = "comment_section">
-            {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
-            <form id="comment_form" method="post">
-                {% csrf_token %}
-                {% include 'includes/form.html' %}
-                <button type="submit" class="btn btn-success" value="button" name="x_comment">Create/Edit</button>
-            </form>
+        {% comment %} For showing meta objects from same MetaGroup {% endcomment %}
+        <div class="tab-pane fade" id="meta_group">
+            {%  comment %} Table with meta objects from same MetaGroup {% endcomment %}
+            <div class="meta_group_table">
+                <table class="table table-bordered table-responsive-md">
+                  <thead class="thead-dark">
+                    <tr>
+                        <th>master_ind</th>
+                        <th>master_name</th>
+                        <th>master_survey</th>
+                        <th>ID e1</th>
+                        <th>ID e2</th>
+                        <th>ID e3</th>
+                        <th>ID e4</th>
+                        <th>ID e1234</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    {% for meta_object in meta_group.meta_objects.all %}
+                        <a>
+                            <td>{{ meta_object.master_ind }}</td>
+                            {% if meta_object.primary_object %}
+                                <td><a href="{% url 'source' meta_object.pk %}">
+                                    <span class="badge">P</span>{{ meta_object.master_name }}</a></td>
+                            {% else %}
+                                <td><a href="{% url 'source' meta_object.pk %}">{{ meta_object.master_name }}</a></td>
+                            {% endif %}
+                            <td>{{ meta_object.master_survey }}</td>
+                            <td>{{ meta_object.ID_e1 }}</td>
+                            <td>{{ meta_object.ID_e2 }}</td>
+                            <td>{{ meta_object.ID_e3 }}</td>
+                            <td>{{ meta_object.ID_e4 }}</td>
+                            <td>{{ meta_object.ID_e1234 }}</td>
+                        </tr>
+                    {% endfor %}
+
+                  </tbody>
+                </table>
+            </div>
         </div>
 
         {%  comment %} List of comments for this source {% endcomment %}

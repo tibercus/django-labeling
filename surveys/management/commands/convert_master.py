@@ -119,7 +119,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = timezone.now()
-        file_path = os.path.join(settings.MASTER_DIR, 'my_master_table.pkl')
+        file_path = os.path.join(settings.MASTER_DIR, 'emaster_43691_48110_03_23_sd01_a15_g12_r7.pkl')
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
 

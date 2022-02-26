@@ -81,6 +81,13 @@
     top: 75%;
 }
 
+.meta_group_table
+{
+    margin: 20px;
+    height: 600px;
+    overflow:auto;
+}
+
 /* This is for OPTICAL SURVEYS */
 .opticalSurveys
 {

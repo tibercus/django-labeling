@@ -21,17 +21,25 @@
               </thead>
               <tbody>
                 {% for meta_obj in meta_objects %}
-                  <tr>
-                  {% for field,value in meta_obj %}
-                    <td class="align-middle">
-                        {% if field == 'master_name' %}
-                            <a href="{% url 'source' meta_obj.pk %}">{{ value }} </a>
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </td>
-                  {% endfor %}
-                  </tr>
+                    {% if meta_obj.primary_object %}
+                        <tr>
+                        {% for field,value in meta_obj %}
+                            <td class="align-middle">
+                                {% if field == 'master_name' %}
+                                    {% if  meta_obj.primary_object%}
+                                        <a href="{% url 'source' meta_obj.pk %}"> <span class="badge">P</span> {{ value }} </a>
+                                    {% else %}
+                                        <a href="{% url 'source' meta_obj.pk %}"> {{ value }} </a>
+                                    {% endif %}
+                                {% elif field == 'master_survey' and value == 9 %}
+                                    {{ 1234 }} {% comment %} TODO: think how to show summary - survey1234 {% endcomment %}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        </tr>
+                    {% endif %}
                 {% endfor %}
               </tbody>
             </table>

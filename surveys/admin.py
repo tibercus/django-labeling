@@ -23,6 +23,18 @@ class MetaAdmin(admin.ModelAdmin):
     ]
 
 
+class ObjectInline(admin.TabularInline):
+    model = MetaObject
+
+
+class MetaGroupAdmin(admin.ModelAdmin):
+    readonly_fields = ('id',)
+    inlines = [
+       ObjectInline,
+    ]
+
+
+admin.site.register(MetaGroup, MetaGroupAdmin)
 admin.site.register(MetaObject, MetaAdmin)
 admin.site.register(OriginFile)
 admin.site.register(Survey)

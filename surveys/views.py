@@ -22,6 +22,7 @@ def source(request, pk):
 
     surveys = get_list_or_404(Survey)
     meta_object = get_object_or_404(MetaObject, pk=pk)  # get meta object chosen by user on main page
+    meta_group = meta_object.meta_group
     sources = meta_object.object_sources.all()
     # TODO: refactor POST request
     if request.method == 'POST':
@@ -77,5 +78,5 @@ def source(request, pk):
         # create form for optical source
         # opt_form = OptCommentForm()
 
-    return render(request, 'source.html', {'surveys': surveys, 'meta_object': meta_object, 'base_fields': base_fields,
-                                           'sources': sources, 'form': form})
+    return render(request, 'source.html', {'surveys': surveys, 'meta_group': meta_group, 'meta_object': meta_object,
+                                           'base_fields': base_fields, 'sources': sources, 'form': form})

@@ -15,8 +15,23 @@ class OriginFile(models.Model):
         return 'MetaSource: {}'.format(self.file_name)
 
 
+# Class for Meta Objects with common eROSITA sources
+class MetaGroup(models.Model):
+    # Pavel id in master table
+    master_ind = models.PositiveIntegerField()
+    master_name = models.CharField(max_length=200, blank=True, null=True)
+    master_survey = models.PositiveIntegerField(blank=True, null=True)
+    # number of related sources of primary meta object
+    max_sources_num = models.PositiveIntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return '{} - MetaGroup: {}'.format(self.master_ind, self.master_name)
+
+
 # Class for objects of master table
 class MetaObject(models.Model):
+    # Pavel id in master table
+    master_ind = models.PositiveIntegerField(blank=True, null=True)
     # TODO: think about master_name
     master_name = models.CharField(max_length=200, blank=True, null=True)
     master_survey = models.PositiveIntegerField(blank=True, null=True)
@@ -74,7 +89,7 @@ class MetaObject(models.Model):
     ID_e2 = models.BigIntegerField(blank=True, null=True)
     ID_e3 = models.BigIntegerField(blank=True, null=True)
     ID_e4 = models.BigIntegerField(blank=True, null=True)
-    ID_e123 = models.BigIntegerField(blank=True, null=True)
+    ID_e1234 = models.BigIntegerField(blank=True, null=True)
 
     RATIO_e2e1 = models.FloatField(blank=True, null=True)
     RATIO_e3e2 = models.FloatField(blank=True, null=True)
@@ -112,12 +127,16 @@ class MetaObject(models.Model):
     TSTOP_e3 = models.CharField(max_length=100, blank=True, null=True)
     TSTOP_e4 = models.CharField(max_length=100, blank=True, null=True)
 
+    primary_object = models.BooleanField(default=True, blank=True, null=True)
+    # Meta Group object for meta objects with common sources
+    meta_group = models.ForeignKey(MetaGroup, on_delete=models.CASCADE, related_name='meta_objects', blank=True, null=True)
+
     def __str__(self):
-        return 'MetaObject: {}'.format(self.master_name)
+        return '{} - MetaObject: {}'.format(self.master_ind, self.master_name)
 
     @staticmethod
     def fields_to_show():
-        fields = ['id', 'master_name', 'master_survey', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
+        fields = ['master_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e1234',
                   'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m',
@@ -283,7 +302,7 @@ class eROSITA(models.Model):
     meta_objects = models.ManyToManyField(MetaObject, related_name='object_sources', blank=True)
 
     def __str__(self):
-        return 'Source: {}'.format(self.name)
+        return '{} - Source: {}'.format(self.survey_ind, self.name)
 
     def get_comment_count(self):
         return Comment.objects.filter(source=self).count()
