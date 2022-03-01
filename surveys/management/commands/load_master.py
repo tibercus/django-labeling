@@ -39,7 +39,7 @@ class Command(BaseCommand):
         return fields
 
     @staticmethod
-    def rename_copy_images(img_id, meta_id):
+    def rename_copy_images(img_id, meta_ind):
         # Rename and Copy images to dir: static/images
         # img_id, master_name - attributes of master table
 
@@ -48,21 +48,21 @@ class Command(BaseCommand):
             # Copy Light Curve
             old_path = os.path.join(images_path, 'eRASS'+str(i), 'src_' + str(img_id) + '_lc' + '.pdf')
             if os.path.isfile(old_path):
-                new_file_name = 'lc_' + str(meta_id) + '.pdf'
+                new_file_name = 'lc_' + str(meta_ind) + '.pdf'
                 new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
                 shutil.copy(old_path, new_path)
 
             # Copy Spectrum
             old_path = os.path.join(images_path, 'eRASS'+str(i), 'src_' + str(img_id) + '_spec' + '.pdf')
             if os.path.isfile(old_path):
-                new_file_name = 'spec_' + str(meta_id) + '.pdf'
+                new_file_name = 'spec_' + str(meta_ind) + '.pdf'
                 new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
                 shutil.copy(old_path, new_path)
 
             # Copy Trans Image
             old_path = os.path.join(images_path, 'eRASS'+str(i), 'src_' + str(img_id) + '_e' + str(i) + '.png')
             if os.path.isfile(old_path):
-                new_file_name = 'trans_' + str(meta_id) + '.png'
+                new_file_name = 'trans_' + str(meta_ind) + '.png'
                 new_path = os.path.join(settings.IMAGE_DATA_PATH, 'e' + str(i), new_file_name)
                 shutil.copy(old_path, new_path)
 
@@ -287,7 +287,7 @@ class Command(BaseCommand):
                 try:
                     self.stdout.write(f'Start filling fields...\n')
                     for i, field in enumerate(field_list):
-                        # self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+2 - skip index
+                        # self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+1 - skip index
                         filled_fields = ['RA', 'DEC', 'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e1234']
                         if field not in filled_fields:
                             setattr(meta_object, field, row[i+1])  # Similar to source.field = row[i+1]
@@ -308,8 +308,8 @@ class Command(BaseCommand):
                     raise CommandError(e)
 
             # TODO: think about image names
-            # rename and copy in case meta object was created or existed
-            Command.rename_copy_images(row.img_id, meta_object.pk)
+            # rename and copy in case meta object created or existed
+            Command.rename_copy_images(row.img_id, meta_object.meta_ind)
 
             # maybe use this later
             # if len(sources) > 500:

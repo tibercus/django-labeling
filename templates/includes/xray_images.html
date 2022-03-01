@@ -3,7 +3,7 @@
 {% load widget_tweaks %}
 
 {%  comment %} TODO: size of png/pdf files? {% endcomment %}
-{% with  survey=survey.name|to_str id=meta_object.pk|to_str%}
+{% with  survey=survey.name|to_str id=meta_object.meta_ind|to_str%}
     <div class = "trans_image">
         <img src="{% static 'images/e'|add:survey|add:'/'|add:'trans_'|add:id|add:'.png'|file_exists%}"
                                                                         width="400px" height="380px"/>

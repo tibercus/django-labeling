@@ -49,7 +49,8 @@ def is_summary(survey):
 
 @register.filter
 def file_exists(filepath):
-    full_path = os.path.join(settings.BASE_DIR, 'static', filepath)
+    file_path = "/".join(filepath.strip("/").split('/')[1:])  # get path without images/
+    full_path = os.path.join(settings.IMAGE_DATA_PATH, file_path)
     if os.path.isfile(full_path):
         return filepath
     else:
