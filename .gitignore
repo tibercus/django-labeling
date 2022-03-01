@@ -62,7 +62,7 @@ db.sqlite3
 db.sqlite3-journal
 # for server integration
 surveys/migrations
-static/images/
+static/images/e*
 surveys/test_xray_data/
 
 # Flask stuff:
