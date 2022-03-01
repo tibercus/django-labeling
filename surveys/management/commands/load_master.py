@@ -302,13 +302,14 @@ class Command(BaseCommand):
                     if not meta_object.meta_group:
                         Command.find_or_create_meta_group(meta_object)
 
-                    # TODO: think about image names
-                    Command.rename_copy_images(row.img_id, meta_object.pk)
-
                 except Exception as e:
                     # Delete created source if there was ERROR while filling fields
                     if created: meta_object.delete()
                     raise CommandError(e)
+
+            # TODO: think about image names
+            # rename and copy in case meta object was created or existed
+            Command.rename_copy_images(row.img_id, meta_object.pk)
 
             # maybe use this later
             # if len(sources) > 500:

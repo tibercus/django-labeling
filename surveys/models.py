@@ -371,6 +371,7 @@ class Comment(models.Model):
 class GAIA(models.Model):
     name = models.CharField(max_length=150)
 
+    # TODO: change this later to FloatField
     RA = models.DecimalField(max_digits=9, decimal_places=5)
     DEC = models.DecimalField(max_digits=9, decimal_places=5)
 
