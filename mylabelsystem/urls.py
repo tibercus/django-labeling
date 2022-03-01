@@ -15,23 +15,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.conf.urls import url
+# from django.conf.urls import url
+from django.urls import re_path
 from django.contrib.auth import views as auth_views
 
 from accounts import views as accounts_views
 from surveys import views
 
 urlpatterns = [
-    url(r'^$', views.home, name='home'),
-    url(r'^signup/$', accounts_views.signup, name='signup'),
-    url(r'^login/$', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
-    url(r'^criteria/', views.criteria, name='criteria'),
-    url(r'^settings/password/$', auth_views.PasswordChangeView.as_view(template_name='password_change.html'),
+    re_path(r'^$', views.home, name='home'),
+    re_path(r'^signup/$', accounts_views.signup, name='signup'),
+    re_path(r'^login/$', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    re_path(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
+    re_path(r'^criteria/', views.criteria, name='criteria'),
+    re_path(r'^settings/password/$', auth_views.PasswordChangeView.as_view(template_name='password_change.html'),
         name='password_change'),
-    url(r'^settings/password/done/$', auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),
+    re_path(r'^settings/password/done/$', auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),
         name='password_change_done'),
-    url(r'^source/(?P<pk>\d+)/$', views.source, name='source'),
-    url(r'^admin/', admin.site.urls),
+    re_path(r'^source/(?P<pk>\d+)/$', views.source, name='source'),
+    re_path(r'^admin/', admin.site.urls),
 ]
 
