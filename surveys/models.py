@@ -357,7 +357,7 @@ class Comment(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     updated_at = models.DateTimeField(blank=True, null=True)
 
-    meta_source = models.ForeignKey(MetaObject, on_delete=models.CASCADE, related_name='comments')
+    meta_source = models.ForeignKey(MetaObject, on_delete=models.CASCADE, related_name='comments', blank=True, null=True)
 
     def __str__(self):
         truncated_comment = Truncator(self.comment)
@@ -397,7 +397,7 @@ class OptComment(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='opt_comments')
     updated_at = models.DateTimeField(blank=True, null=True)
 
-    meta_source = models.ForeignKey(MetaObject, on_delete=models.CASCADE, related_name='opt_comments')
+    meta_source = models.ForeignKey(MetaObject, on_delete=models.CASCADE, related_name='opt_comments', blank=True, null=True)
 
     def __str__(self):
         truncated_comment = Truncator(self.comment)
