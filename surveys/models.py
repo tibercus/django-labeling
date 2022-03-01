@@ -18,14 +18,14 @@ class OriginFile(models.Model):
 # Class for Meta Objects with common eROSITA sources
 class MetaGroup(models.Model):
     # Pavel id in master table
-    master_ind = models.PositiveIntegerField()
+    meta_ind = models.PositiveIntegerField()
     master_name = models.CharField(max_length=200, blank=True, null=True)
     master_survey = models.PositiveIntegerField(blank=True, null=True)
     # number of related sources of primary meta object
     max_sources_num = models.PositiveIntegerField(blank=True, null=True)
 
     def __str__(self):
-        return '{} - MetaGroup: {}'.format(self.master_ind, self.master_name)
+        return '{} - MetaGroup: {}'.format(self.meta_ind, self.master_name)
 
 
 # Class for objects of master table
