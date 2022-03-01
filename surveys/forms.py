@@ -1,6 +1,6 @@
 from django import forms
 from import_export.forms import ImportForm, ConfirmImportForm
-from .models import Survey, Comment, OptComment
+from .models import *
 
 
 class CustomImportForm(ImportForm):
@@ -16,10 +16,11 @@ class NewCommentForm(forms.ModelForm):
         max_length=2000,
         help_text='The max length of the text is 2000.'
     )
+    source_class = forms.ChoiceField(choices=MetaObject.CLASS_CHOICES, required=True, label='Class - Criteria', initial='')
 
     class Meta:
         model = Comment
-        fields = ['comment', 'follow_up', 'source_class']
+        fields = ['source_class', 'comment', 'follow_up']
 
 
 class OptCommentForm(forms.ModelForm):

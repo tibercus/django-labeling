@@ -14,32 +14,45 @@
             <table id = "ScrollTable" class="table table-bordered w-auto" cellspacing="0">
               <thead class="thead-dark">
                 <tr>
-                {% for field in meta_fields%}
-                    <th>{{ field }}</th>
-                {% endfor %}
+                    <th>{{ 'group_id' }}</th>
+                    {% for field in meta_fields %}
+                        {% if field in master_fields %}
+                            <th>master_{{ field }}</th>
+                        {% else %}
+                            <th>{{ field }}</th>
+                        {% endif %}
+                    {% endfor %}
+                    <th>{{ 'master_flux_05_20' }}</th>
                 </tr>
               </thead>
               <tbody>
                 {% for meta_obj in meta_objects %}
                     {% if meta_obj.primary_object %}
                         <tr>
-                        {% for field,value in meta_obj %}
-                            <td class="align-middle">
-                                {% if field == 'master_name' %}
-                                    {% if  meta_obj.primary_object%}
-                                        <a href="{% url 'source' meta_obj.pk %}"> <span class="badge">P</span> {{ value }} </a>
+                            <td> {{ meta_obj.meta_group.pk }} </td>
+                            {% for field,value in meta_obj %}
+                                <td class="align-middle">
+                                    {% if field == 'master_name' %}
+                                        {% if  meta_obj.primary_object%}
+                                            <a href="{% url 'source' meta_obj.pk %}"> <span class="badge">P</span> {{ value }} </a>
+                                        {% else %}
+                                            <a href="{% url 'source' meta_obj.pk %}"> {{ value }} </a>
+                                        {% endif %}
+                                    {% comment %} TODO: change this later {% endcomment %}
+                                    {% elif field == 'master_survey' %}
+                                        {{ value|is_summary }}
+                                    {% elif 'UPLIM' in field %}
+                                        {{ value|stringformat:"e" }}
                                     {% else %}
-                                        <a href="{% url 'source' meta_obj.pk %}"> {{ value }} </a>
+                                        {{ value }}
                                     {% endif %}
-                                {% elif field == 'master_survey' and value == 9 %}
-                                    {{ 1234 }} {% comment %} TODO: think how to show summary - survey1234 {% endcomment %}
-                                {% else %}
-                                    {{ value }}
-                                {% endif %}
-                            </td>
-                        {% endfor %}
+                                </td>
+                            {% endfor %}
+                            {% define meta_obj|get_master_source as master_source %}
+                            <td class="align-middle"> {{ master_source.flux_05_20|stringformat:"e" }} </td>
                         </tr>
                     {% endif %}
+
                 {% endfor %}
               </tbody>
             </table>

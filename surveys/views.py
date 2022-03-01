@@ -11,19 +11,24 @@ from .models import *
 def home(request):
     # surveys = get_list_or_404(Survey)
     meta_objects = MetaObject.objects.all()
-    return render(request, 'home.html', {'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show()})
+    master_fields = ['RA', 'DEC', 'EXT', 'R98', 'LIKE']
+    return render(request, 'home.html', {'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show(),
+                                         'master_fields': master_fields})
 
 
 @login_required
 def source(request, pk):
-    # for parsing source fields on source page
-    postfixes = ['_e1', '_e2', '_e3', '_e4', '_e5', '_e6', '_e7', '_e8']
-    base_fields = [field.name for field in MetaObject._meta.get_fields() if not field.name[-3:] in postfixes]
-
     surveys = get_list_or_404(Survey)
     meta_object = get_object_or_404(MetaObject, pk=pk)  # get meta object chosen by user on main page
     meta_group = meta_object.meta_group
     sources = meta_object.object_sources.all()
+    # get class chosen by superuser
+    try:
+        admin_comment = meta_object.comments.get(created_by__is_superuser=True)
+        admin_class = admin_comment.source_class
+    except Comment.DoesNotExist:
+        admin_class = None
+
     # TODO: refactor POST request
     if request.method == 'POST':
         # Make source master/not master by superuser
@@ -47,7 +52,7 @@ def source(request, pk):
 
             return redirect('source', pk=meta_object.pk)
 
-        # Make superuser comment final for xray_source by superuser
+        # Make superuser comment final for meta object by superuser
         elif 'final' in request.POST and request.user.is_superuser:
             comment = meta_object.comments.get(created_by=request.user)
             meta_object.comment = comment.comment
@@ -56,7 +61,7 @@ def source(request, pk):
 
             return redirect('source', pk=meta_object.pk)
 
-        # Create/Edit comment for XRAY SOURCE
+        # Create/Edit comment for xray data
         elif 'x_comment' in request.POST:
             # Edit existing comment or create new one
             try:
@@ -72,11 +77,38 @@ def source(request, pk):
 
             return redirect('source', pk=meta_object.pk)
 
+        # Create/Edit comment for xray data
+        elif 'opt_comment' in request.POST:
+            # Edit existing opt_comment or create new one
+            try:
+                opt_comment = OptComment.objects.get(meta_source=meta_object, created_by=request.user)
+                opt_comment.updated_at = datetime.now()
+            except OptComment.DoesNotExist:
+                opt_comment = OptComment.objects.create(comment='create', meta_source=meta_object, created_by=request.user)
+
+            opt_form = OptCommentForm(request.POST, instance=opt_comment)  # use existing or created comment
+            if opt_form.is_valid():
+                opt_form.save()
+                opt_comment.save()
+
+            return redirect('source', pk=meta_object.pk)
+
     else:
         # create form for xray source
         form = NewCommentForm()
         # create form for optical source
-        # opt_form = OptCommentForm()
+        opt_form = OptCommentForm()
 
     return render(request, 'source.html', {'surveys': surveys, 'meta_group': meta_group, 'meta_object': meta_object,
-                                           'base_fields': base_fields, 'sources': sources, 'form': form})
+                                           'sources': sources, 'admin_class': admin_class, 'form': form, 'opt_form': opt_form})
+
+
+@login_required
+def criteria(request):
+    criteria_list = [('TDE', 'Criteria 1: Parameter A > a1, Parameter B > b2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
+                     ('TDE', 'Criteria 2: Parameter B > b1, Parameter C > c2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
+                     ('TDE', 'Criteria 3: Parameter D > d1, Parameter E > e2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
+                     ('NOT TDE', 'Criteria 1: Parameter A < a1, Parameter B < b2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
+                     ('NOT TDE', 'Criteria 2: Parameter B < b1, Parameter C < c2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
+                     ('NOT TDE', 'Criteria 3: Parameter D < d1, Parameter E < e2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')]
+    return render(request, 'criteria.html', {'criteria_list': criteria_list})

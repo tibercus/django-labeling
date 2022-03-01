@@ -31,7 +31,7 @@ class MetaGroup(models.Model):
 # Class for objects of master table
 class MetaObject(models.Model):
     # Pavel id in master table
-    master_ind = models.PositiveIntegerField(blank=True, null=True)
+    meta_ind = models.PositiveIntegerField(blank=True, null=True)
     # TODO: think about master_name
     master_name = models.CharField(max_length=200, blank=True, null=True)
     master_survey = models.PositiveIntegerField(blank=True, null=True)
@@ -42,15 +42,20 @@ class MetaObject(models.Model):
 
     comment = models.TextField(max_length=2000, blank=True, null=True)
 
+    # TODO: change this later
     CLASS_CHOICES = [
-        ('TDE', 'TDE Source'),
-        ('NOT TDE', 'Not TDE Source'),
-        ('NaN', 'Unknown Source'),
+        ('TDE: Criteria 1', 'TDE: Parameter A > a1, Parameter B > b2'),
+        ('TDE: Criteria 2', 'TDE: Parameter B > b1, Parameter C > c2'),
+        ('TDE: Criteria 3', 'TDE: Parameter D > d1, Parameter E > e2'),
+        ('NOT TDE: Criteria 1', 'Not TDE: Parameter A < a1, Parameter B < b2'),
+        ('NOT TDE: Criteria 2', 'Not TDE: Parameter B < b1, Parameter C < c2'),
+        ('NOT TDE: Criteria 3', 'Not TDE: Parameter D < d1, Parameter E < e2'),
+        (None, 'Unknown Source'),
     ]
     object_class = models.CharField(
         max_length=100,
         choices=CLASS_CHOICES,
-        default='NaN',
+        default=None,
         blank=True, null=True,
     )
 
@@ -132,11 +137,11 @@ class MetaObject(models.Model):
     meta_group = models.ForeignKey(MetaGroup, on_delete=models.CASCADE, related_name='meta_objects', blank=True, null=True)
 
     def __str__(self):
-        return '{} - MetaObject: {}'.format(self.master_ind, self.master_name)
+        return '{} - MetaObject: {}'.format(self.meta_ind, self.master_name)
 
     @staticmethod
     def fields_to_show():
-        fields = ['master_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
+        fields = ['meta_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e1234',
                   'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m',
@@ -200,7 +205,7 @@ class eROSITA(models.Model):
     source_class = models.CharField(
         max_length=100,
         choices=MetaObject.CLASS_CHOICES,
-        default='NaN',
+        default=None,
         blank=True, null=True,
     )
 
@@ -344,7 +349,7 @@ class Comment(models.Model):
     source_class = models.CharField(
         max_length=100,
         choices=MetaObject.CLASS_CHOICES,
-        default='NaN',
+        default=None,
         blank=True, null=True,
     )
 
@@ -357,6 +362,9 @@ class Comment(models.Model):
     def __str__(self):
         truncated_comment = Truncator(self.comment)
         return 'Comment: {}'.format(truncated_comment.chars(10))
+
+    class Meta:
+        ordering = ('-created_by__is_superuser',)
 
 
 # Class for GAIA sources
@@ -394,3 +402,6 @@ class OptComment(models.Model):
     def __str__(self):
         truncated_comment = Truncator(self.comment)
         return 'OptComment: {}'.format(truncated_comment.chars(10))
+
+    class Meta:
+        ordering = ('-created_by__is_superuser',)

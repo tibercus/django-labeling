@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load filters_tags %}
+
+{% block title %} List of criteria {% endblock %}
+
+{% block style %}
+    <style>
+        .criteria_table
+        {
+        margin: 20px;
+        height: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {%  comment %} Table with meta objects from same MetaGroup {% endcomment %}
+    <div class="criteria_table">
+        <table class="table table-bordered table-responsive-md">
+          <thead class="thead-dark">
+            <tr>
+                <th>Class</th>
+                <th>Criteria</th>
+                <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            {% for row_values in criteria_list %}
+                <tr>
+                    <td>{{ row_values.0 }}</td>
+                    <td>{{ row_values.1 }}</td>
+                    <td>{{ row_values.2 }}</td>
+                </tr>
+            {% endfor %}
+
+          </tbody>
+        </table>
+    </div>
+
+{% endblock %}

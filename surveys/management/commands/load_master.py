@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_fields():  # add img_id to identify images in load_data
-        fields = ['master_ind', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
+        fields = ['meta_ind', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e1234',
                   'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m',
@@ -133,7 +133,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def create_m_group_with_prime_obj(prime_obj):
-        meta_group = MetaGroup.objects.create(master_ind=prime_obj.master_ind,
+        meta_group = MetaGroup.objects.create(meta_ind=prime_obj.meta_ind,
                                               master_name=prime_obj.master_name,
                                               master_survey=prime_obj.master_survey,
                                               max_sources_num=prime_obj.object_sources.count())
@@ -149,7 +149,7 @@ class Command(BaseCommand):
         old_primary_obj.primary_object = False
         old_primary_obj.save()
         # handle new primary object
-        meta_group.master_ind = new_prime_obj.master_ind
+        meta_group.meta_ind = new_prime_obj.meta_ind
         meta_group.master_name = new_prime_obj.master_name
         meta_group.master_survey = new_prime_obj.master_survey
         meta_group.max_sources_num = new_prime_obj.object_sources.count()
@@ -223,7 +223,7 @@ class Command(BaseCommand):
         # queryset is empty -> no meta groups for meta_objects with common sources
         # create meta group for these meta objects
         if not meta_groups.exists():
-            # get master_ind and sources number of primary meta object
+            # get meta_ind and sources number of primary meta object
             prime_pk = max(sources_num, key=sources_num.get)
             prime_object = dup_objects.get(pk=prime_pk)
             print(f'Found prime object {prime_object} with max sources number: {sources_num[prime_pk]}')

@@ -6,12 +6,12 @@
 {% with  survey=survey.name|to_str id=meta_object.pk|to_str%}
     <div class = "trans_image">
         <img src="{% static 'images/e'|add:survey|add:'/'|add:'trans_'|add:id|add:'.png'|file_exists%}"
-                                                                        width="360px" height="360px"/>
+                                                                        width="400px" height="380px"/>
     </div>
 
     <div class = "light_curve">
             <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'lc_'|add:id|add:'.pdf'|file_exists%}"
-                                                                        width="500px" height="440px"></iframe>
+                                                                        width="500px" height="450px"></iframe>
     </div>
 
     <div class = "spectrum">

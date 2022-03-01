@@ -20,7 +20,7 @@
             </div>
             <div class="row ml-0">
                 {{ comment.comment }}
-                {% if comment.meta_source and comment.created_by.is_superuser and user.is_superuser %}
+                {% if type == 'comment' and comment.created_by.is_superuser and user.is_superuser %}
                 {%  comment %} Comment for 'Final' button in comment card {% endcomment %}
                   <form class="ml-3" method="post">
                       {% csrf_token %}

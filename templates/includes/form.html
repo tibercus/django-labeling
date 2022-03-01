@@ -10,7 +10,11 @@
 
 {% for field in form %}
   <div class="form-group">
-    {{ field.label_tag }}
+    {% if field.name == 'source_class' %}
+        {{ field.label_tag }} <a href="{% url 'criteria' %}">Info</a>
+    {% else %}
+        {{ field.label_tag }}
+    {% endif %}
     {% render_field field class=field|input_class %}
     {% for error in field.errors %}
       <div class="invalid-feedback">
