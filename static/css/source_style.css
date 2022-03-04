@@ -3,6 +3,7 @@
 {
     margin-top: 20px;
     height: 900px;
+    max-width: 400px;
     overflow:auto;
     /*border: 1px solid red;*/
 }
@@ -29,6 +30,7 @@
 .comments
 {
     margin-top: 5px;
+    max-width: 600px;
     /*border: 1px solid red;*/
 }
 
