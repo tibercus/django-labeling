@@ -1,126 +1,108 @@
-/* Table with dup_sources for current source */
-.table-dup_sources
-{
-    margin-left: 20px;
-    max-width: 70%;
-    overflow:auto;
-}
-#dup_table
-{
-    width: auto;
-}
-
 /* Table with source attributes and values */
 .table_source
 {
-    margin: 20px;
-    width: 25%;
-    height: 600px;
+    margin-top: 20px;
+    height: 900px;
     overflow:auto;
+    /*border: 1px solid red;*/
 }
+
 /* For section with source images */
-#container
-{
-    position: relative;
-    top:0px;
-}
-#container > * {
-  position: absolute;
-}
 .trans_image
 {
-    position: absolute;
-    margin: 10px;
-    right:43%;
-    top: 0px;
+    margin-top: 20px;
+    text-align: center;
+    /*border: 1px solid red;*/
 }
 .light_curve
 {
-    position: absolute;
-    margin: 10px;
-    right:5%;
-    top: 0px;
+    margin-top: 20px;
+    /*border: 1px solid red;*/
 }
 .spectrum
 {
-    position: absolute;
-    margin: 10px;
-    right:5%;
-    top: 430px;
-}
-/* This is for form fields */
-/* TODO: think about master_form location */
-#master_form
-{
-    position: absolute;
-    margin-left: 16%;
-    top: 800px;
+    margin-top: 10px;
+    /*border: 1px solid red;*/
 }
 
+/* For List of comments */
+.comments
+{
+    margin-top: 5px;
+    /*border: 1px solid red;*/
+}
+
+/* This is for Comment Form+Master button */
+.container
+{
+    margin-top: 20px;
+    width: 400px;
+    height: 400px;
+    position: relative;
+    /*border: 1px solid blue;*/
+}
 .comment_section
 {
-    margin: 20px;
-    width: 300px;
-    height: 200px;
+    height: 100%;
+    width: 350px;
+    position: absolute;
+    /*border: 1px solid red;*/
 }
 #id_source_class
 {
     width: 200px;
 }
-
 #id_comment
 {
-    width: 300px;
     height: 70px;
 }
 #id_follow_up
 {
-    width: 300px;
     height: 40px;
 }
-
-.comments
+.overlay
 {
-    position: absolute;
-    right:40%;
-    top: 75%;
+    z-index: 2;
+    width: 100px;
+    margin-left: 230px;
+    margin-top: 35px;
+    /*border: 1px solid red;*/
 }
 
-.meta_group_table
+/* Meta Object Table */
+.table_meta
+{
+    margin-top: 20px;
+    width: 400px;
+    height: 700px;
+    overflow:auto;
+}
+
+/* Group on Source Page */
+.table_meta_group
 {
     margin: 20px;
-    height: 300px;
+    min-height: 200px;
+    height: auto;
     overflow:auto;
 }
 
 /* This is for OPTICAL SURVEYS */
-.opticalSurveys
+.OptSurveys
 {
-    position: relative;
-    top: 200px;
+    margin-top: 20px;
 }
 
 .aladin_lite
 {
     position: relative;
+    width: 700px;
     margin: 20px;
-    width: 60%;
     left: 25%;
+    /*border: 1px solid red;*/
 }
 
-.opt_comment_section
-{
-    margin: 10px;
-    width: 300px;
-    height: 200px;
-}
 
-.opt_comments
-{
-    position: absolute;
-    right: 35%;
-    top: 73%;
-}
 
 
 

@@ -1,15 +1,8 @@
-.bs-surveys
-{
-    margin: 40px;
-}
 /* Next is for Table Scrolling */
 .table-responsive
 {
+    margin-top: 40px;
     width:100%;
     overflow:auto;
 }
-th
-{
-    position: sticky;
-    top: 0;
-}
+

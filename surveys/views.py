@@ -86,7 +86,7 @@ def source(request, pk):
             except OptComment.DoesNotExist:
                 opt_comment = OptComment.objects.create(comment='create', meta_source=meta_object, created_by=request.user)
 
-            opt_form = OptCommentForm(request.POST, instance=opt_comment)  # use existing or created comment
+            opt_form = OptCommentForm(request.POST, instance=opt_comment)  # use existing or created optical comment
             if opt_form.is_valid():
                 opt_form.save()
                 opt_comment.save()

@@ -56,3 +56,10 @@ def file_exists(filepath):
     else:
         new_filepath = 'images/file_not_found.pdf' if filepath[-3:] == 'pdf' else 'images/file_not_found.png'
         return new_filepath
+
+
+@register.filter
+def sec_in_deg(sec):
+    """add filter option in template"""
+    result = sec / 3600
+    return result

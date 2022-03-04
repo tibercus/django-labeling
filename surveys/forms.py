@@ -11,12 +11,14 @@ class CustomImportForm(ImportForm):
 
 
 class NewCommentForm(forms.ModelForm):
+    # TODO: Change to required = True ?
+    source_class = forms.ChoiceField(choices=MetaObject.CLASS_CHOICES, required=False, label='Class - Criteria', initial='')
+
     comment = forms.CharField(
         widget=forms.Textarea(),
         max_length=2000,
         help_text='The max length of the text is 2000.'
     )
-    source_class = forms.ChoiceField(choices=MetaObject.CLASS_CHOICES, required=True, label='Class - Criteria', initial='')
 
     class Meta:
         model = Comment
