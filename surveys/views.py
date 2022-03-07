@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from .models import *
 
+from django.utils.timezone import make_aware
+
 
 @login_required
 def home(request):
@@ -42,12 +44,12 @@ def source(request, pk):
             else:
                 meta_object.master_name = req_source.name
                 meta_object.master_survey = req_source.survey.name
-                # TODO: uncomment later
-                # meta_object.RA = req_source.RA
-                # meta_object.DEC = req_source.DEC
-                # meta_object.EXT = req_source.EXT
-                # meta_object.R98 = req_source.pos_r98
-                # meta_object.LIKE = req_source.DET_LIKE_0
+                # TODO: test this part
+                meta_object.RA = req_source.RA
+                meta_object.DEC = req_source.DEC
+                meta_object.EXT = req_source.EXT
+                meta_object.R98 = req_source.pos_r98
+                meta_object.LIKE = req_source.DET_LIKE_0
                 meta_object.save()
 
             return redirect('source', pk=meta_object.pk)
@@ -66,7 +68,7 @@ def source(request, pk):
             # Edit existing comment or create new one
             try:
                 comment = Comment.objects.get(meta_source=meta_object, created_by=request.user)
-                comment.updated_at = datetime.now()
+                comment.updated_at = make_aware(datetime.now())
             except Comment.DoesNotExist:
                 comment = Comment.objects.create(comment='create', meta_source=meta_object, created_by=request.user)
 
@@ -82,7 +84,7 @@ def source(request, pk):
             # Edit existing opt_comment or create new one
             try:
                 opt_comment = OptComment.objects.get(meta_source=meta_object, created_by=request.user)
-                opt_comment.updated_at = datetime.now()
+                opt_comment.updated_at = make_aware(datetime.now())
             except OptComment.DoesNotExist:
                 opt_comment = OptComment.objects.create(comment='create', meta_source=meta_object, created_by=request.user)
 

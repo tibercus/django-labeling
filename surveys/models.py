@@ -32,7 +32,6 @@ class MetaGroup(models.Model):
 class MetaObject(models.Model):
     # Pavel id in master table
     meta_ind = models.PositiveIntegerField(blank=True, null=True)
-    # TODO: think about master_name
     master_name = models.CharField(max_length=200, blank=True, null=True)
     master_survey = models.PositiveIntegerField(blank=True, null=True)
     RA = models.FloatField()

@@ -14,9 +14,9 @@ class Command(BaseCommand):
     help = "Restore user saved comment on a specific meta source."
 
     @staticmethod
-    def get_fields():
+    def get_saved_fields():
         fields = ['comment', 'follow_up', 'source_class', 'created_at', 'created_by', 'updated_at',
-                  'meta_source', 'by_user', 'master_source_name', 'master_survey']
+                  'meta_source', 'by_user', 'meta_ind', 'master_source_name', 'master_survey']
         return fields
 
     def handle(self, *args, **options):
@@ -24,10 +24,12 @@ class Command(BaseCommand):
         # file_name = 'saved_comments.parquet'
 
         # User request - to restore specific comment
-        user_name = 'user'
-        source_name = 'SRGe J192719.1+653355'
-        survey = 9
-        comment_date = '2022-02-21'
+        user_name = 'user_new'
+        # TODO: think about the way to find specific comment
+        # source_name = 'SRGe J192719.1+653355'
+        # survey = 9
+        meta_ind = 1482249
+        comment_date = '2022-03-07'
 
         file_name = 'saved_comments_' + comment_date + '.parquet'
         # Look for saved comments with request date
@@ -54,12 +56,12 @@ class Command(BaseCommand):
             exit()
 
         # Look for user comment to specific meta source
-        user_source_comment = user_comments[(user_comments['master_source_name'] == source_name) & (user_comments['master_survey'] == survey)]
+        user_source_comment = user_comments[(user_comments['meta_ind'] == meta_ind)]
         if not user_source_comment.empty:
-            print('Found {} comments to source: {}'.format(user_name, source_name))
+            print('Found {} comments to meta source: {}'.format(user_name, meta_ind))
             print(user_source_comment)
         else:
-            print('Cant find saved comments wrote by {} to source: {}'.format(user_name, source_name))
+            print('Cant find saved comments wrote by {} to meta source: {}'.format(user_name, meta_ind))
             print('Try to request another source or user.')
             exit()
 
@@ -67,14 +69,17 @@ class Command(BaseCommand):
         self.stdout.write(f'Start restoring saved comments')
         # Find comment's user
         try:
-            user = User.objects.get(username=user_source_comment['by_user'].values[0])
+            user = User.objects.get(username=user_name)
         except User.DoesNotExist:
             self.stdout.write(f"NOTE: User {user_name} not found")
             exit()
 
         # Find comment's source
+        # get meta source master_name and survey
+        source_name = user_source_comment['master_source_name'].values[0]
+        survey = user_source_comment['master_survey'].values[0]
         try:
-            meta_source = MetaObject.objects.get(pk=user_source_comment['meta_source'].values[0], master_name=source_name, master_survey=survey)
+            meta_source = MetaObject.objects.get(meta_ind=meta_ind, master_name=source_name, master_survey=survey)
         except MetaObject.DoesNotExist:
             self.stdout.write(f"WARNING: Meta Source {user_source_comment['meta_source'].values[0]}, "
                               f"name: {source_name} survey: {survey} not found")
@@ -90,7 +95,7 @@ class Command(BaseCommand):
 
         self.stdout.write(f'Restore Comment by {user_name} for source {meta_source.master_name}'
                           f' from survey {meta_source.master_survey}')
-        # fill Comment fields
+        # Fill Comment fields
         comment.comment = user_source_comment['comment'].values[0]
         comment.follow_up = user_source_comment['follow_up'].values[0]
         comment.source_class = user_source_comment['source_class'].values[0]
