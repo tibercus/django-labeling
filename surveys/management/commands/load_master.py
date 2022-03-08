@@ -69,7 +69,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def link_source_with_meta(meta_object, row_values):
-        if row_values.ID_e1 > 0:
+        if row_values.ID_e1 > 0 and row_values.ID_e1 > 0:
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e1, survey=Survey.objects.get(name=1))
                 source.meta_objects.add(meta_object)
@@ -78,7 +78,7 @@ class Command(BaseCommand):
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e1} from survey 1 not found')
 
-        if row_values.ID_e2 > 0:
+        if row_values.ID_e2 and row_values.ID_e2 > 0:
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e2, survey=Survey.objects.get(name=2))
                 source.meta_objects.add(meta_object)
@@ -87,7 +87,7 @@ class Command(BaseCommand):
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e2} from survey 2 not found')
 
-        if row_values.ID_e3 > 0:
+        if row_values.ID_e3 and row_values.ID_e3 > 0:
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e3, survey=Survey.objects.get(name=3))
                 source.meta_objects.add(meta_object)
@@ -96,7 +96,7 @@ class Command(BaseCommand):
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e3} from survey 3 not found')
 
-        if row_values.ID_e4 > 0:
+        if row_values.ID_e4 and row_values.ID_e4 > 0:
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e4, survey=Survey.objects.get(name=4))
                 source.meta_objects.add(meta_object)
@@ -105,17 +105,16 @@ class Command(BaseCommand):
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e4} from survey 4 not found')
 
-        # TODO: uncomment this
-        # if row_values.ID_e5 > 0:
-        #     try:
-        #         source = eROSITA.objects.get(survey_ind=row_values.ID_e5, survey=Survey.objects.get(name=5))
-        #         source.meta_objects.add(meta_object)
-        #         print(f'Link meta object: {meta_object} with source: {source.survey_ind} - {source}')
-        #         source.save()
-        #     except eROSITA.DoesNotExist:
-        #         raise CommandError(f'Source with survey_ind: {row_values.ID_e5} from survey 5 not found')
+        if row_values.ID_e5 and row_values.ID_e5 > 0:
+            try:
+                source = eROSITA.objects.get(survey_ind=row_values.ID_e5, survey=Survey.objects.get(name=5))
+                source.meta_objects.add(meta_object)
+                print(f'Link meta object: {meta_object} with source: {source.survey_ind} - {source}')
+                source.save()
+            except eROSITA.DoesNotExist:
+                raise CommandError(f'Source with survey_ind: {row_values.ID_e5} from survey 5 not found')
 
-        if row_values.ID_e1234 > 0:
+        if row_values.ID_e1234 and row_values.ID_e1234 > 0:
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e1234, survey=Survey.objects.get(name=9))
                 source.meta_objects.add(meta_object)
@@ -317,8 +316,7 @@ class Command(BaseCommand):
                     if created: meta_object.delete()
                     raise CommandError(e)
 
-            # TODO: think about image names
-            # rename and copy in case meta object created or existed
+            # rename and copy images TODO: image names
             Command.rename_copy_images(row.img_id, meta_object.meta_ind)
 
             # maybe use this later
