@@ -7,13 +7,29 @@ from datetime import datetime
 from .models import *
 
 from django.utils.timezone import make_aware
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 @login_required
 def home(request):
     # surveys = get_list_or_404(Survey)
-    meta_objects = MetaObject.objects.all()
+    meta_queryset = MetaObject.objects.all()
     master_fields = ['RA', 'DEC', 'EXT', 'R98', 'LIKE']
+    page = request.GET.get('page', 1)
+
+    # 20 meta_objects per page
+    paginator = Paginator(meta_queryset, 20)
+
+    try:
+        meta_objects = paginator.page(page)
+    except PageNotAnInteger:
+        # fallback to the first page
+        meta_objects = paginator.page(1)
+    except EmptyPage:
+        # probably the user tried to add a page number
+        # in the url, so we fallback to the last page
+        meta_objects = paginator.page(paginator.num_pages)
+
     return render(request, 'home.html', {'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show(),
                                          'master_fields': master_fields})
 
