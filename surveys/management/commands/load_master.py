@@ -26,16 +26,17 @@ class Command(BaseCommand):
     @staticmethod
     def get_fields():  # add img_id to identify images in load_data
         fields = ['meta_ind', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
-                  'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4',
-                  'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e1234',
-                  'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m',
-                  'ID_FLAG_me1', 'ID_FLAG_me2', 'ID_FLAG_me3', 'ID_FLAG_me4',
-                  'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e1234',
-                  'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RFLAG_e2e1', 'RFLAG_e3e2', 'RFLAG_e4e3',
-                  'R_NSRC_e1m', 'R_NSRC_e2m', 'R_NSRC_e3m', 'R_NSRC_e4m',
-                  'R_NSRC_me1', 'R_NSRC_me2', 'R_NSRC_me3', 'R_NSRC_me4',
-                  'UPLIM_e1', 'UPLIM_e2', 'UPLIM_e3', 'UPLIM_e4', 'UPLIM_e1234', 'flag',
-                  'TSTART_e1', 'TSTART_e2', 'TSTART_e3', 'TSTART_e4', 'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3', 'TSTOP_e4']
+                  'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_e5m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4', 'D2D_me5',
+                  'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e5', 'EXP_e1234',
+                  'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m', 'ID_FLAG_e5m',
+                  'ID_FLAG_me1', 'ID_FLAG_me2', 'ID_FLAG_me3', 'ID_FLAG_me4', 'ID_FLAG_me5',
+                  'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e5', 'ID_e1234',
+                  'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RATIO_e5e4', 'RFLAG_e2e1', 'RFLAG_e3e2', 'RFLAG_e4e3', 'RFLAG_e5e4',
+                  'R_NSRC_e1m', 'R_NSRC_e2m', 'R_NSRC_e3m', 'R_NSRC_e4m', 'R_NSRC_e5m',
+                  'R_NSRC_me1', 'R_NSRC_me2', 'R_NSRC_me3', 'R_NSRC_me4', 'R_NSRC_me5',
+                  'UPLIM_e1', 'UPLIM_e2', 'UPLIM_e3', 'UPLIM_e4', 'UPLIM_e5', 'UPLIM_e1234', 'flag',
+                  'TSTART_e1', 'TSTART_e2', 'TSTART_e3', 'TSTART_e4', 'TSTART_e5',
+                  'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3', 'TSTOP_e4', 'TSTOP_e5']
         return fields
 
     @staticmethod
@@ -104,6 +105,16 @@ class Command(BaseCommand):
             except eROSITA.DoesNotExist:
                 raise CommandError(f'Source with survey_ind: {row_values.ID_e4} from survey 4 not found')
 
+        # TODO: uncomment this
+        # if row_values.ID_e5 > 0:
+        #     try:
+        #         source = eROSITA.objects.get(survey_ind=row_values.ID_e5, survey=Survey.objects.get(name=5))
+        #         source.meta_objects.add(meta_object)
+        #         print(f'Link meta object: {meta_object} with source: {source.survey_ind} - {source}')
+        #         source.save()
+        #     except eROSITA.DoesNotExist:
+        #         raise CommandError(f'Source with survey_ind: {row_values.ID_e5} from survey 5 not found')
+
         if row_values.ID_e1234 > 0:
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e1234, survey=Survey.objects.get(name=9))
@@ -123,12 +134,11 @@ class Command(BaseCommand):
             # take name, survey, RA, DEC, EXT, R98, LIKE from master_source
             meta_object.master_name = master_source.name
             meta_object.master_survey = master_source.survey.name
-            # TODO: uncomment later
-            # meta_object.RA = master_source.RA
-            # meta_object.DEC = master_source.DEC
-            # meta_object.EXT = master_source.EXT
-            # meta_object.R98 = master_source.pos_r98
-            # meta_object.LIKE = master_source.DET_LIKE_0
+            meta_object.RA = master_source.RA
+            meta_object.DEC = master_source.DEC
+            meta_object.EXT = master_source.EXT
+            meta_object.R98 = master_source.pos_r98
+            meta_object.LIKE = master_source.DET_LIKE_0
             meta_object.save()
 
     @staticmethod
@@ -278,7 +288,7 @@ class Command(BaseCommand):
         for row in data.itertuples():
             # find/create meta object
             meta_object, created = MetaObject.objects.get_or_create(ID_e1=row.ID_e1, ID_e2=row.ID_e2, ID_e3=row.ID_e3,
-                                                                    ID_e4=row.ID_e4, ID_e1234=row.ID_e1234,
+                                                                    ID_e4=row.ID_e4, ID_e5=row.ID_e5, ID_e1234=row.ID_e1234,
                                                                     defaults={'RA': row.RA, 'DEC': row.DEC})
 
             # Check that it is new meta object
@@ -288,7 +298,7 @@ class Command(BaseCommand):
                     self.stdout.write(f'Start filling fields...\n')
                     for i, field in enumerate(field_list):
                         # self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+1 - skip index
-                        filled_fields = ['RA', 'DEC', 'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e1234']
+                        filled_fields = ['RA', 'DEC', 'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e5', 'ID_e1234']
                         if field not in filled_fields:
                             setattr(meta_object, field, row[i+1])  # Similar to source.field = row[i+1]
 

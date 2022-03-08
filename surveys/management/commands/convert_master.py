@@ -20,16 +20,17 @@ class Command(BaseCommand):
     @staticmethod
     def get_fields():  # add img_id to identify images in load_data
         fields = ['img_id', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
-                  'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4',
-                  'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e1234',
-                  'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m',
-                  'ID_FLAG_me1', 'ID_FLAG_me2', 'ID_FLAG_me3', 'ID_FLAG_me4',
-                  'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e1234',
-                  'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RFLAG_e2e1', 'RFLAG_e3e2', 'RFLAG_e4e3',
-                  'R_NSRC_e1m', 'R_NSRC_e2m', 'R_NSRC_e3m', 'R_NSRC_e4m',
-                  'R_NSRC_me1', 'R_NSRC_me2', 'R_NSRC_me3', 'R_NSRC_me4',
-                  'UPLIM_e1', 'UPLIM_e2', 'UPLIM_e3', 'UPLIM_e4', 'UPLIM_e1234', 'flag',
-                  'TSTART_e1', 'TSTART_e2', 'TSTART_e3', 'TSTART_e4', 'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3', 'TSTOP_e4']
+                  'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_e5m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4', 'D2D_me5',
+                  'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e5', 'EXP_e1234',
+                  'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m', 'ID_FLAG_e5m',
+                  'ID_FLAG_me1', 'ID_FLAG_me2', 'ID_FLAG_me3', 'ID_FLAG_me4', 'ID_FLAG_me5',
+                  'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e5', 'ID_e1234',
+                  'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RATIO_e5e4', 'RFLAG_e2e1', 'RFLAG_e3e2', 'RFLAG_e4e3', 'RFLAG_e5e4',
+                  'R_NSRC_e1m', 'R_NSRC_e2m', 'R_NSRC_e3m', 'R_NSRC_e4m', 'R_NSRC_e5m',
+                  'R_NSRC_me1', 'R_NSRC_me2', 'R_NSRC_me3', 'R_NSRC_me4', 'R_NSRC_me5',
+                  'UPLIM_e1', 'UPLIM_e2', 'UPLIM_e3', 'UPLIM_e4', 'UPLIM_e5', 'UPLIM_e1234', 'flag',
+                  'TSTART_e1', 'TSTART_e2', 'TSTART_e3', 'TSTART_e4', 'TSTART_e5',
+                  'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3', 'TSTOP_e4', 'TSTOP_e5']
         return fields
 
     @staticmethod
@@ -51,53 +52,64 @@ class Command(BaseCommand):
             pa.field('D2D_e2m', pa.float64()),
             pa.field('D2D_e3m', pa.float64()),
             pa.field('D2D_e4m', pa.float64()),
+            pa.field('D2D_e5m', pa.float64()),
             pa.field('D2D_me1', pa.float64()),
             pa.field('D2D_me2', pa.float64()),
             pa.field('D2D_me3', pa.float64()),
             pa.field('D2D_me4', pa.float64()),
+            pa.field('D2D_me5', pa.float64()),
 
             pa.field('EXP_e1', pa.float64()),
             pa.field('EXP_e2', pa.float64()),
             pa.field('EXP_e3', pa.float64()),
             pa.field('EXP_e4', pa.float64()),
+            pa.field('EXP_e5', pa.float64()),
             pa.field('EXP_e1234', pa.float64()),
 
             pa.field('ID_FLAG_e1m', pa.int64()),
             pa.field('ID_FLAG_e2m', pa.int64()),
             pa.field('ID_FLAG_e3m', pa.int64()),
             pa.field('ID_FLAG_e4m', pa.int64()),
+            pa.field('ID_FLAG_e5m', pa.int64()),
             pa.field('ID_FLAG_me1', pa.int64()),
             pa.field('ID_FLAG_me2', pa.int64()),
             pa.field('ID_FLAG_me3', pa.int64()),
             pa.field('ID_FLAG_me4', pa.int64()),
+            pa.field('ID_FLAG_me5', pa.int64()),
 
             pa.field('ID_e1', pa.int64()),
             pa.field('ID_e2', pa.int64()),
             pa.field('ID_e3', pa.int64()),
             pa.field('ID_e4', pa.int64()),
+            pa.field('ID_e5', pa.int64()),
             pa.field('ID_e1234', pa.int64()),
 
             pa.field('RATIO_e2e1', pa.float64()),
             pa.field('RATIO_e3e2', pa.float64()),
             pa.field('RATIO_e4e3', pa.float64()),
+            pa.field('RATIO_e5e4', pa.float64()),
 
             pa.field('RFLAG_e2e1', pa.int64()),
             pa.field('RFLAG_e3e2', pa.int64()),
             pa.field('RFLAG_e4e3', pa.int64()),
+            pa.field('RFLAG_e5e4', pa.int64()),
 
             pa.field('R_NSRC_e1m', pa.int64()),
             pa.field('R_NSRC_e2m', pa.int64()),
             pa.field('R_NSRC_e3m', pa.int64()),
             pa.field('R_NSRC_e4m', pa.int64()),
+            pa.field('R_NSRC_e5m', pa.int64()),
             pa.field('R_NSRC_me1', pa.int64()),
             pa.field('R_NSRC_me2', pa.int64()),
             pa.field('R_NSRC_me3', pa.int64()),
             pa.field('R_NSRC_me4', pa.int64()),
+            pa.field('R_NSRC_me5', pa.int64()),
 
             pa.field('UPLIM_e1', pa.float64()),
             pa.field('UPLIM_e2', pa.float64()),
             pa.field('UPLIM_e3', pa.float64()),
             pa.field('UPLIM_e4', pa.float64()),
+            pa.field('UPLIM_e5', pa.float64()),
             pa.field('UPLIM_e1234', pa.float64()),
 
             pa.field('flag', pa.int64()),
@@ -106,11 +118,13 @@ class Command(BaseCommand):
             pa.field('TSTART_e2', pa.string()),
             pa.field('TSTART_e3', pa.string()),
             pa.field('TSTART_e4', pa.string()),
+            pa.field('TSTART_e5', pa.string()),
 
             pa.field('TSTOP_e1', pa.string()),
             pa.field('TSTOP_e2', pa.string()),
             pa.field('TSTOP_e3', pa.string()),
             pa.field('TSTOP_e4', pa.string()),
+            pa.field('TSTOP_e5', pa.string()),
             # end of master table fields
         ]
         schema = pa.schema(fields)

@@ -68,15 +68,18 @@ class MetaObject(models.Model):
     D2D_e2m = models.FloatField(blank=True, null=True)
     D2D_e3m = models.FloatField(blank=True, null=True)
     D2D_e4m = models.FloatField(blank=True, null=True)
+    D2D_e5m = models.FloatField(blank=True, null=True)
     D2D_me1 = models.FloatField(blank=True, null=True)
     D2D_me2 = models.FloatField(blank=True, null=True)
     D2D_me3 = models.FloatField(blank=True, null=True)
     D2D_me4 = models.FloatField(blank=True, null=True)
+    D2D_me5 = models.FloatField(blank=True, null=True)
 
     EXP_e1 = models.FloatField(blank=True, null=True)
     EXP_e2 = models.FloatField(blank=True, null=True)
     EXP_e3 = models.FloatField(blank=True, null=True)
     EXP_e4 = models.FloatField(blank=True, null=True)
+    EXP_e5 = models.FloatField(blank=True, null=True)
     EXP_e1234 = models.FloatField(blank=True, null=True)
 
     # TODO: do we need these fields???
@@ -84,38 +87,46 @@ class MetaObject(models.Model):
     ID_FLAG_e2m = models.IntegerField(blank=True, null=True)
     ID_FLAG_e3m = models.IntegerField(blank=True, null=True)
     ID_FLAG_e4m = models.IntegerField(blank=True, null=True)
+    ID_FLAG_e5m = models.IntegerField(blank=True, null=True)
     ID_FLAG_me1 = models.IntegerField(blank=True, null=True)
     ID_FLAG_me2 = models.IntegerField(blank=True, null=True)
     ID_FLAG_me3 = models.IntegerField(blank=True, null=True)
     ID_FLAG_me4 = models.IntegerField(blank=True, null=True)
+    ID_FLAG_me5 = models.IntegerField(blank=True, null=True)
 
     ID_e1 = models.BigIntegerField(blank=True, null=True)
     ID_e2 = models.BigIntegerField(blank=True, null=True)
     ID_e3 = models.BigIntegerField(blank=True, null=True)
     ID_e4 = models.BigIntegerField(blank=True, null=True)
+    ID_e5 = models.BigIntegerField(blank=True, null=True)
     ID_e1234 = models.BigIntegerField(blank=True, null=True)
 
     RATIO_e2e1 = models.FloatField(blank=True, null=True)
     RATIO_e3e2 = models.FloatField(blank=True, null=True)
     RATIO_e4e3 = models.FloatField(blank=True, null=True)
+    RATIO_e5e4 = models.FloatField(blank=True, null=True)
 
     RFLAG_e2e1 = models.IntegerField(blank=True, null=True)
     RFLAG_e3e2 = models.IntegerField(blank=True, null=True)
     RFLAG_e4e3 = models.IntegerField(blank=True, null=True)
+    RFLAG_e5e4 = models.IntegerField(blank=True, null=True)
 
     R_NSRC_e1m = models.IntegerField(blank=True, null=True)
     R_NSRC_e2m = models.IntegerField(blank=True, null=True)
     R_NSRC_e3m = models.IntegerField(blank=True, null=True)
     R_NSRC_e4m = models.IntegerField(blank=True, null=True)
+    R_NSRC_e5m = models.IntegerField(blank=True, null=True)
     R_NSRC_me1 = models.IntegerField(blank=True, null=True)
     R_NSRC_me2 = models.IntegerField(blank=True, null=True)
     R_NSRC_me3 = models.IntegerField(blank=True, null=True)
     R_NSRC_me4 = models.IntegerField(blank=True, null=True)
+    R_NSRC_me5 = models.IntegerField(blank=True, null=True)
 
     UPLIM_e1 = models.FloatField(blank=True, null=True)
     UPLIM_e2 = models.FloatField(blank=True, null=True)
     UPLIM_e3 = models.FloatField(blank=True, null=True)
     UPLIM_e4 = models.FloatField(blank=True, null=True)
+    UPLIM_e5 = models.FloatField(blank=True, null=True)
     UPLIM_e1234 = models.FloatField(blank=True, null=True)
 
     flag = models.IntegerField(blank=True, null=True)
@@ -125,11 +136,13 @@ class MetaObject(models.Model):
     TSTART_e2 = models.CharField(max_length=100, blank=True, null=True)
     TSTART_e3 = models.CharField(max_length=100, blank=True, null=True)
     TSTART_e4 = models.CharField(max_length=100, blank=True, null=True)
+    TSTART_e5 = models.CharField(max_length=100, blank=True, null=True)
     # TSTOP_e1,2,3,4
     TSTOP_e1 = models.CharField(max_length=100, blank=True, null=True)
     TSTOP_e2 = models.CharField(max_length=100, blank=True, null=True)
     TSTOP_e3 = models.CharField(max_length=100, blank=True, null=True)
     TSTOP_e4 = models.CharField(max_length=100, blank=True, null=True)
+    TSTOP_e5 = models.CharField(max_length=100, blank=True, null=True)
 
     primary_object = models.BooleanField(default=True, blank=True, null=True)
     # Meta Group object for meta objects with common sources
@@ -141,16 +154,17 @@ class MetaObject(models.Model):
     @staticmethod
     def fields_to_show():
         fields = ['meta_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
-                  'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4',
-                  'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e1234',
-                  'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m',
-                  'ID_FLAG_me1', 'ID_FLAG_me2', 'ID_FLAG_me3', 'ID_FLAG_me4',
-                  'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e1234',
-                  'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RFLAG_e2e1', 'RFLAG_e3e2', 'RFLAG_e4e3',
-                  'R_NSRC_e1m', 'R_NSRC_e2m', 'R_NSRC_e3m', 'R_NSRC_e4m',
-                  'R_NSRC_me1', 'R_NSRC_me2', 'R_NSRC_me3', 'R_NSRC_me4',
-                  'UPLIM_e1', 'UPLIM_e2', 'UPLIM_e3', 'UPLIM_e4', 'UPLIM_e1234', 'flag',
-                  'TSTART_e1', 'TSTART_e2', 'TSTART_e3', 'TSTART_e4', 'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3', 'TSTOP_e4']
+                  'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_e5m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4', 'D2D_me5',
+                  'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e5', 'EXP_e1234',
+                  'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m', 'ID_FLAG_e5m',
+                  'ID_FLAG_me1', 'ID_FLAG_me2', 'ID_FLAG_me3', 'ID_FLAG_me4', 'ID_FLAG_me5',
+                  'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e5', 'ID_e1234',
+                  'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RATIO_e5e4', 'RFLAG_e2e1', 'RFLAG_e3e2', 'RFLAG_e4e3', 'RFLAG_e5e4',
+                  'R_NSRC_e1m', 'R_NSRC_e2m', 'R_NSRC_e3m', 'R_NSRC_e4m', 'R_NSRC_e5m',
+                  'R_NSRC_me1', 'R_NSRC_me2', 'R_NSRC_me3', 'R_NSRC_me4', 'R_NSRC_me5',
+                  'UPLIM_e1', 'UPLIM_e2', 'UPLIM_e3', 'UPLIM_e4', 'UPLIM_e5', 'UPLIM_e1234', 'flag',
+                  'TSTART_e1', 'TSTART_e2', 'TSTART_e3', 'TSTART_e4', 'TSTART_e5',
+                  'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3', 'TSTOP_e4', 'TSTOP_e5']
         return fields
 
     def find_master_source(self):
@@ -162,12 +176,11 @@ class MetaObject(models.Model):
             # take name, survey, RA, DEC, EXT, R98, LIKE from master_source
             self.master_name = master_source.name
             self.master_survey = master_source.survey.name
-            # TODO: uncomment later
-            # self.RA = master_source.RA
-            # self.DEC = master_source.DEC
-            # self.EXT = master_source.EXT
-            # self.R98 = master_source.pos_r98
-            # self.LIKE = master_source.DET_LIKE_0
+            self.RA = master_source.RA
+            self.DEC = master_source.DEC
+            self.EXT = master_source.EXT
+            self.R98 = master_source.pos_r98
+            self.LIKE = master_source.DET_LIKE_0
             self.save()
 
     def __iter__(self):
