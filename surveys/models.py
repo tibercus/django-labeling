@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from itertools import zip_longest
 from django.db.models import Max
 
+import django_filters
+
 
 # Class for files from where sources were loaded
 class OriginFile(models.Model):
@@ -187,6 +189,20 @@ class MetaObject(models.Model):
         for field in MetaObject.fields_to_show():
             value = getattr(self, field, None)
             yield field, value
+
+
+# Class for filtering Meta Objects by requested fields
+class MetaObjFilter(django_filters.FilterSet):
+    class Meta:
+        model = MetaObject
+        fields = {'meta_ind': ['lt', 'gt'],
+                  'master_survey': ['lt', 'gt'],
+                  'RA': ['lt', 'gt'],
+                  'DEC': ['lt', 'gt'],
+                  # 'LIKE': ['lt', 'gt'],
+                  # 'EXT': ['lt', 'gt'],
+                  # 'test_name__set_test_name': ['icontains'],
+                  }
 
 
 # Class for surveys where transients were detected

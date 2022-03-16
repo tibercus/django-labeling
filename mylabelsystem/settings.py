@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'surveys',
     'accounts',
     'import_export',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

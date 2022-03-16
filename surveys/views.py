@@ -9,14 +9,26 @@ from .models import *
 from django.utils.timezone import make_aware
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from django.db.models import F
+
 
 @login_required
 def home(request):
-    meta_queryset = MetaObject.objects.all()
+    f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F(request.GET).desc(nulls_last=True)))
+    # meta_queryset = MetaObject.objects.all()
     master_fields = ['RA', 'DEC', 'EXT', 'R98', 'LIKE']
-    page = request.GET.get('page', 1)
+    # fields which can be sorted
+    sort_fields = ['meta_ind', 'master_survey', 'RA', 'DEC', 'LIKE', 'EXT',
+                   'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RATIO_e5e4']
+    # sort meta objects by requested field
+    meta_queryset = f.qs
+    field_order_by = request.GET.get('order_by', 'pk')  # TODO: think about default value and master_flux_05_20
+    if field_order_by:
+        meta_queryset = meta_queryset.order_by(F(field_order_by).desc(nulls_last=True))
 
-    # 20 meta_objects per page
+    # which page to show
+    page = request.GET.get('page', 1)
+    # 50 meta_objects per page
     paginator = Paginator(meta_queryset, 50)
 
     try:
@@ -29,8 +41,8 @@ def home(request):
         # in the url, so we fallback to the last page
         meta_objects = paginator.page(paginator.num_pages)
 
-    return render(request, 'home.html', {'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show(),
-                                         'master_fields': master_fields})
+    return render(request, 'home.html', {'filter': f, 'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show(),
+                                         'master_fields': master_fields, 'sort_fields': sort_fields})
 
 
 @login_required

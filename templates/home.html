@@ -9,6 +9,17 @@
 
 {% block content %}
 
+        {%  comment %} Form for filtering MetaObj table {% endcomment %}
+        <form id="filter_form" method="get">
+            <div class="row">
+                {% with filter.form as form %}
+                    {% csrf_token %}
+                    {% include 'includes/filter_form.html' %}
+                {% endwith %}
+            </div>
+            <input type="submit" value="Filter" class="btn btn-primary"/>
+        </form>
+
         <div class="table-responsive">
 
             <table id = "ScrollTable" class="table table-bordered w-auto" cellspacing="0">
@@ -17,7 +28,9 @@
                         <th>{{ 'group_id' }}</th>
                         {% for field in meta_fields %}
                             {% if field in master_fields %}
-                                <th>master_{{ field }}</th>
+                                <th><a href="?order_by={{ field }}">master_{{ field }}</a></th>
+                            {% elif field in sort_fields %}
+                                <th><a href="?order_by={{ field }}">{{ field }}</a></th>
                             {% else %}
                                 <th>{{ field }}</th>
                             {% endif %}
