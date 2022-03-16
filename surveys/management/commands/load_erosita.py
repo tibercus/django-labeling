@@ -15,7 +15,7 @@ from astropy.coordinates import SkyCoord
 
 
 class Command(BaseCommand):
-    help = "Loads data from Parquet file."
+    help = "Load data from Parquet file."
 
     # def add_arguments(self, parser):
     #     parser.add_argument("file_path", type=str, help='path for parquet file')
@@ -66,6 +66,7 @@ class Command(BaseCommand):
             except Survey.DoesNotExist:
                 raise CommandError(f'Survey{row.survey} not found')
 
+            # TODO: use hpidx instead of survey_ind?
             source, created = eROSITA.objects.get_or_create(survey_ind=row.survey_ind, name=row.name,
                                                             survey=survey, origin_file=origin_file,
                                                             defaults={'RA': row.RA, 'DEC': row.DEC})

@@ -12,13 +12,12 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required
 def home(request):
-    # surveys = get_list_or_404(Survey)
     meta_queryset = MetaObject.objects.all()
     master_fields = ['RA', 'DEC', 'EXT', 'R98', 'LIKE']
     page = request.GET.get('page', 1)
 
     # 20 meta_objects per page
-    paginator = Paginator(meta_queryset, 20)
+    paginator = Paginator(meta_queryset, 50)
 
     try:
         meta_objects = paginator.page(page)

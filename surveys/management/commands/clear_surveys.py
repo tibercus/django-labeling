@@ -18,6 +18,10 @@ class Command(BaseCommand):
         meta_objects = MetaObject.objects.all()
         meta_objects.delete()
 
+        print('Delete meta groups')
+        meta_objects = MetaGroup.objects.all()
+        meta_objects.delete()
+
         print('Delete origin files')
         meta_sources = OriginFile.objects.all()
         meta_sources.delete()

@@ -135,6 +135,8 @@ STATIC_URL = '/static/'
 IMAGE_DATA_PATH = os.path.join(BASE_DIR, 'static', 'images')
 # Path of Pavel's dir with files
 MASTER_DIR = 'C:/Users/fedor/Desktop/4 курс/Diploma/Научная работа/sources_Xray_data/cmc/'
+# Path to optical data
+OPTICAL_DIR = 'C:/Users/fedor/Desktop/4 курс/Diploma/Научная работа/sources_opt_data/New_Optical/'
 # Path with converted to parquet files
 WORK_DIR = os.path.join(BASE_DIR, 'surveys', 'test_xray_data')
 

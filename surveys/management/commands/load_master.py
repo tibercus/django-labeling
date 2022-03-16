@@ -18,7 +18,7 @@ from django.db.models import Count
 
 
 class Command(BaseCommand):
-    help = "Loads data from Parquet file."
+    help = "Load data from Parquet file."
 
     # def add_arguments(self, parser):
     #     parser.add_argument("file_path", type=str, help='path for parquet file')
@@ -288,7 +288,7 @@ class Command(BaseCommand):
             # find/create meta object
             meta_object, created = MetaObject.objects.get_or_create(ID_e1=row.ID_e1, ID_e2=row.ID_e2, ID_e3=row.ID_e3,
                                                                     ID_e4=row.ID_e4, ID_e5=row.ID_e5, ID_e1234=row.ID_e1234,
-                                                                    defaults={'RA': row.RA, 'DEC': row.DEC})
+                                                                    defaults={'meta_ind': row.img_id, 'RA': row.RA, 'DEC': row.DEC})
 
             # Check that it is new meta object
             if created:
@@ -297,7 +297,7 @@ class Command(BaseCommand):
                     self.stdout.write(f'Start filling fields...\n')
                     for i, field in enumerate(field_list):
                         # self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+1 - skip index
-                        filled_fields = ['RA', 'DEC', 'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e5', 'ID_e1234']
+                        filled_fields = ['img_id', 'RA', 'DEC', 'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e5', 'ID_e1234']
                         if field not in filled_fields:
                             setattr(meta_object, field, row[i+1])  # Similar to source.field = row[i+1]
 
@@ -315,6 +315,10 @@ class Command(BaseCommand):
                     # Delete created source if there was ERROR while filling fields
                     if created: meta_object.delete()
                     raise CommandError(e)
+                    # print(f'ERROR:{e}\n')
+            else:
+                # MetaObject exists already
+                print(f'{row[0]} - Meta object with img_id: {row.img_id}, RA: {row.RA}, DEC: {row.DEC} exists.')
 
             # rename and copy images TODO: image names
             Command.rename_copy_images(row.img_id, meta_object.meta_ind)

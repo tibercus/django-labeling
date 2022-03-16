@@ -134,8 +134,8 @@ class Command(BaseCommand):
             pa.field('TSTOP', pa.string()),
             # end of eROSITA table
 
-            pa.field("survey", pa.int64()),
-            pa.field("file_name", pa.string()),
+            pa.field('survey', pa.int64()),
+            pa.field('file_name', pa.string()),
         ]
         schema = pa.schema(fields)
 
@@ -143,14 +143,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = timezone.now()
-        # load sources from survey 1
         file_path = os.path.join(settings.MASTER_DIR, 'ecat_43691_48110_03_23_sd01_a15_g14_r7.pkl')
+
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
 
         xray_sources = data.drop(columns=['RA', 'DEC', 'srcname', 'RADEC_ERR'])
-        xray_sources = xray_sources.rename( columns={'srcname_fin': 'name', 'RA_fin': 'RA', 'DEC_fin': 'DEC',
-                                                     'RADEC_ERR_fin': 'RADEC_ERR', 'flux_05-20': 'flux_05_20'})
+        xray_sources = xray_sources.rename(columns={'srcname_fin': 'name', 'RA_fin': 'RA', 'DEC_fin': 'DEC',
+                                                    'RADEC_ERR_fin': 'RADEC_ERR', 'flux_05-20': 'flux_05_20'})
 
         # TODO: change this later (object, datetime64[ns] -> string)
         for col in xray_sources.columns:

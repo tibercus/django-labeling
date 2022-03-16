@@ -379,26 +379,359 @@ class Comment(models.Model):
         ordering = ('-created_by__is_superuser',)
 
 
-# Class for GAIA sources
-class GAIA(models.Model):
-    name = models.CharField(max_length=150)
+# Class for LS sources
+class LS(models.Model):
+    objID = models.PositiveIntegerField(blank=True, null=True)
+    ra = models.FloatField()
+    dec = models.FloatField()
+    # add heal pix index for identification
+    opt_hpidx = models.BigIntegerField()
 
-    # TODO: change this later to FloatField
-    RA = models.DecimalField(max_digits=9, decimal_places=5)
-    DEC = models.DecimalField(max_digits=9, decimal_places=5)
+    brick_primary = models.BooleanField(blank=True, null=True)
+
+    maskbits = models.FloatField(blank=True, null=True)
+    fitbits = models.FloatField(blank=True, null=True)
+    type = models.CharField(max_length=100, blank=True, null=True)
+    ra_ivar = models.FloatField(blank=True, null=True)
+    dec_ivar = models.FloatField(blank=True, null=True)
+    bx = models.FloatField(blank=True, null=True)
+    by = models.FloatField(blank=True, null=True)
+    ebv = models.FloatField(blank=True, null=True)
+    mjd_min = models.FloatField(blank=True, null=True)
+    mjd_max = models.FloatField(blank=True, null=True)
+    ref_cat = models.CharField(max_length=100, blank=True, null=True)
+    ref_id = models.FloatField(blank=True, null=True)
+
+    pmra = models.FloatField(blank=True, null=True)
+    pmdec = models.FloatField(blank=True, null=True)
+    parallax = models.FloatField(blank=True, null=True)
+    pmra_ivar = models.FloatField(blank=True, null=True)
+    pmdec_ivar = models.FloatField(blank=True, null=True)
+    parallax_ivar = models.FloatField(blank=True, null=True)
+    ref_epoch = models.FloatField(blank=True, null=True)
+
+    gaia_phot_g_mean_mag = models.FloatField(blank=True, null=True)
+    gaia_phot_g_mean_flux_over_error = models.FloatField(blank=True, null=True)
+    gaia_phot_g_n_obs = models.FloatField(blank=True, null=True)
+    gaia_phot_bp_mean_mag = models.FloatField(blank=True, null=True)
+    gaia_phot_bp_mean_flux_over_error = models.FloatField(blank=True, null=True)
+    gaia_phot_bp_n_obs = models.FloatField(blank=True, null=True)
+    gaia_phot_rp_mean_mag = models.FloatField(blank=True, null=True)
+    gaia_phot_rp_mean_flux_over_error = models.FloatField(blank=True, null=True)
+    gaia_phot_rp_n_obs = models.FloatField(blank=True, null=True)
+
+    gaia_phot_variable_flag = models.BooleanField(blank=True, null=True)
+
+    gaia_astrometric_excess_noise = models.FloatField(blank=True, null=True)
+    gaia_astrometric_excess_noise_sig = models.FloatField(blank=True, null=True)
+    gaia_astrometric_n_obs_al = models.FloatField(blank=True, null=True)
+    gaia_astrometric_n_good_obs_al = models.FloatField(blank=True, null=True)
+    gaia_astrometric_weight_al = models.FloatField(blank=True, null=True)
+
+    gaia_duplicated_source = models.BooleanField(blank=True, null=True)
+
+    gaia_a_g_val = models.FloatField(blank=True, null=True)
+    gaia_e_bp_min_rp_val = models.FloatField(blank=True, null=True)
+    gaia_phot_bp_rp_excess_factor = models.FloatField(blank=True, null=True)
+    gaia_astrometric_sigma5d_max = models.FloatField(blank=True, null=True)
+    gaia_astrometric_params_solved = models.FloatField(blank=True, null=True)
+
+    fiberflux_g = models.FloatField(blank=True, null=True)
+    fiberflux_r = models.FloatField(blank=True, null=True)
+    fiberflux_z = models.FloatField(blank=True, null=True)
+    fibertotflux_g = models.FloatField(blank=True, null=True)
+    fibertotflux_r = models.FloatField(blank=True, null=True)
+    fibertotflux_z = models.FloatField(blank=True, null=True)
+
+    mw_transmission_g = models.FloatField(blank=True, null=True)
+    mw_transmission_r = models.FloatField(blank=True, null=True)
+    mw_transmission_z = models.FloatField(blank=True, null=True)
+    mw_transmission_w1 = models.FloatField(blank=True, null=True)
+    mw_transmission_w2 = models.FloatField(blank=True, null=True)
+    mw_transmission_w3 = models.FloatField(blank=True, null=True)
+    mw_transmission_w4 = models.FloatField(blank=True, null=True)
+
+    nobs_g = models.PositiveIntegerField(blank=True, null=True)
+    nobs_r = models.PositiveIntegerField(blank=True, null=True)
+    nobs_z = models.PositiveIntegerField(blank=True, null=True)
+    nobs_w1 = models.PositiveIntegerField(blank=True, null=True)
+    nobs_w2 = models.PositiveIntegerField(blank=True, null=True)
+    nobs_w3 = models.PositiveIntegerField(blank=True, null=True)
+    nobs_w4 = models.PositiveIntegerField(blank=True, null=True)
+
+    rchisq_g = models.FloatField(blank=True, null=True)
+    rchisq_r = models.FloatField(blank=True, null=True)
+    rchisq_z = models.FloatField(blank=True, null=True)
+    rchisq_w1 = models.FloatField(blank=True, null=True)
+    rchisq_w2 = models.FloatField(blank=True, null=True)
+    rchisq_w3 = models.FloatField(blank=True, null=True)
+    rchisq_w4 = models.FloatField(blank=True, null=True)
+
+    fracflux_g = models.FloatField(blank=True, null=True)
+    racflux_r = models.FloatField(blank=True, null=True)
+    fracflux_z = models.FloatField(blank=True, null=True)
+    fracflux_w1 = models.FloatField(blank=True, null=True)
+    fracflux_w2 = models.FloatField(blank=True, null=True)
+    fracflux_w3 = models.FloatField(blank=True, null=True)
+    fracflux_w4 = models.FloatField(blank=True, null=True)
+
+    fracmasked_g = models.FloatField(blank=True, null=True)
+    fracmasked_r = models.FloatField(blank=True, null=True)
+    fracmasked_z = models.FloatField(blank=True, null=True)
+    fracin_g = models.FloatField(blank=True, null=True)
+    racin_r = models.FloatField(blank=True, null=True)
+    facin_z = models.FloatField(blank=True, null=True)
+
+    anymask_g = models.FloatField(blank=True, null=True)
+    anymask_r = models.FloatField(blank=True, null=True)
+    anymask_z = models.FloatField(blank=True, null=True)
+    allmask_g = models.FloatField(blank=True, null=True)
+    allmask_r = models.FloatField(blank=True, null=True)
+    allmask_z = models.FloatField(blank=True, null=True)
+
+    wisemask_w1 = models.FloatField(blank=True, null=True)
+    wisemask_w2 = models.FloatField(blank=True, null=True)
+
+    psfsize_g = models.FloatField(blank=True, null=True)
+    psfsize_r = models.FloatField(blank=True, null=True)
+    psfsize_z = models.FloatField(blank=True, null=True)
+    psfdepth_g = models.FloatField(blank=True, null=True)
+    psfdepth_r = models.FloatField(blank=True, null=True)
+    psfdepth_z = models.FloatField(blank=True, null=True)
+    galdepth_g = models.FloatField(blank=True, null=True)
+    galdepth_r = models.FloatField(blank=True, null=True)
+    galdepth_z = models.FloatField(blank=True, null=True)
+
+    nea_g = models.FloatField(blank=True, null=True)
+    nea_r = models.FloatField(blank=True, null=True)
+    nea_z = models.FloatField(blank=True, null=True)
+
+    lob_nea_g = models.FloatField(blank=True, null=True)
+    blob_nea_r = models.FloatField(blank=True, null=True)
+    blob_nea_z = models.FloatField(blank=True, null=True)
+
+    psfdepth_w1 = models.FloatField(blank=True, null=True)
+    psfdepth_w2 = models.FloatField(blank=True, null=True)
+    psfdepth_w3 = models.FloatField(blank=True, null=True)
+    psfdepth_w4 = models.FloatField(blank=True, null=True)
+
+    wise_coadd_id = models.CharField(max_length=100, blank=True, null=True)
+
+    wise_x = models.FloatField(blank=True, null=True)
+    wise_y = models.FloatField(blank=True, null=True)
+
+    sersic = models.FloatField(blank=True, null=True)
+    sersic_ivar = models.FloatField(blank=True, null=True)
+
+    shape_r = models.FloatField(blank=True, null=True)
+    shape_r_ivar = models.FloatField(blank=True, null=True)
+    shape_e1 = models.FloatField(blank=True, null=True)
+    shape_e1_ivar = models.FloatField(blank=True, null=True)
+    shape_e2 = models.FloatField(blank=True, null=True)
+    shape_e2_ivar = models.FloatField(blank=True, null=True)
+
+    healpix_id_log2nside17 = models.FloatField(blank=True, null=True)
+
+    flux_g = models.FloatField(blank=True, null=True)
+    flux_ivar_g = models.FloatField(blank=True, null=True)
+    flux_r = models.FloatField(blank=True, null=True)
+    flux_ivar_r = models.FloatField(blank=True, null=True)
+    flux_z = models.FloatField(blank=True, null=True)
+    flux_ivar_z = models.FloatField(blank=True, null=True)
+
+    flux_w1 = models.FloatField(blank=True, null=True)
+    flux_ivar_w1 = models.FloatField(blank=True, null=True)
+    flux_w2 = models.FloatField(blank=True, null=True)
+    flux_ivar_w2 = models.FloatField(blank=True, null=True)
+    flux_w3 = models.FloatField(blank=True, null=True)
+    flux_ivar_w3 = models.FloatField(blank=True, null=True)
+    flux_w4 = models.FloatField(blank=True, null=True)
+    flux_ivar_w4 = models.FloatField(blank=True, null=True)
+
+    counterparts_number = models.FloatField(blank=True, null=True)
+    single_counterpart = models.BooleanField(blank=True, null=True)
+    counterparts_type = models.CharField(max_length=100, blank=True, null=True)
+
+    flux_g_ebv = models.FloatField(blank=True, null=True)
+    flux_r_ebv = models.FloatField(blank=True, null=True)
+    flux_z_ebv = models.FloatField(blank=True, null=True)
+    flux_w1_ebv = models.FloatField(blank=True, null=True)
+    flux_w2_ebv = models.FloatField(blank=True, null=True)
+    flux_w3_ebv = models.FloatField(blank=True, null=True)
+    flux_w4_ebv = models.FloatField(blank=True, null=True)
 
     # xray sources near which gaia source was found
-    xray_sources = models.ManyToManyField(eROSITA, related_name='gaia_sources')
+    xray_sources = models.ManyToManyField(eROSITA, related_name='ls_sources', blank=True)
     # File from which source was loaded to system
-    origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='gaia_sources', blank=True, null=True)
+    origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='ls_sources', blank=True, null=True)
     # Meta object for which this gaia source is master
-    meta_object = models.OneToOneField(MetaObject, on_delete=models.CASCADE, related_name='master_gaia', blank=True, null=True)
+    meta_object = models.OneToOneField(MetaObject, on_delete=models.CASCADE, related_name='master_ls', blank=True, null=True)
 
     def __str__(self):
-        return 'GAIA Source: {}'.format(self.name)
+        return '{} - LS Source: {}'.format(self.opt_hpidx, self.objID)
+
+    def __iter__(self):
+        for field in LS.fields_to_show():
+            value = getattr(self, field, None)
+            yield field, value
 
     class Meta:
-        verbose_name_plural = 'GAIA sources'
+        verbose_name_plural = 'LS sources'
+
+
+# Class for SDSS sources
+class SDSS(models.Model):
+    objID = models.CharField(max_length=100, blank=True, null=True)
+    ra = models.FloatField()
+    dec = models.FloatField()
+    # add heal pix index for identification
+    opt_hpidx = models.BigIntegerField()
+    
+    RAERR = models.FloatField(blank=True, null=True)
+    DECERR = models.FloatField(blank=True, null=True)
+
+    cModelFlux_u = models.FloatField(blank=True, null=True)
+    cModelFluxIvar_u = models.FloatField(blank=True, null=True)
+
+    cModelFlux_g = models.FloatField(blank=True, null=True)
+    cModelFluxIvar_g = models.FloatField(blank=True, null=True)
+
+    cModelFlux_r = models.FloatField(blank=True, null=True)
+    cModelFluxIvar_r = models.FloatField(blank=True, null=True)
+
+    cModelFlux_i = models.FloatField(blank=True, null=True)
+    cModelFluxIvar_i = models.FloatField(blank=True, null=True)
+
+    cModelFlux_z = models.FloatField(blank=True, null=True)
+    cModelFluxIvar_z = models.FloatField(blank=True, null=True)
+
+    psfFlux_u = models.FloatField(blank=True, null=True)
+    psfFluxIvar_u = models.FloatField(blank=True, null=True)
+
+    psfFlux_g = models.FloatField(blank=True, null=True)
+    psfFluxIvar_g = models.FloatField(blank=True, null=True)
+
+    psfFlux_r = models.FloatField(blank=True, null=True)
+    psfFluxIvar_r = models.FloatField(blank=True, null=True)
+
+    psfFlux_i = models.FloatField(blank=True, null=True)
+    psfFluxIvar_i = models.FloatField(blank=True, null=True)
+
+    psfFlux_z = models.FloatField(blank=True, null=True)
+    psfFluxIvar_z = models.FloatField(blank=True, null=True)
+
+    counterparts_number = models.FloatField(blank=True, null=True)
+    single_counterpart = models.BooleanField(blank=True, null=True)
+    counterparts_type = models.CharField(max_length=100, blank=True, null=True)
+    
+    # xray sources near which gaia source was found
+    xray_sources = models.ManyToManyField(eROSITA, related_name='sdss_sources', blank=True)
+    # File from which source was loaded to system
+    origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='sdss_sources', blank=True, null=True)
+    # Meta object for which this gaia source is master
+    meta_object = models.OneToOneField(MetaObject, on_delete=models.CASCADE, related_name='master_sdss', blank=True, null=True)
+
+    def __str__(self):
+        return '{} - SDSS Source: {}'.format(self.opt_hpidx, self.objID)
+
+    def __iter__(self):
+        for field in SDSS.fields_to_show():
+            value = getattr(self, field, None)
+            yield field, value
+
+    class Meta:
+        verbose_name_plural = 'SDSS sources'
+
+
+# Class for PS sources
+class PS(models.Model):
+    objID = models.CharField(max_length=100, blank=True, null=True)
+    ra = models.FloatField()
+    dec = models.FloatField()
+    # add heal pix index for identification
+    opt_hpidx = models.BigIntegerField()
+
+    raStack = models.FloatField(blank=True, null=True)
+    decStack = models.FloatField(blank=True, null=True)
+    raStackErr = models.FloatField(blank=True, null=True)
+    decStackErr = models.FloatField(blank=True, null=True)
+    raMean = models.FloatField(blank=True, null=True)
+    decMean = models.FloatField(blank=True, null=True)
+    raMeanErr = models.FloatField(blank=True, null=True)
+    decMeanErr = models.FloatField(blank=True, null=True)
+
+    objInfoFlag = models.FloatField(blank=True, null=True)
+    qualityFlag = models.IntegerField(blank=True, null=True)
+
+    primaryDetection = models.IntegerField(blank=True, null=True)
+    bestDetection = models.IntegerField(blank=True, null=True)
+
+    duplicat = models.BooleanField(blank=True, null=True)
+    d_to = models.IntegerField(blank=True, null=True)
+    fitext = models.BooleanField(blank=True, null=True)
+    devaucou = models.BooleanField(blank=True, null=True)
+    star = models.BooleanField(blank=True, null=True)
+
+    w1fit = models.BooleanField(blank=True, null=True)
+    w1bad = models.BooleanField(blank=True, null=True)
+    w1mag = models.FloatField(blank=True, null=True)
+    dw1mag = models.FloatField(blank=True, null=True)
+
+    w2fit = models.BooleanField(blank=True, null=True)
+    w2bad = models.BooleanField(blank=True, null=True)
+    w2mag = models.FloatField(blank=True, null=True)
+    dw2mag = models.FloatField(blank=True, null=True)
+
+    gKronFlux = models.FloatField(blank=True, null=True)
+    gKronFluxErr = models.FloatField(blank=True, null=True)
+    rKronFlux = models.FloatField(blank=True, null=True)
+    rKronFluxErr = models.FloatField(blank=True, null=True)
+    iKronFlux = models.FloatField(blank=True, null=True)
+    iKronFluxErr = models.FloatField(blank=True, null=True)
+    zKronFlux = models.FloatField(blank=True, null=True)
+    zKronFluxErr = models.FloatField(blank=True, null=True)
+    yKronFlux = models.FloatField(blank=True, null=True)
+    yKronFluxErr = models.FloatField(blank=True, null=True)
+
+    gPSFFlux = models.FloatField(blank=True, null=True)
+    gPSFFluxErr = models.FloatField(blank=True, null=True)
+    rPSFFlux = models.FloatField(blank=True, null=True)
+    rPSFFluxErr = models.FloatField(blank=True, null=True)
+    iPSFFlux = models.FloatField(blank=True, null=True)
+    iPSFFluxErr = models.FloatField(blank=True, null=True)
+    zPSFFlux = models.FloatField(blank=True, null=True)
+    zPSFFluxErr = models.FloatField(blank=True, null=True)
+    yPSFFlux = models.FloatField(blank=True, null=True)
+    yPSFFluxErr = models.FloatField(blank=True, null=True)
+    
+    w1flux = models.FloatField(blank=True, null=True)
+    dw1flux = models.FloatField(blank=True, null=True)
+    w2flux = models.FloatField(blank=True, null=True)
+    dw2flux = models.FloatField(blank=True, null=True)
+
+    counterparts_number = models.FloatField(blank=True, null=True)
+    single_counterpart = models.BooleanField(blank=True, null=True)
+    counterparts_type = models.CharField(max_length=100, blank=True, null=True)
+
+    # xray sources near which gaia source was found
+    xray_sources = models.ManyToManyField(eROSITA, related_name='ps_sources', blank=True)
+    # File from which source was loaded to system
+    origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='ps_sources', blank=True,
+                                    null=True)
+    # Meta object for which this gaia source is master
+    meta_object = models.OneToOneField(MetaObject, on_delete=models.CASCADE, related_name='master_ps', blank=True,
+                                       null=True)
+
+    def __str__(self):
+        return '{} - PS Source: {}'.format(self.opt_hpidx, self.objID)
+
+    def __iter__(self):
+        for field in PS.fields_to_show():
+            value = getattr(self, field, None)
+            yield field, value
+
+    class Meta:
+        verbose_name_plural = 'PS sources'
 
 
 # Class for comments on optical data
