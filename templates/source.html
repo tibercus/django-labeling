@@ -272,57 +272,57 @@
 
         {% comment %} Optical navigation tabs {% endcomment %}
         <ul class="nav nav-tabs" id="myTab_opt">
-            <li class="nav-item">
-                {% for opt_survey, opt_sources in opt_survey_sources.items %}
+            {% for opt_survey, opt_sources in opt_survey_sources.items %}
 
-                    {% if opt_survey == 'LS'%}
-                        {% define "active" as status %} {% define "true" as selected %}
-                    {% elif opt_sources %}
-                        {% define "" as status %} {% define "false" as selected %}
-                    {% else %}
-                        {% define "disabled" as status %} {% define "false" as selected %}
-                    {% endif %}
+                {% if opt_survey == 'LS'%}
+                    {% define "active" as status %} {% define "true" as selected %}
+                {% elif opt_sources %}
+                    {% define "" as status %} {% define "false" as selected %}
+                {% else %}
+                    {% define "disabled" as status %} {% define "false" as selected %}
+                {% endif %}
 
+                <li class="nav-item">
                     <a href="#survey_{{ opt_survey }}" class="nav-link {{ status }}" data-toggle="tab">{{ opt_survey }}</a>
+                </li>
 
-                {% endfor %}
-            </li>
+            {% endfor %}
         </ul>
 
         {% comment %} General Aladin Lite {% endcomment %}
-{#        <div class="aladin_lite">#}
-{##}
-{#            {% comment %} Aladin Lite container at requested dimensions {% endcomment %}#}
-{#            <div id="aladin-lite-div" style="width:700px;height:400px;"></div>#}
-{#            <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>#}
-{##}
-{#            {% comment %} Radio buttons with surveys {% endcomment %}#}
-{#            <input id="PS_DR1" type="radio" name="survey" value="P/PanSTARRS/DR1/color-i-r-g" checked><label for="PS_DR1">PS_DR1 color</label>#}
-{#            <input id="SDSS9" type="radio" name="survey" value="P/SDSS9/color"><label for="SDSS9">SDSS9 color</label>#}
-{#            <input id="GAIAedr3" type="radio" name="survey" value="P/DM/flux-Bp/I/350/gaiaedr3"><label for="GAIAedr3">gaiaedr3</label>#}
-{#            <input id="allwise" type="radio" name="survey" value="P/allWISE/color"><label for="allwise">AllWISE</label>#}
-{##}
-{#            {% comment %} Creation of Aladin Lite instance {% endcomment %}#}
-{#            <script type="text/javascript">#}
-{#                var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-i-r-g", fov: 0.05, target: "{{ meta_object.RA }} {{ meta_object.DEC }}"});#}
-{#                $('input[name=survey]').change(function() {#}
-{#                    aladin.setImageSurvey($(this).val());#}
-{#                });#}
-{##}
-{#                // marker at meta_object center#}
-{#                var markers = A.catalog({name: 'Some markers'})#}
-{#                aladin.addCatalog(markers);#}
-{#                markers.addSources([A.marker({{ meta_object.RA }}, {{ meta_object.DEC }}, {popupTitle: '{{meta_object.master_name}}',#}
-{#                    popupDesc: '<em>RA:</em> {{ meta_object.RA }} <br/><em>DEC:</em> {{ meta_object.DEC }} <br/>\#}
-{#                        <em><Class:</em> {{ meta_object.object_class }} <br/>'})]);#}
-{##}
-{#                // circle around meta_object center - r98#}
-{#                var overlay = A.graphicOverlay({color: 'cyan', lineWidth: 2});#}
-{#                aladin.addOverlay(overlay);#}
-{#                overlay.add(A.circle({{ meta_object.RA }}, {{ meta_object.DEC }}, 0.0083, {color: 'cyan'})); // radius in degrees#}
-{#                overlay.add(A.circle({{ meta_object.RA }}, {{ meta_object.DEC }}, {{ meta_object.R98|sec_in_deg }}, {color: 'red'})); // radius in degrees#}
-{#            </script>#}
-{#        </div>#}
+        <div class="aladin_lite">
+
+            {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
+            <div id="aladin-lite-div" style="width:550px;height:300px;"></div>
+            <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+
+            {% comment %} Radio buttons with surveys {% endcomment %}
+            <input id="PS_DR1" type="radio" name="survey" value="P/PanSTARRS/DR1/color-i-r-g" checked><label for="PS_DR1">PS_DR1 color</label>
+            <input id="SDSS9" type="radio" name="survey" value="P/SDSS9/color"><label for="SDSS9">SDSS9 color</label>
+            <input id="GAIAedr3" type="radio" name="survey" value="P/DM/flux-Bp/I/350/gaiaedr3"><label for="GAIAedr3">gaiaedr3</label>
+            <input id="allwise" type="radio" name="survey" value="P/allWISE/color"><label for="allwise">AllWISE</label>
+
+            {% comment %} Creation of Aladin Lite instance {% endcomment %}
+            <script type="text/javascript">
+                var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-i-r-g", fov: 0.05, target: "{{ meta_object.RA }} {{ meta_object.DEC }}"});
+                $('input[name=survey]').change(function() {
+                    aladin.setImageSurvey($(this).val());
+                });
+
+                // marker at meta_object center
+                var markers = A.catalog({name: 'Some markers'})
+                aladin.addCatalog(markers);
+                markers.addSources([A.marker({{ meta_object.RA }}, {{ meta_object.DEC }}, {popupTitle: '{{meta_object.master_name}}',
+                    popupDesc: '<em>RA:</em> {{ meta_object.RA }} <br/><em>DEC:</em> {{ meta_object.DEC }} <br/>\
+                        <em><Class:</em> {{ meta_object.object_class }} <br/>'})]);
+
+                // circle around meta_object center - r98
+                var overlay = A.graphicOverlay({color: 'cyan', lineWidth: 2});
+                aladin.addOverlay(overlay);
+                overlay.add(A.circle({{ meta_object.RA }}, {{ meta_object.DEC }}, 0.0083, {color: 'cyan'})); // radius in degrees
+                overlay.add(A.circle({{ meta_object.RA }}, {{ meta_object.DEC }}, {{ meta_object.R98|sec_in_deg }}, {color: 'red'})); // radius in degrees
+            </script>
+        </div>
 
         <div class="tab-content">
             {% for opt_survey, opt_sources in opt_survey_sources.items %}
@@ -336,7 +336,7 @@
                 {% if opt_sources %}
                 <div class="tab-pane {{ status }}" id="survey_{{ opt_survey }}" role="tabpanel" aria-labelledby="{{ opt_survey }}-tab">
 
-                    <table id = "ScrollTable" class="table table-bordered w-auto" cellspacing="0">
+                    <table id = "ScrollTable" class="table table-bordered small" cellspacing="0">
                         <thead class="thead-dark" >
                             <tr>
                                 {% for field,value in opt_sources.first %}

@@ -104,6 +104,12 @@
     /*border: 1px solid red;*/
 }
 
+.table_opt_sources
+{
+    max-width: 800px;
+    overflow:auto;
+}
+
 
 
 
