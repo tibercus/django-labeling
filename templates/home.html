@@ -10,14 +10,24 @@
 {% block content %}
 
         {%  comment %} Form for filtering MetaObj table {% endcomment %}
+        {%  comment %} TODO: make grid system {% endcomment %}
         <form id="filter_form" method="get">
             <div class="row">
-                {% with filter.form as form %}
-                    {% csrf_token %}
-                    {% include 'includes/filter_form.html' %}
-                {% endwith %}
+                <div class="col-4">
+                    {% with filter.form as form %}
+                        {% include 'includes/filter_form.html' %}
+                    {% endwith %}
+                    <input type="submit" value="Filter" class="btn btn-primary"/>
+                </div>
+                <div class="form-col-1 ml-1">
+                    {% for field_name in sort_fields %}
+                        <div class="form-group mt-5 mb-3" style="height: 36px">
+                            <input class="form-check-input" type="radio" name="sort_by" id="sort_by{{ field_name }}" value="{{ field_name }}" />
+                            <label class="form-check-label" for="sort_by{{ field_name }}">Sort by {{ field_name }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-            <input type="submit" value="Filter" class="btn btn-primary"/>
         </form>
 
         <div class="table-responsive">
@@ -28,9 +38,7 @@
                         <th>{{ 'group_id' }}</th>
                         {% for field in meta_fields %}
                             {% if field in master_fields %}
-                                <th><a href="?order_by={{ field }}">master_{{ field }}</a></th>
-                            {% elif field in sort_fields %}
-                                <th><a href="?order_by={{ field }}">{{ field }}</a></th>
+                                <th>master_{{ field }}</th>
                             {% else %}
                                 <th>{{ field }}</th>
                             {% endif %}

@@ -10,26 +10,39 @@ from django.utils.timezone import make_aware
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.db.models import F
+from django.http import QueryDict
 
 
 @login_required
 def home(request):
-    f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F(request.GET).desc(nulls_last=True)))
-    # meta_queryset = MetaObject.objects.all()
-    master_fields = ['RA', 'DEC', 'EXT', 'R98', 'LIKE']
-    # fields which can be sorted
-    sort_fields = ['meta_ind', 'master_survey', 'RA', 'DEC', 'LIKE', 'EXT',
-                   'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RATIO_e5e4']
-    # sort meta objects by requested field
+    master_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'EXT', 'R98', 'LIKE']
+    sort_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'LIKE', 'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RATIO_e5e4']
+    # filter meta objects
+    f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)))
     meta_queryset = f.qs
-    field_order_by = request.GET.get('order_by', 'pk')  # TODO: think about default value and master_flux_05_20
+    # print current GET request and previous
+    print(f'Request: {request.GET.urlencode}')
+    print(f'Sort by: {request.GET.get("sort_by")}')
+
+    # sort meta objects by requested field
+    # field_order_by = request.GET.get('order_by', None)
+    # print(f'Sort by:{field_order_by}')
+    # if field_order_by:
+    #     # look at previous GET request for filtering
+    #     print(f'Filter by previous request')
+    #     f = MetaObjFilter(prev_qd, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)))
+    #     meta_queryset = f.qs
+    #     meta_queryset = meta_queryset.order_by(F(field_order_by).desc(nulls_last=True))
+
+    field_order_by = request.GET.get("sort_by")
     if field_order_by:
         meta_queryset = meta_queryset.order_by(F(field_order_by).desc(nulls_last=True))
 
     # which page to show
     page = request.GET.get('page', 1)
+    # print(f'Previous req:', QueryDict(request.META.get('HTTP_REFERER')[23:]))
     # 50 meta_objects per page
-    paginator = Paginator(meta_queryset, 50)
+    paginator = Paginator(meta_queryset, 10)
 
     try:
         meta_objects = paginator.page(page)
@@ -51,6 +64,23 @@ def source(request, pk):
     meta_object = get_object_or_404(MetaObject, pk=pk)  # get meta object chosen by user on main page
     meta_group = meta_object.meta_group
     sources = meta_object.object_sources.all()
+    # get master source for meta object
+    master_source = sources.get(survey__name=meta_object.master_survey)
+    print(f'Master source:{master_source}\n')
+
+    opt_surveys = ['LS', 'PS', 'SDSS']
+    # get list of query sets - optical sources from different surveys
+    opt_sources = []
+    for s_name in opt_surveys:
+        opt_sources.append(eROSITA.get_opt_survey_sources(master_source, s_name))
+
+    # zip surveys and corresponding optical sources for template nested nav-tabs
+    opt_survey_sources = dict(zip(opt_surveys, opt_sources))
+    print(f'Opt Sources by Survey: {opt_survey_sources}\n')
+    # TODO: make flat array from list of query sets
+    opt_sources_flat = sum([list(opt_s) for opt_s in opt_sources if opt_s], [])
+    print(f'Flat array: {opt_sources_flat}')
+
     # get class chosen by superuser
     try:
         admin_comment = meta_object.comments.get(created_by__is_superuser=True)
@@ -74,6 +104,8 @@ def source(request, pk):
                 # TODO: test this part
                 meta_object.RA = req_source.RA
                 meta_object.DEC = req_source.DEC
+                meta_object.GLON = req_source.GLON
+                meta_object.GLAT = req_source.GLAT
                 meta_object.EXT = req_source.EXT
                 meta_object.R98 = req_source.pos_r98
                 meta_object.LIKE = req_source.DET_LIKE_0
@@ -129,7 +161,9 @@ def source(request, pk):
         opt_form = OptCommentForm()
 
     return render(request, 'source.html', {'surveys': surveys, 'meta_group': meta_group, 'meta_object': meta_object,
-                                           'sources': sources, 'admin_class': admin_class, 'form': form, 'opt_form': opt_form})
+                                           'sources': sources, 'admin_class': admin_class, 'form': form,
+                                           'opt_form': opt_form, 'opt_surveys': opt_surveys,
+                                           'opt_sources': opt_sources_flat, 'opt_survey_sources': opt_survey_sources})
 
 
 @login_required

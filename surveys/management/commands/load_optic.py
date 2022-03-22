@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_ls_fields():
-        fields = ['objID', 'ra', 'dec', 'opt_hpidx', 'brick_primary', 'maskbits', 'fitbits', 'type', 'ra_ivar',
+        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'brick_primary', 'maskbits', 'fitbits', 'type', 'ra_ivar',
                   'dec_ivar', 'bx', 'by', 'ebv', 'mjd_min', 'mjd_max', 'ref_cat', 'ref_id', 'pmra', 'pmdec', 'parallax',
                   'pmra_ivar', 'pmdec_ivar', 'parallax_ivar', 'ref_epoch', 'gaia_phot_g_mean_mag', 'gaia_phot_g_mean_flux_over_error',
                   'gaia_phot_g_n_obs', 'gaia_phot_bp_mean_mag', 'gaia_phot_bp_mean_flux_over_error', 'gaia_phot_bp_n_obs',
@@ -57,7 +57,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_sdss_fields():
-        fields = ['objID', 'ra', 'dec', 'opt_hpidx', 'RAERR', 'DECERR',
+        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'RAERR', 'DECERR',
                   'cModelFlux_u', 'cModelFluxIvar_u', 'cModelFlux_g', 'cModelFluxIvar_g', 'cModelFlux_r',
                   'cModelFluxIvar_r', 'cModelFlux_i', 'cModelFluxIvar_i', 'cModelFlux_z', 'cModelFluxIvar_z',
                   'psfFlux_u', 'psfFluxIvar_u', 'psfFlux_g', 'psfFluxIvar_g', 'psfFlux_r', 'psfFluxIvar_r',
@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_ps_fields():
-        fields = ['objID', 'ra', 'dec', 'opt_hpidx', 'raStack', 'decStack', 'raStackErr', 'decStackErr',
+        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'raStack', 'decStack', 'raStackErr', 'decStackErr',
                   'raMean', 'decMean', 'raMeanErr', 'decMeanErr', 'objInfoFlag', 'qualityFlag', 'primaryDetection',
                   'bestDetection', 'duplicat', 'd_to', 'fitext', 'devaucou', 'star', 'w1fit', 'w1bad',
                   'w1mag', 'dw1mag', 'w2fit', 'w2bad', 'w2mag', 'dw2mag', 'gKronFlux', 'gKronFluxErr', 'rKronFlux',

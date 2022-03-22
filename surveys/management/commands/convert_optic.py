@@ -17,11 +17,11 @@ import os
 class Command(BaseCommand):
     help = "Convert Optical sources from PKL to Parquet file."
 
-    base_fields = ['srcname_fin', 'RA_fin', 'DEC_fin', 'hpidx', 'opt_hpidx', 'survey', 'file_name']
+    base_fields = ['srcname_fin', 'RA_fin', 'DEC_fin', 'hpidx', 'opt_id', 'opt_hpidx', 'survey', 'file_name']
 
     @staticmethod
     def get_ls_fields():
-        fields = ['srcname_fin', 'hpidx', 'objID', 'ra', 'dec', 'opt_hpidx',
+        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx',
                   'brick_primary', 'maskbits', 'fitbits', 'type', 'ra_ivar', 'dec_ivar', 'bx', 'by', 'ebv',
                   'mjd_min', 'mjd_max', 'ref_cat', 'ref_id', 'pmra', 'pmdec', 'parallax', 'pmra_ivar', 'pmdec_ivar',
                   'parallax_ivar', 'ref_epoch', 'gaia_phot_g_mean_mag', 'gaia_phot_g_mean_flux_over_error', 'gaia_phot_g_n_obs',
@@ -48,7 +48,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_sdss_fields():
-        fields = ['srcname_fin', 'hpidx', 'objID', 'ra', 'dec', 'opt_hpidx', 'RAERR', 'DECERR',
+        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'RAERR', 'DECERR',
                   'cModelFlux_u', 'cModelFluxIvar_u', 'cModelFlux_g', 'cModelFluxIvar_g', 'cModelFlux_r',
                   'cModelFluxIvar_r', 'cModelFlux_i', 'cModelFluxIvar_i', 'cModelFlux_z', 'cModelFluxIvar_z',
                   'psfFlux_u', 'psfFluxIvar_u', 'psfFlux_g', 'psfFluxIvar_g', 'psfFlux_r', 'psfFluxIvar_r',
@@ -58,7 +58,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_ps_fields():
-        fields = ['srcname_fin', 'hpidx', 'objID', 'ra', 'dec', 'opt_hpidx', 'raStack', 'decStack', 'raStackErr', 'decStackErr',
+        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'raStack', 'decStack', 'raStackErr', 'decStackErr',
                   'raMean', 'decMean', 'raMeanErr', 'decMeanErr', 'objInfoFlag', 'qualityFlag', 'primaryDetection',
                   'bestDetection', 'duplicat', 'd_to', 'fitext', 'devaucou', 'star', 'w1fit', 'w1bad',
                   'w1mag', 'dw1mag', 'w2fit', 'w2bad', 'w2mag', 'dw2mag', 'gKronFlux', 'gKronFluxErr', 'rKronFlux',
@@ -72,6 +72,7 @@ class Command(BaseCommand):
     def get_ls_table_schema():
         fields = [pa.field('srcname_fin', pa.string()),
                   pa.field('hpidx', pa.int64()),
+                  pa.field('opt_id', pa.int64()),
                   pa.field('objID', pa.int64()),
                   pa.field('ra', pa.float64(), False),
                   pa.field('dec', pa.float64(), False),
@@ -261,6 +262,7 @@ class Command(BaseCommand):
     def get_sdss_table_schema():
         fields = [pa.field('srcname_fin', pa.string()),
                   pa.field('hpidx', pa.int64()),
+                  pa.field('opt_id', pa.int64()),
                   pa.field('objID', pa.string()),
                   pa.field('ra', pa.float64(), False),
                   pa.field('dec', pa.float64(), False),
@@ -306,6 +308,7 @@ class Command(BaseCommand):
     def get_ps_table_schema():
         fields = [pa.field('srcname_fin', pa.string()),
                   pa.field('hpidx', pa.int64()),
+                  pa.field('opt_id', pa.int64()),
                   pa.field('objID', pa.string()),
                   pa.field('ra', pa.float64(), False),
                   pa.field('dec', pa.float64(), False),
@@ -403,17 +406,40 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = timezone.now()
-        file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1_opt_50.pkl')
+        ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ls_50.pkl')
+        ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ps_50.pkl')
 
-        with open(file_path, 'rb') as f:
-            opt_sources = pickle.load(f)
+        # load opt sources correlated with DESI LIS
+        with open(ls_file_path, 'rb') as f:
+            opt_sources_ls = pickle.load(f)
 
-        print(f'Table with opt_sources:\n', opt_sources)
+        # load opt sources correlated with Pan-STARRs
+        with open(ps_file_path, 'rb') as f:
+            opt_sources_ps = pickle.load(f)
+
+        print(f'Table with opt_sources_ls:\n', opt_sources_ls)
+        print(f'Table with opt_sources_ps:\n', opt_sources_ps)
+
+        # get names of xray sources without correlated ls optical sources
+        null_ls_sources = list(opt_sources_ls[opt_sources_ls['ls_objid'].isnull()]['srcname_fin'])
+        # delete NULL rows
+        opt_sources_ls = opt_sources_ls[opt_sources_ls['ls_objid'].notnull()]
+        print(f'Table with filtered opt_sources_ls:\n', opt_sources_ls)
+
+        # get ps correlated optical sources for xray sources found earlier
+        opt_sources_ps = opt_sources_ps.query('srcname_fin in @null_ls_sources')
+        print(f'Table with filtered opt_sources_ps:\n', opt_sources_ps)
+
+        # Concatenate sources correlated with ls and correlated with ps
+        opt_sources = pd.concat([opt_sources_ps, opt_sources_ls])
+
         # rename columns of opt sources
         opt_sources = opt_sources.rename(columns={'ls_objid': 'ls_objID', 'ps_raBest': 'ps_ra', 'ps_decBest': 'ps_dec'})
-        # convert sdss objID from str to int64
-        # if opt_sources['sdss_objID'].dtype == np.object:
-        #     opt_sources.sdss_objID = pd.to_numeric(opt_sources.sdss_objID, errors='coerce').astype('Int64')
+        # index sources in each group(same xray source)
+        opt_sources['opt_id'] = opt_sources.groupby('srcname_fin').cumcount()
+        # add file name
+        file_name = os.path.splitext(os.path.basename(ls_file_path))[0]
+        opt_sources['file_name'] = file_name
 
         # TODO: change this later (datetime64[ns] -> string)
         for col in opt_sources.columns:
@@ -422,28 +448,30 @@ class Command(BaseCommand):
                 opt_sources[col] = pd.to_datetime(opt_sources[col]).dt.date
                 opt_sources[col] = opt_sources[col].astype(str)
 
-        file_name = os.path.splitext(os.path.basename(file_path))[0]
-        opt_sources['file_name'] = file_name
         # TODO: change this later!
-        opt_sources['survey'] = 1
+        opt_sources['survey'] = 9
 
-        # get DESI LIS sources
+        # TODO: delete this later
+        opt_sources = opt_sources.groupby('srcname_fin').head(10)
+        print(f'Table with opt_sources:\n', opt_sources)
+
+        # # get DESI LIS sources
         ls_fields = Command.get_ls_fields()
         ls_sources = Command.get_opt_survey_sources(self, opt_sources, ls_fields, opt_type='ls_')
         # Save parquet table with specified schema
         ls_schema = Command.get_ls_table_schema()
         table = pa.Table.from_pandas(ls_sources, schema=ls_schema)
         pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_ls.parquet'))
-
-        # get SDSS source
+        #
+        # # get SDSS source
         sdss_fields = Command.get_sdss_fields()
         sdss_sources = Command.get_opt_survey_sources(self, opt_sources, sdss_fields, opt_type='sdss_')
         # Save parquet table with specified schema
         sdss_schema = Command.get_sdss_table_schema()
         table = pa.Table.from_pandas(sdss_sources, schema=sdss_schema)
         pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_sdss.parquet'))
-
-        # get PS source
+        #
+        # # get PS source
         ps_fields = Command.get_ps_fields()
         ps_sources = Command.get_opt_survey_sources(self, opt_sources, ps_fields, opt_type='ps_')
         # Save parquet table with specified schema

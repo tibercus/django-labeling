@@ -38,21 +38,29 @@ class MetaObject(models.Model):
     master_survey = models.PositiveIntegerField(blank=True, null=True)
     RA = models.FloatField()
     DEC = models.FloatField()
+    # add galactic coordinates
+    GLON = models.FloatField(blank=True, null=True)
+    GLAT = models.FloatField(blank=True, null=True)
 
     unchange_flag = models.BooleanField(default=False, blank=True, null=True)
 
     comment = models.TextField(max_length=2000, blank=True, null=True)
 
     # TODO: change this later
+    # CLASS_CHOICES = [
+    #     ('TDE: Criteria 1', 'TDE: Parameter A > a1, Parameter B > b2'),
+    #     ('TDE: Criteria 2', 'TDE: Parameter B > b1, Parameter C > c2'),
+    #     ('TDE: Criteria 3', 'TDE: Parameter D > d1, Parameter E > e2'),
+    #     ('NOT TDE: Criteria 1', 'Not TDE: Parameter A < a1, Parameter B < b2'),
+    #     ('NOT TDE: Criteria 2', 'Not TDE: Parameter B < b1, Parameter C < c2'),
+    #     ('NOT TDE: Criteria 3', 'Not TDE: Parameter D < d1, Parameter E < e2'),
+    #     (None, 'Unknown Source'),
+    # ]
     CLASS_CHOICES = [
-        ('TDE: Criteria 1', 'TDE: Parameter A > a1, Parameter B > b2'),
-        ('TDE: Criteria 2', 'TDE: Parameter B > b1, Parameter C > c2'),
-        ('TDE: Criteria 3', 'TDE: Parameter D > d1, Parameter E > e2'),
-        ('NOT TDE: Criteria 1', 'Not TDE: Parameter A < a1, Parameter B < b2'),
-        ('NOT TDE: Criteria 2', 'Not TDE: Parameter B < b1, Parameter C < c2'),
-        ('NOT TDE: Criteria 3', 'Not TDE: Parameter D < d1, Parameter E < e2'),
-        (None, 'Unknown Source'),
-    ]
+            ('TDE', 'Class TDE'),
+            ('NOT TDE', 'Not Class TDE'),
+            (None, 'Unknown Source'),
+        ]
     object_class = models.CharField(
         max_length=100,
         choices=CLASS_CHOICES,
@@ -155,7 +163,8 @@ class MetaObject(models.Model):
 
     @staticmethod
     def fields_to_show():
-        fields = ['meta_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
+        fields = ['meta_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'GLON', 'GLAT',
+                  'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_e5m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4', 'D2D_me5',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e5', 'EXP_e1234',
                   'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m', 'ID_FLAG_e5m',
@@ -195,12 +204,16 @@ class MetaObject(models.Model):
 class MetaObjFilter(django_filters.FilterSet):
     class Meta:
         model = MetaObject
-        fields = {'meta_ind': ['lt', 'gt'],
-                  'master_survey': ['lt', 'gt'],
-                  'RA': ['lt', 'gt'],
-                  'DEC': ['lt', 'gt'],
-                  # 'LIKE': ['lt', 'gt'],
-                  # 'EXT': ['lt', 'gt'],
+        fields = {'RA': ['gt', 'lt'],
+                  'DEC': ['gt', 'lt'],
+                  'GLON': ['gt', 'lt'],
+                  'GLAT': ['gt', 'lt'],
+                  'LIKE': ['gt', 'lt'],
+                  # 'EXT': ['gt', 'lt'],
+                  'RATIO_e2e1': ['gt', 'lt'],
+                  'RATIO_e3e2': ['gt', 'lt'],
+                  'RATIO_e4e3': ['gt', 'lt'],
+                  'RATIO_e5e4': ['gt', 'lt'],
                   # 'test_name__set_test_name': ['icontains'],
                   }
 
@@ -365,6 +378,24 @@ class eROSITA(models.Model):
             value = getattr(self, field, None)
             yield field, value
 
+    def get_opt_survey_sources(self, survey_name):
+        if survey_name == 'LS':
+            opt_sources = self.ls_sources.all()
+            return opt_sources if opt_sources.exists() else None
+
+        elif survey_name == 'PS':
+            opt_sources = self.sdss_sources.all()
+            return opt_sources if opt_sources.exists() else None
+
+        if survey_name == 'SDSS':
+            opt_sources = self.ps_sources.all()
+            return opt_sources if opt_sources.exists() else None
+
+    def __iter__(self):
+        for field in eROSITA.fields_to_show():
+            value = getattr(self, field, None)
+            yield field, value
+
     class Meta:
         verbose_name_plural = 'eROSITA sources'
 
@@ -397,6 +428,7 @@ class Comment(models.Model):
 
 # Class for LS sources
 class LS(models.Model):
+    opt_id = models.PositiveIntegerField(blank=True, null=True)
     objID = models.PositiveIntegerField(blank=True, null=True)
     ra = models.FloatField()
     dec = models.FloatField()
@@ -587,9 +619,9 @@ class LS(models.Model):
         return '{} - LS Source: {}'.format(self.opt_hpidx, self.objID)
 
     def __iter__(self):
-        for field in LS.fields_to_show():
-            value = getattr(self, field, None)
-            yield field, value
+        for field in LS._meta.get_fields():
+            value = getattr(self, field.name, None)
+            yield field.name, value
 
     class Meta:
         verbose_name_plural = 'LS sources'
@@ -597,6 +629,7 @@ class LS(models.Model):
 
 # Class for SDSS sources
 class SDSS(models.Model):
+    opt_id = models.PositiveIntegerField(blank=True, null=True)
     objID = models.CharField(max_length=100, blank=True, null=True)
     ra = models.FloatField()
     dec = models.FloatField()
@@ -651,9 +684,9 @@ class SDSS(models.Model):
         return '{} - SDSS Source: {}'.format(self.opt_hpidx, self.objID)
 
     def __iter__(self):
-        for field in SDSS.fields_to_show():
-            value = getattr(self, field, None)
-            yield field, value
+        for field in SDSS._meta.get_fields():
+            value = getattr(self, field.name, None)
+            yield field.name, value
 
     class Meta:
         verbose_name_plural = 'SDSS sources'
@@ -661,6 +694,7 @@ class SDSS(models.Model):
 
 # Class for PS sources
 class PS(models.Model):
+    opt_id = models.PositiveIntegerField(blank=True, null=True)
     objID = models.CharField(max_length=100, blank=True, null=True)
     ra = models.FloatField()
     dec = models.FloatField()
@@ -742,9 +776,9 @@ class PS(models.Model):
         return '{} - PS Source: {}'.format(self.opt_hpidx, self.objID)
 
     def __iter__(self):
-        for field in PS.fields_to_show():
-            value = getattr(self, field, None)
-            yield field, value
+        for field in PS._meta.get_fields():
+            value = getattr(self, field.name, None)
+            yield field.name, value
 
     class Meta:
         verbose_name_plural = 'PS sources'

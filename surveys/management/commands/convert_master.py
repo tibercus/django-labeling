@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_fields():  # add img_id to identify images in load_data
-        fields = ['img_id', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
+        fields = ['img_id', 'RA', 'DEC', 'GLON', 'GLAT', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_e5m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4', 'D2D_me5',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e5', 'EXP_e1234',
                   'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m', 'ID_FLAG_e5m',
@@ -39,6 +39,10 @@ class Command(BaseCommand):
             pa.field('img_id', pa.int64()),  # to identify Pavel images
             pa.field("RA", pa.float64(), False),
             pa.field("DEC", pa.float64(), False),
+            # add galactic coordinates
+            pa.field("GLON", pa.float64()),
+            pa.field("GLAT", pa.float64()),
+
             pa.field('unchange_flag', pa.bool_()),
             pa.field("comment", pa.string()),
             pa.field("object_class", pa.string()),
