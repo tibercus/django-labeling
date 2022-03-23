@@ -5,6 +5,7 @@ from itertools import zip_longest
 from django.db.models import Max
 
 import django_filters
+from django.db.models import FloatField, ExpressionWrapper, F
 
 
 # Class for files from where sources were loaded
@@ -381,14 +382,20 @@ class eROSITA(models.Model):
     def get_opt_survey_sources(self, survey_name):
         if survey_name == 'LS':
             opt_sources = self.ls_sources.all()
+            opt_sources = opt_sources.annotate(separation=((F('ra') - self.RA)*(F('ra') - self.RA)
+                                                           + (F('dec') - self.DEC)*(F('dec') - self.DEC))).order_by('separation')
             return opt_sources if opt_sources.exists() else None
 
         elif survey_name == 'PS':
-            opt_sources = self.sdss_sources.all()
+            opt_sources = self.ps_sources.all()
+            opt_sources = opt_sources.annotate(separation=((F('ra') - self.RA) * (F('ra') - self.RA)
+                                                           + (F('dec') - self.DEC) * (F('dec') - self.DEC))).order_by('separation')
             return opt_sources if opt_sources.exists() else None
 
         if survey_name == 'SDSS':
-            opt_sources = self.ps_sources.all()
+            opt_sources = self.sdss_sources.all()
+            opt_sources = opt_sources.annotate(separation=((F('ra') - self.RA) * (F('ra') - self.RA)
+                                                           + (F('dec') - self.DEC) * (F('dec') - self.DEC))).order_by('separation')
             return opt_sources if opt_sources.exists() else None
 
     def __iter__(self):
@@ -616,7 +623,7 @@ class LS(models.Model):
     meta_object = models.OneToOneField(MetaObject, on_delete=models.CASCADE, related_name='master_ls', blank=True, null=True)
 
     def __str__(self):
-        return '{} - LS Source: {}'.format(self.opt_hpidx, self.objID)
+        return '{} - LS Source: {}'.format(self.opt_hpidx, self.opt_id)
 
     def __iter__(self):
         for field in LS._meta.get_fields():
@@ -681,7 +688,7 @@ class SDSS(models.Model):
     meta_object = models.OneToOneField(MetaObject, on_delete=models.CASCADE, related_name='master_sdss', blank=True, null=True)
 
     def __str__(self):
-        return '{} - SDSS Source: {}'.format(self.opt_hpidx, self.objID)
+        return '{} - SDSS Source: {}'.format(self.opt_hpidx, self.opt_id)
 
     def __iter__(self):
         for field in SDSS._meta.get_fields():
@@ -773,7 +780,7 @@ class PS(models.Model):
                                        null=True)
 
     def __str__(self):
-        return '{} - PS Source: {}'.format(self.opt_hpidx, self.objID)
+        return '{} - PS Source: {}'.format(self.opt_hpidx, self.opt_id)
 
     def __iter__(self):
         for field in PS._meta.get_fields():

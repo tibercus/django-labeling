@@ -77,7 +77,8 @@ def source(request, pk):
     # zip surveys and corresponding optical sources for template nested nav-tabs
     opt_survey_sources = dict(zip(opt_surveys, opt_sources))
     print(f'Opt Sources by Survey: {opt_survey_sources}\n')
-    # TODO: make flat array from list of query sets
+
+    # make flat array from list of query sets
     opt_sources_flat = sum([list(opt_s) for opt_s in opt_sources if opt_s], [])
     print(f'Flat array: {opt_sources_flat}')
 
