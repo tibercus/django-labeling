@@ -6,7 +6,7 @@ from django.db.models import Max
 
 import django_filters
 from django import forms
-from django.db.models import FloatField, ExpressionWrapper, F
+from django.db.models import FloatField, ExpressionWrapper, F, Case, When, Value, IntegerField
 
 
 # Class for files from where sources were loaded
@@ -211,6 +211,8 @@ class MetaObjFilter(django_filters.FilterSet):
         widget=forms.RadioSelect(attrs={'class': 'custom_radio form-check-inline'}, choices=CHOICES),
         )
 
+    ext_gt_0 = django_filters.BooleanFilter(label='EXT > 0', method='ext_gt_zero')
+
     class Meta:
         model = MetaObject
         fields = {'RA': ['gt', 'lt'],
@@ -227,6 +229,20 @@ class MetaObjFilter(django_filters.FilterSet):
                   'RFLAG_e4e3': ['gt', 'lt'],
                   # 'test_name__set_test_name': ['icontains'],
                   }
+
+    def ext_gt_zero(self, queryset, name, value):
+        if value is not None:
+            queryset = queryset.annotate(
+                ext_is_gt=Case(
+                    When(
+                        EXT__gt=0,
+                        then=Value(True)
+                    ),
+                    default=Value(False),
+                    output_field=models.BooleanField())
+            ).filter(ext_is_gt=value)
+
+        return queryset
 
 
 # Class for surveys where transients were detected
