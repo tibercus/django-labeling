@@ -9,30 +9,25 @@ from .models import *
 from django.utils.timezone import make_aware
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from django.db.models import F
+from django.db.models import F, Count
 from django.http import QueryDict
 
 
 @login_required
 def home(request):
     master_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'EXT', 'R98', 'LIKE']
-    sort_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'LIKE', 'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3', 'RATIO_e5e4']
+    sort_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'LIKE', 'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3']
     # filter meta objects
     f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)))
     meta_queryset = f.qs
     # print current GET request and previous
     print(f'Request: {request.GET.urlencode}')
     print(f'Sort by: {request.GET.get("sort_by")}')
+    print(f'Sort by group: {request.GET.get("sort_by_group")}')
 
-    # sort meta objects by requested field
-    # field_order_by = request.GET.get('order_by', None)
-    # print(f'Sort by:{field_order_by}')
-    # if field_order_by:
-    #     # look at previous GET request for filtering
-    #     print(f'Filter by previous request')
-    #     f = MetaObjFilter(prev_qd, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)))
-    #     meta_queryset = f.qs
-    #     meta_queryset = meta_queryset.order_by(F(field_order_by).desc(nulls_last=True))
+    sort_by_group = request.GET.get("sort_by_group")
+    if sort_by_group:
+        meta_queryset = meta_queryset.annotate(num_obj=Count('meta_group__meta_objects')).filter(num_obj=1)
 
     field_order_by = request.GET.get("sort_by")
     if field_order_by:

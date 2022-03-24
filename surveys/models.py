@@ -5,6 +5,7 @@ from itertools import zip_longest
 from django.db.models import Max
 
 import django_filters
+from django import forms
 from django.db.models import FloatField, ExpressionWrapper, F
 
 
@@ -203,6 +204,13 @@ class MetaObject(models.Model):
 
 # Class for filtering Meta Objects by requested fields
 class MetaObjFilter(django_filters.FilterSet):
+    CHOICES = ((True, 'Primary'), (False, 'Secondary'))
+
+    is_primary = django_filters.BooleanFilter(
+        field_name='primary_object', label='Meta Object', required=False,
+        widget=forms.RadioSelect(attrs={'class': 'custom_radio form-check-inline'}, choices=CHOICES),
+        )
+
     class Meta:
         model = MetaObject
         fields = {'RA': ['gt', 'lt'],
@@ -212,9 +220,11 @@ class MetaObjFilter(django_filters.FilterSet):
                   'LIKE': ['gt', 'lt'],
                   # 'EXT': ['gt', 'lt'],
                   'RATIO_e2e1': ['gt', 'lt'],
+                  'RFLAG_e2e1': ['gt', 'lt'],
                   'RATIO_e3e2': ['gt', 'lt'],
+                  'RFLAG_e3e2': ['gt', 'lt'],
                   'RATIO_e4e3': ['gt', 'lt'],
-                  'RATIO_e5e4': ['gt', 'lt'],
+                  'RFLAG_e4e3': ['gt', 'lt'],
                   # 'test_name__set_test_name': ['icontains'],
                   }
 

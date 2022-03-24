@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_fields():  # add img_id to identify images in load_data
-        fields = ['meta_ind', 'RA', 'DEC', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
+        fields = ['meta_ind', 'RA', 'DEC', 'GLON', 'GLAT', 'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_e5m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4', 'D2D_me5',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e5', 'EXP_e1234',
                   'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m', 'ID_FLAG_e5m',
@@ -299,7 +299,7 @@ class Command(BaseCommand):
                 try:
                     self.stdout.write(f'Start filling fields...\n')
                     for i, field in enumerate(field_list):
-                        # self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+1 - skip index
+                        self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+1 - skip index
                         filled_fields = ['img_id', 'RA', 'DEC', 'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e5', 'ID_e1234']
                         if field not in filled_fields:
                             setattr(meta_object, field, row[i+1])  # Similar to source.field = row[i+1]

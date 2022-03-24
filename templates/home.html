@@ -17,7 +17,8 @@
                     {% with filter.form as form %}
                         {% include 'includes/filter_form.html' %}
                     {% endwith %}
-                    <input type="submit" value="Filter" class="btn btn-primary"/>
+                    <input type="submit" value="Filter" class="btn btn-primary btn-md"/>
+                    <a href="{% url 'home' %}" class="btn btn-secondary btn-md ml-2">Reset</a>
                 </div>
                 <div class="form-col-1 ml-1">
                     {% for field_name in sort_fields %}
@@ -26,6 +27,10 @@
                             <label class="form-check-label" for="sort_by{{ field_name }}">Sort by {{ field_name }}</label>
                         </div>
                     {% endfor %}
+                    <div class="form-group mt-5 mb-3" style="height: 36px">
+                        <input class="form-check-input" type="radio" name="sort_by_group" id="sort_by_group" value="1" />
+                        <label class="form-check-label" for="sort_by_group">Sort by Group</label>
+                    </div>
                 </div>
             </div>
         </form>
