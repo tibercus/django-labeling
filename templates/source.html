@@ -279,7 +279,8 @@
                 {% elif opt_sources %}
                     {% define "" as status %} {% define "false" as selected %}
                 {% else %}
-                    {% define "disabled" as status %} {% define "false" as selected %}
+{#                    {% define "disabled" as status %} {% define "false" as selected %}#}
+                    {% define "" as status %} {% define "false" as selected %}
                 {% endif %}
 
                 <li class="nav-item">
@@ -310,11 +311,10 @@
                 });
 
                 // marker at meta_object center
-                var markers = A.catalog({name: 'Some markers'})
+                var markers = A.catalog({name: 'Xray Source', shape: 'plus', sourceSize: 20, color: 'red', onClick: 'showTable'})
                 aladin.addCatalog(markers);
-                markers.addSources([A.marker({{ meta_object.RA }}, {{ meta_object.DEC }}, {popupTitle: '{{meta_object.master_name}}',
-                    popupDesc: '<em>RA:</em> {{ meta_object.RA }} <br/><em>DEC:</em> {{ meta_object.DEC }} <br/>\
-                        <em><Class:</em> {{ meta_object.object_class }} <br/>'})]);
+                markers.addSources(A.source({{ meta_object.RA }}, {{ meta_object.DEC }}, {name: '{{meta_object.master_name}}',
+                    RA: {{ meta_object.RA }}, DEC: {{ meta_object.DEC }}, Class: '{{ meta_object.object_class }}'}));
 
                 // circle around meta_object center - r98
                 var overlay = A.graphicOverlay({color: 'cyan', lineWidth: 2});
@@ -323,12 +323,14 @@
                 overlay.add(A.circle({{ meta_object.RA }}, {{ meta_object.DEC }}, {{ meta_object.R98|sec_in_deg }}, {color: 'red'})); // radius in degrees
 
                 // markers for optical sources
-                var markers = A.catalog({name: 'Some markers'})
-                aladin.addCatalog(markers);
-                {% for opt_s in opt_sources %}
-                    markers.addSources([A.marker({{ opt_s.ra }}, {{ opt_s.dec }}, {popupTitle: '{{opt_s}}',
-                        popupDesc: '<em>RA:</em> {{ opt_s.ra }} <br/><em>DEC:</em> {{ opt_s.dec }} <br/>\
-                                    More info <a target="_blank" href="#">in Simbad</a>'})]);
+                {% for opt_survey, opt_sources in opt_survey_sources.items %}
+                    var markers = A.catalog({name: '{{ opt_survey }}', sourceSize: 13, color: '{{ opt_survey|get_survey_color }}'})
+                    aladin.addCatalog(markers);
+                    {% for opt_s in opt_sources %}
+                        markers.addSources([A.marker({{ opt_s.ra }}, {{ opt_s.dec }}, {popupTitle: '{{opt_s}}',
+                            popupDesc: '<em>RA:</em> {{ opt_s.ra }} <br/><em>DEC:</em> {{ opt_s.dec }} <br/>\
+                                        More info <a target="_blank" href="#">in Simbad</a>'})]);
+                    {% endfor %}
                 {% endfor %}
             </script>
         </div>
@@ -342,7 +344,6 @@
                         {% define "fade" as status %}
                     {% endif %}
 
-                {% if opt_sources %}
                 <div class="tab-pane {{ status }}" id="survey_{{ opt_survey }}" role="tabpanel" aria-labelledby="{{ opt_survey }}-tab">
 
                     <div class="table_opt_sources">
@@ -356,15 +357,17 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for opt_source in opt_sources %}
-                                <tr>
-                                    {% for field,value in opt_source %}
-                                        <td class="align-middle">
-                                            {{ value }}
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                            {% endfor %}
+                            {% if opt_sources %}
+                                {% for opt_source in opt_sources %}
+                                    <tr class="{% opt_row_class opt_source master_source %}">
+                                        {% for field,value in opt_source %}
+                                            <td class="align-middle">
+                                                {{ value }}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
                           </tbody>
                         </table>
                     </div>
@@ -391,8 +394,6 @@
                     </div>
 
                 </div>
-                {% endif %}
-
             {% endfor %}
         </div>
     </div>

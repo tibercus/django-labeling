@@ -452,8 +452,8 @@ class Command(BaseCommand):
         opt_sources['survey'] = 9
 
         # TODO: delete this later
-        opt_sources = opt_sources.groupby('srcname_fin').head(10)
-        print(f'Table with opt_sources:\n', opt_sources)
+        # opt_sources = opt_sources.groupby('srcname_fin').head(10)
+        # print(f'Table with opt_sources:\n', opt_sources)
 
         # # get DESI LIS sources
         ls_fields = Command.get_ls_fields()

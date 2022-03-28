@@ -299,7 +299,7 @@ class Command(BaseCommand):
                 try:
                     self.stdout.write(f'Start filling fields...\n')
                     for i, field in enumerate(field_list):
-                        self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+1 - skip index
+                        # self.stdout.write(f'Num:{i} - {field} - {row[i+1]}')  # i+1 - skip index
                         filled_fields = ['img_id', 'RA', 'DEC', 'ID_e1', 'ID_e2', 'ID_e3', 'ID_e4', 'ID_e5', 'ID_e1234']
                         if field not in filled_fields:
                             setattr(meta_object, field, row[i+1])  # Similar to source.field = row[i+1]

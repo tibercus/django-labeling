@@ -75,3 +75,22 @@ def relative_url(value, field_name, urlencode=None):
         encoded_querystring = '&'.join(filtered_querystring)
         url = '{}&{}'.format(url, encoded_querystring)
     return url
+
+
+@register.filter
+def get_survey_color(opt_survey):
+    """get color for opt survey markers"""
+    if opt_survey == 'LS':
+        return 'fuchsia'
+    elif opt_survey == 'SDSS':
+        return 'yellow'
+    else:
+        return 'blue'
+
+
+@register.simple_tag
+def opt_row_class(opt_source, master_source):
+    if master_source in opt_source.dup_xray.all():
+        return "table-primary"
+    else:
+        return ""

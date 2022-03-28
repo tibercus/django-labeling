@@ -6,7 +6,8 @@ from django.db.models import Max
 
 import django_filters
 from django import forms
-from django.db.models import FloatField, ExpressionWrapper, F, Case, When, Value, IntegerField
+from django.db.models import FloatField, ExpressionWrapper, F, Func, Case, When, Value, IntegerField
+from decimal import Decimal
 
 
 # Class for files from where sources were loaded
@@ -371,8 +372,17 @@ class eROSITA(models.Model):
     # File from which source was loaded to system
     origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='xray_sources', blank=True, null=True)
     # to find sources that are considered one space object
-    # meta_object = models.ForeignKey(MetaObject, on_delete=models.CASCADE, related_name='object_sources', blank=True, null=True)
     meta_objects = models.ManyToManyField(MetaObject, related_name='object_sources', blank=True)
+
+    # ls counterpart link + separation(arcseconds)
+    ls_dup = models.ForeignKey('LS', on_delete=models.SET_NULL, related_name='dup_xray', blank=True, null=True)
+    ls_dup_sep = models.DecimalField(max_digits=8, decimal_places=5)
+    # sdss counterpart pk + separation(arcseconds)
+    sdss_dup = models.ForeignKey('SDSS', on_delete=models.SET_NULL, related_name='dup_xray', blank=True, null=True)
+    sdss_dup_sep = models.DecimalField(max_digits=8, decimal_places=5)
+    # ps counterpart pk + separation(arcseconds)
+    ps_dup = models.ForeignKey('PS', on_delete=models.SET_NULL, related_name='dup_xray', blank=True, null=True)
+    ps_dup_sep = models.DecimalField(max_digits=8, decimal_places=5)
 
     def __str__(self):
         return '{} - Source: {}'.format(self.survey_ind, self.name)
@@ -408,20 +418,20 @@ class eROSITA(models.Model):
     def get_opt_survey_sources(self, survey_name):
         if survey_name == 'LS':
             opt_sources = self.ls_sources.all()
-            opt_sources = opt_sources.annotate(separation=((F('ra') - self.RA)*(F('ra') - self.RA)
-                                                           + (F('dec') - self.DEC)*(F('dec') - self.DEC))).order_by('separation')
+            opt_sources = opt_sources.annotate(separation=(Func(F('ra') - self.RA, function='ABS')
+                                                           + Func(F('dec') - self.DEC, function='ABS'))).order_by('separation')
             return opt_sources if opt_sources.exists() else None
 
         elif survey_name == 'PS':
             opt_sources = self.ps_sources.all()
-            opt_sources = opt_sources.annotate(separation=((F('ra') - self.RA) * (F('ra') - self.RA)
-                                                           + (F('dec') - self.DEC) * (F('dec') - self.DEC))).order_by('separation')
+            opt_sources = opt_sources.annotate(separation=(Func(F('ra') - self.RA, function='ABS')
+                                                           + Func(F('dec') - self.DEC, function='ABS'))).order_by('separation')
             return opt_sources if opt_sources.exists() else None
 
         if survey_name == 'SDSS':
             opt_sources = self.sdss_sources.all()
-            opt_sources = opt_sources.annotate(separation=((F('ra') - self.RA) * (F('ra') - self.RA)
-                                                           + (F('dec') - self.DEC) * (F('dec') - self.DEC))).order_by('separation')
+            opt_sources = opt_sources.annotate(separation=(Func(F('ra') - self.RA, function='ABS')
+                                                           + Func(F('dec') - self.DEC, function='ABS'))).order_by('separation')
             return opt_sources if opt_sources.exists() else None
 
     def __iter__(self):
@@ -645,8 +655,6 @@ class LS(models.Model):
     xray_sources = models.ManyToManyField(eROSITA, related_name='ls_sources', blank=True)
     # File from which source was loaded to system
     origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='ls_sources', blank=True, null=True)
-    # Meta object for which this gaia source is master
-    meta_object = models.OneToOneField(MetaObject, on_delete=models.CASCADE, related_name='master_ls', blank=True, null=True)
 
     def __str__(self):
         return '{} - LS Source: {}'.format(self.opt_hpidx, self.opt_id)
@@ -710,8 +718,6 @@ class SDSS(models.Model):
     xray_sources = models.ManyToManyField(eROSITA, related_name='sdss_sources', blank=True)
     # File from which source was loaded to system
     origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='sdss_sources', blank=True, null=True)
-    # Meta object for which this gaia source is master
-    meta_object = models.OneToOneField(MetaObject, on_delete=models.CASCADE, related_name='master_sdss', blank=True, null=True)
 
     def __str__(self):
         return '{} - SDSS Source: {}'.format(self.opt_hpidx, self.opt_id)
@@ -801,9 +807,6 @@ class PS(models.Model):
     # File from which source was loaded to system
     origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='ps_sources', blank=True,
                                     null=True)
-    # Meta object for which this gaia source is master
-    meta_object = models.OneToOneField(MetaObject, on_delete=models.CASCADE, related_name='master_ps', blank=True,
-                                       null=True)
 
     def __str__(self):
         return '{} - PS Source: {}'.format(self.opt_hpidx, self.opt_id)

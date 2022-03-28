@@ -74,8 +74,8 @@ def source(request, pk):
     print(f'Opt Sources by Survey: {opt_survey_sources}\n')
 
     # make flat array from list of query sets
-    opt_sources_flat = sum([list(opt_s) for opt_s in opt_sources if opt_s], [])
-    print(f'Flat array: {opt_sources_flat}')
+    # opt_sources_flat = sum([list(opt_s) for opt_s in opt_sources if opt_s], [])
+    # print(f'Flat array: {opt_sources_flat}')
 
     # get class chosen by superuser
     try:
@@ -159,7 +159,7 @@ def source(request, pk):
     return render(request, 'source.html', {'surveys': surveys, 'meta_group': meta_group, 'meta_object': meta_object,
                                            'sources': sources, 'admin_class': admin_class, 'form': form,
                                            'opt_form': opt_form, 'opt_surveys': opt_surveys,
-                                           'opt_sources': opt_sources_flat, 'opt_survey_sources': opt_survey_sources})
+                                           'master_source': master_source, 'opt_survey_sources': opt_survey_sources})
 
 
 @login_required

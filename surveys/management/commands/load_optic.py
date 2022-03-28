@@ -15,6 +15,7 @@ from astropy.coordinates import SkyCoord
 
 import astropy_healpix
 from astropy_healpix import HEALPix
+from decimal import Decimal
 
 
 
@@ -77,6 +78,32 @@ class Command(BaseCommand):
                   'counterparts_number', 'single_counterpart', 'counterparts_type', 'survey', 'file_name']
         return fields
 
+    @staticmethod
+    def find_dup_source(xray_sources, opt_source, opt_type):
+        # for comparing float values
+        TOLERANCE = 10 ** -6
+        c_opt = SkyCoord(ra=opt_source.ra * u.deg, dec=opt_source.dec * u.deg, frame='icrs')
+        for xray_source in xray_sources:
+            c_xray = SkyCoord(ra=xray_source.RA * u.deg, dec=xray_source.DEC * u.deg, frame='icrs')
+            sep = c_xray.separation(c_opt).arcsecond
+            # find/create new opt LS counterpart + get new separation
+            if opt_type == 'LS' and (not xray_source.ls_dup or xray_source.ls_dup_sep > sep):
+                print(f'Old Sep: {xray_source.ls_dup_sep} New Sep: {sep}')
+                xray_source.ls_dup = opt_source
+                xray_source.ls_dup_sep = sep
+            # find/create new opt SDSS counterpart
+            elif opt_type == 'SDSS' and (not xray_source.sdss_dup or xray_source.sdss_dup_sep > sep):
+                print(f'Old Sep: {xray_source.sdss_dup_sep} New Sep: {sep}')
+                xray_source.sdss_dup = opt_source
+                xray_source.sdss_dup_sep = sep
+            # find/create new opt PS counterpart
+            elif opt_type == 'PS' and (not xray_source.ps_dup or xray_source.ps_dup_sep > sep):
+                print(f'Old Sep: {xray_source.ps_dup_sep} New Sep: {sep}')
+                xray_source.ps_dup = opt_source
+                xray_source.ps_dup_sep = sep
+
+            xray_source.save()
+
     def load_opt_survey(self, data, field_list, hp, opt_type='LS'):
         self.stdout.write(f'Start loading {opt_type} optical data')
         for row in data.itertuples():
@@ -88,7 +115,7 @@ class Command(BaseCommand):
             # get heal pix index
             opt_hpidx = hp.skycoord_to_healpix(SkyCoord(ra=row.ra * u.deg, dec=row.dec * u.deg, frame='icrs'))
 
-            # find/create ls source
+            # find/create optical source
             if opt_type == 'LS':
                 opt_source, created = LS.objects.get_or_create(opt_hpidx=opt_hpidx, origin_file=origin_file,
                                                                defaults={'objID': row.objID, 'ra': row.ra, 'dec': row.dec})
@@ -119,6 +146,8 @@ class Command(BaseCommand):
                                                           hpidx=row.hpidx)
                     if xray_sources.exists():
                         opt_source.xray_sources.add(*xray_sources)
+                        # find counter part for xray sources
+                        Command.find_dup_source(xray_sources, opt_source, opt_type)
                         opt_source.save()
                         print(f'Link {opt_type} source: {opt_source} with xray sources: {xray_sources}\n')
                     else:
