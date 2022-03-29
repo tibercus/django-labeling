@@ -95,13 +95,16 @@
     margin-top: 20px;
 }
 
+#opt_comment_form
+{
+    margin-top: 20px;
+    /*border: 1px solid red;*/
+}
+
 .aladin_lite
 {
-    position: relative;
-    width: 700px;
-    margin: 20px;
-    left: 25%;
-    /*border: 1px solid red;*/
+    margin-top: 20px;
+    /*border: 1px solid limegreen;*/
 }
 
 .table_opt_sources

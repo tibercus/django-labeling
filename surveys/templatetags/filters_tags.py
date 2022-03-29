@@ -84,8 +84,10 @@ def get_survey_color(opt_survey):
         return 'fuchsia'
     elif opt_survey == 'SDSS':
         return 'yellow'
-    else:
+    elif opt_survey == 'PS':
         return 'blue'
+    else:
+        return 'limegreen'
 
 
 @register.simple_tag

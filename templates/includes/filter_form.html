@@ -3,7 +3,7 @@
 <div class = "row">
     {% for field in form %}
         <div class="form-group">
-            <div class="col">
+            <div class="col-lg">
                 {{ field.label_tag }}
                 {{ field|add_class:'form-control' }}
                 {% for error in field.errors %}

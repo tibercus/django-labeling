@@ -46,11 +46,15 @@ class PSInline(admin.TabularInline):
     model = PS.xray_sources.through
 
 
+class GAIAInline(admin.TabularInline):
+    model = GAIA.xray_sources.through
+
+
 class eROSITAAdmin(admin.ModelAdmin):
     readonly_fields = ('id',)
     filter_horizontal = ('meta_objects',)
     inlines = [
-        LSInline, SDSSInline, PSInline
+        LSInline, SDSSInline, PSInline, GAIAInline
     ]
 
 
@@ -64,5 +68,6 @@ admin.site.register(Comment)
 admin.site.register(LS, LSAdmin)
 admin.site.register(SDSS, LSAdmin)
 admin.site.register(PS, LSAdmin)
+admin.site.register(GAIA, LSAdmin)
 admin.site.register(OptComment)
 

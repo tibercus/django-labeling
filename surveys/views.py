@@ -63,7 +63,7 @@ def source(request, pk):
     master_source = sources.get(survey__name=meta_object.master_survey)
     print(f'Master source:{master_source}\n')
 
-    opt_surveys = ['LS', 'PS', 'SDSS']
+    opt_surveys = ['LS', 'PS', 'SDSS', 'GAIA']
     # get list of query sets - optical sources from different surveys
     opt_sources = []
     for s_name in opt_surveys:
@@ -97,7 +97,6 @@ def source(request, pk):
             else:
                 meta_object.master_name = req_source.name
                 meta_object.master_survey = req_source.survey.name
-                # TODO: test this part
                 meta_object.RA = req_source.RA
                 meta_object.DEC = req_source.DEC
                 meta_object.GLON = req_source.GLON

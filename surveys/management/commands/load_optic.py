@@ -18,7 +18,6 @@ from astropy_healpix import HEALPix
 from decimal import Decimal
 
 
-
 class Command(BaseCommand):
     help = "Load Optical data from Parquet file."
 
@@ -79,6 +78,19 @@ class Command(BaseCommand):
         return fields
 
     @staticmethod
+    def get_gaia_fields():
+        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'ra_error', 'dec_error',
+                  'parallax', 'parallax_error', 'pm', 'pmra', 'pmra_error', 'pmdec', 'pmdec_error',
+                  'astrometric_n_good_obs_al', 'astrometric_gof_al', 'astrometric_chi2_al', 'astrometric_excess_noise',
+                  'astrometric_excess_noise_sig', 'pseudocolour', 'pseudocolour_error', 'visibility_periods_used',
+                  'ruwe', 'duplicated_source', 'phot_g_n_obs', 'phot_g_mean_mag', 'phot_bp_mean_flux',
+                  'phot_bp_mean_flux_error', 'phot_bp_mean_mag', 'phot_rp_mean_flux', 'phot_rp_mean_flux_error',
+                  'phot_rp_mean_mag', 'dr2_radial_velocity', 'dr2_radial_velocity_error',
+                  'l', 'b', 'ecl_lon', 'ecl_lat', 'phot_g_mean_flux', 'phot_g_mean_flux_error',
+                  'counterparts_number', 'single_counterpart', 'counterparts_type', 'survey', 'file_name']
+        return fields
+
+    @staticmethod
     def find_dup_source(xray_sources, opt_source, opt_type):
         # for comparing float values
         TOLERANCE = 10 ** -6
@@ -101,6 +113,11 @@ class Command(BaseCommand):
                 print(f'Old Sep: {xray_source.ps_dup_sep} New Sep: {sep}')
                 xray_source.ps_dup = opt_source
                 xray_source.ps_dup_sep = sep
+            # find/create new opt PS counterpart
+            elif opt_type == 'GAIA' and (not xray_source.gaia_dup or xray_source.gaia_dup_sep > sep):
+                print(f'Old Sep: {xray_source.gaia_dup_sep} New Sep: {sep}')
+                xray_source.gaia_dup = opt_source
+                xray_source.gaia_dup_sep = sep
 
             xray_source.save()
 
@@ -125,6 +142,9 @@ class Command(BaseCommand):
             elif opt_type == 'PS':
                 opt_source, created = PS.objects.get_or_create(opt_hpidx=opt_hpidx, origin_file=origin_file,
                                                                defaults={'objID': row.objID, 'ra': row.ra, 'dec': row.dec})
+            elif opt_type == 'GAIA':
+                opt_source, created = GAIA.objects.get_or_create(opt_hpidx=opt_hpidx, origin_file=origin_file,
+                                                                 defaults={'objID': row.objID, 'ra': row.ra, 'dec': row.dec})
 
             if created:
                 self.stdout.write(f'{row[0]} - Create new {opt_type} source {opt_hpidx} with objID: {row.objID}')
@@ -206,6 +226,19 @@ class Command(BaseCommand):
 
         ps_field_list = Command.get_ps_fields()
         Command.load_opt_survey(self, ps_data, ps_field_list, hp, opt_type='PS')
+
+        # Load GAIA sources
+        file_path = os.path.join(settings.WORK_DIR, 'opt_sources_gaia.parquet')
+
+        table = pq.read_table(file_path)
+        gaia_data = table.to_pandas()
+
+        # replace all nan with None
+        gaia_data = gaia_data.replace({np.nan: None})
+        print(f'\nTable with GAIA sources:\n', gaia_data)
+
+        gaia_field_list = Command.get_gaia_fields()
+        Command.load_opt_survey(self, gaia_data, gaia_field_list, hp, opt_type='GAIA')
 
         # maybe use this later
         # if len(sources) > 500:

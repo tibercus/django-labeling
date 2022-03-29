@@ -69,6 +69,18 @@ class Command(BaseCommand):
         return fields
 
     @staticmethod
+    def get_gaia_fields():
+        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'ra_error', 'dec_error',
+                  'parallax', 'parallax_error', 'pm', 'pmra', 'pmra_error', 'pmdec', 'pmdec_error',
+                  'astrometric_n_good_obs_al', 'astrometric_gof_al', 'astrometric_chi2_al', 'astrometric_excess_noise',
+                  'astrometric_excess_noise_sig', 'pseudocolour', 'pseudocolour_error', 'visibility_periods_used', 'ruwe',
+                  'duplicated_source', 'phot_g_n_obs', 'phot_g_mean_mag', 'phot_bp_mean_flux', 'phot_bp_mean_flux_error',
+                  'phot_bp_mean_mag', 'phot_rp_mean_flux', 'phot_rp_mean_flux_error', 'phot_rp_mean_mag',
+                  'dr2_radial_velocity', 'dr2_radial_velocity_error', 'l', 'b', 'ecl_lon', 'ecl_lat', 'phot_g_mean_flux',
+                  'phot_g_mean_flux_error', 'counterparts_number', 'single_counterpart', 'counterparts_type', 'survey', 'file_name']
+        return fields
+
+    @staticmethod
     def get_ls_table_schema():
         fields = [pa.field('srcname_fin', pa.string()),
                   pa.field('hpidx', pa.int64()),
@@ -383,6 +395,72 @@ class Command(BaseCommand):
 
         return schema
 
+    @staticmethod
+    def get_gaia_table_schema():
+        fields = [pa.field('srcname_fin', pa.string()),
+                  pa.field('hpidx', pa.int64()),
+                  pa.field('opt_id', pa.int64()),
+                  pa.field('objID', pa.string()),
+                  pa.field('ra', pa.float64(), False),
+                  pa.field('dec', pa.float64(), False),
+                  pa.field('opt_hpidx', pa.int64()),
+                  
+                  pa.field('ra_error', pa.float64()),
+                  pa.field('dec_error', pa.float64()),
+                  pa.field('parallax', pa.float64()),
+                  pa.field('parallax_error', pa.float64()),
+
+                  pa.field('pm', pa.float64()),
+                  pa.field('pmra', pa.float64()),
+                  pa.field('pmra_error', pa.float64()),
+                  pa.field('pmdec', pa.float64()),
+                  pa.field('pmdec_error', pa.float64()),
+
+                  pa.field('astrometric_n_good_obs_al', pa.int64()),
+                  pa.field('astrometric_gof_al', pa.float64()),
+                  pa.field('astrometric_chi2_al', pa.float64()),
+                  pa.field('astrometric_excess_noise', pa.float64()),
+                  pa.field('astrometric_excess_noise_sig', pa.float64()),
+
+                  pa.field('pseudocolour', pa.float64()),
+                  pa.field('pseudocolour_error', pa.float64()),
+
+                  pa.field('visibility_periods_used', pa.int64()),
+                  pa.field('ruwe', pa.float64()),
+                  pa.field('duplicated_source', pa.bool_()),
+
+                  pa.field('phot_g_n_obs', pa.int64()),
+                  pa.field('phot_g_mean_mag', pa.float64()),
+                  pa.field('phot_bp_mean_flux', pa.float64()),
+                  pa.field('phot_bp_mean_flux_error', pa.float64()),
+                  pa.field('phot_bp_mean_mag', pa.float64()),
+                  pa.field('phot_rp_mean_flux', pa.float64()),
+                  pa.field('phot_rp_mean_flux_error', pa.float64()),
+                  pa.field('phot_rp_mean_mag', pa.float64()),
+
+                  pa.field('dr2_radial_velocity', pa.float64()),
+                  pa.field('dr2_radial_velocity_error', pa.float64()),
+
+                  pa.field('l', pa.float64()),
+                  pa.field('b', pa.float64()),
+
+                  pa.field('ecl_lon', pa.float64()),
+                  pa.field('ecl_lat', pa.float64()),
+
+                  pa.field('phot_g_mean_flux', pa.float64()),
+                  pa.field('phot_g_mean_flux_error', pa.float64()),
+
+                  pa.field('counterparts_number', pa.float64()),
+                  pa.field('single_counterpart', pa.bool_()),
+                  pa.field('counterparts_type', pa.string()),
+
+                  pa.field('survey', pa.int64()),
+                  pa.field('file_name', pa.string()),
+                  ]
+        schema = pa.schema(fields)
+
+        return schema
+
     def get_opt_survey_sources(self, opt_sources, opt_fields, opt_type='ls_'):
         # take sources from optical survey
         obj_id = opt_type + 'objID'
@@ -434,7 +512,9 @@ class Command(BaseCommand):
         opt_sources = pd.concat([opt_sources_ps, opt_sources_ls])
 
         # rename columns of opt sources
-        opt_sources = opt_sources.rename(columns={'ls_objid': 'ls_objID', 'ps_raBest': 'ps_ra', 'ps_decBest': 'ps_dec'})
+        opt_sources = opt_sources.rename(columns={'ls_objid': 'ls_objID', 'ps_raBest': 'ps_ra', 'ps_decBest': 'ps_dec',
+                                                  'gaiaedr3_designation': 'gaiaedr3_objID'})
+
         # index sources in each group(same xray source)
         opt_sources['opt_id'] = opt_sources.groupby('srcname_fin').cumcount()
         # add file name
@@ -462,7 +542,7 @@ class Command(BaseCommand):
         ls_schema = Command.get_ls_table_schema()
         table = pa.Table.from_pandas(ls_sources, schema=ls_schema)
         pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_ls.parquet'))
-        #
+
         # # get SDSS source
         sdss_fields = Command.get_sdss_fields()
         sdss_sources = Command.get_opt_survey_sources(self, opt_sources, sdss_fields, opt_type='sdss_')
@@ -470,7 +550,7 @@ class Command(BaseCommand):
         sdss_schema = Command.get_sdss_table_schema()
         table = pa.Table.from_pandas(sdss_sources, schema=sdss_schema)
         pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_sdss.parquet'))
-        #
+
         # # get PS source
         ps_fields = Command.get_ps_fields()
         ps_sources = Command.get_opt_survey_sources(self, opt_sources, ps_fields, opt_type='ps_')
@@ -478,6 +558,17 @@ class Command(BaseCommand):
         ps_schema = Command.get_ps_table_schema()
         table = pa.Table.from_pandas(ps_sources, schema=ps_schema)
         pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_ps.parquet'))
+
+        # # get GAIA source
+        gaia_fields = Command.get_gaia_fields()
+        gaia_sources = Command.get_opt_survey_sources(self, opt_sources, gaia_fields, opt_type='gaiaedr3_')
+        # convert string column to boolean
+        gaia_sources['duplicated_source'].replace({'True ': True, 'True': True,
+                                                   'False': False, 'False ': False}, inplace=True)
+        # Save parquet table with specified schema
+        gaia_schema = Command.get_gaia_table_schema()
+        table = pa.Table.from_pandas(gaia_sources, schema=gaia_schema)
+        pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_gaia.parquet'))
 
         self.stdout.write(f'End converting pkl')
         end_time = timezone.now()

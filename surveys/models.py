@@ -5,6 +5,7 @@ from itertools import zip_longest
 from django.db.models import Max
 
 import django_filters
+from django_filters.widgets import BooleanWidget
 from django import forms
 from django.db.models import FloatField, ExpressionWrapper, F, Func, Case, When, Value, IntegerField
 from decimal import Decimal
@@ -208,11 +209,12 @@ class MetaObjFilter(django_filters.FilterSet):
     CHOICES = ((True, 'Primary'), (False, 'Secondary'))
 
     is_primary = django_filters.BooleanFilter(
-        field_name='primary_object', label='Meta Object', required=False,
-        widget=forms.RadioSelect(attrs={'class': 'custom_radio form-check-inline'}, choices=CHOICES),
+        field_name='primary_object', label='Status', required=False,
+        widget=forms.RadioSelect(attrs={'class': 'custom_radio form-check d-flex justify-content-between'}, choices=CHOICES),
         )
 
-    ext_gt_0 = django_filters.BooleanFilter(label='EXT > 0', method='ext_gt_zero')
+    ext_gt_0 = django_filters.BooleanFilter(label='EXT > 0', method='ext_gt_zero',
+                                            widget=BooleanWidget(attrs={'class': 'custom_bool'}))
 
     class Meta:
         model = MetaObject
@@ -221,7 +223,6 @@ class MetaObjFilter(django_filters.FilterSet):
                   'GLON': ['gt', 'lt'],
                   'GLAT': ['gt', 'lt'],
                   'LIKE': ['gt', 'lt'],
-                  # 'EXT': ['gt', 'lt'],
                   'RATIO_e2e1': ['gt', 'lt'],
                   'RFLAG_e2e1': ['gt', 'lt'],
                   'RATIO_e3e2': ['gt', 'lt'],
@@ -376,13 +377,16 @@ class eROSITA(models.Model):
 
     # ls counterpart link + separation(arcseconds)
     ls_dup = models.ForeignKey('LS', on_delete=models.SET_NULL, related_name='dup_xray', blank=True, null=True)
-    ls_dup_sep = models.DecimalField(max_digits=8, decimal_places=5)
+    ls_dup_sep = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
     # sdss counterpart pk + separation(arcseconds)
     sdss_dup = models.ForeignKey('SDSS', on_delete=models.SET_NULL, related_name='dup_xray', blank=True, null=True)
-    sdss_dup_sep = models.DecimalField(max_digits=8, decimal_places=5)
+    sdss_dup_sep = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
     # ps counterpart pk + separation(arcseconds)
     ps_dup = models.ForeignKey('PS', on_delete=models.SET_NULL, related_name='dup_xray', blank=True, null=True)
-    ps_dup_sep = models.DecimalField(max_digits=8, decimal_places=5)
+    ps_dup_sep = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
+    # gaia counterpart pk + separation(arcseconds)
+    gaia_dup = models.ForeignKey('GAIA', on_delete=models.SET_NULL, related_name='dup_xray', blank=True, null=True)
+    gaia_dup_sep = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
 
     def __str__(self):
         return '{} - Source: {}'.format(self.survey_ind, self.name)
@@ -416,23 +420,23 @@ class eROSITA(models.Model):
             yield field, value
 
     def get_opt_survey_sources(self, survey_name):
+        opt_sources = None
         if survey_name == 'LS':
             opt_sources = self.ls_sources.all()
-            opt_sources = opt_sources.annotate(separation=(Func(F('ra') - self.RA, function='ABS')
-                                                           + Func(F('dec') - self.DEC, function='ABS'))).order_by('separation')
-            return opt_sources if opt_sources.exists() else None
 
         elif survey_name == 'PS':
             opt_sources = self.ps_sources.all()
-            opt_sources = opt_sources.annotate(separation=(Func(F('ra') - self.RA, function='ABS')
-                                                           + Func(F('dec') - self.DEC, function='ABS'))).order_by('separation')
-            return opt_sources if opt_sources.exists() else None
 
-        if survey_name == 'SDSS':
+        elif survey_name == 'SDSS':
             opt_sources = self.sdss_sources.all()
-            opt_sources = opt_sources.annotate(separation=(Func(F('ra') - self.RA, function='ABS')
-                                                           + Func(F('dec') - self.DEC, function='ABS'))).order_by('separation')
-            return opt_sources if opt_sources.exists() else None
+
+        elif survey_name == 'GAIA':
+            opt_sources = self.gaia_sources.all()
+
+        # order optical sources by distance from xray source
+        opt_sources = opt_sources.annotate(separation=(Func(F('ra') - self.RA, function='ABS')
+                                                       + Func(F('dec') - self.DEC, function='ABS'))).order_by('separation')
+        return opt_sources if opt_sources.exists() else None
 
     def __iter__(self):
         for field in eROSITA.fields_to_show():
@@ -818,6 +822,82 @@ class PS(models.Model):
 
     class Meta:
         verbose_name_plural = 'PS sources'
+
+
+# Class for GAIA sources
+class GAIA(models.Model):
+    opt_id = models.PositiveIntegerField(blank=True, null=True)
+    objID = models.CharField(max_length=100, blank=True, null=True)
+    ra = models.FloatField()
+    dec = models.FloatField()
+    # add heal pix index for identification
+    opt_hpidx = models.BigIntegerField()
+
+    ra_error = models.FloatField(blank=True, null=True)
+    dec_error = models.FloatField(blank=True, null=True)
+    parallax = models.FloatField(blank=True, null=True)
+    parallax_error = models.FloatField(blank=True, null=True)
+    
+    pm = models.FloatField(blank=True, null=True)
+    pmra = models.FloatField(blank=True, null=True)
+    pmra_error = models.FloatField(blank=True, null=True)
+    pmdec = models.FloatField(blank=True, null=True)
+    pmdec_error = models.FloatField(blank=True, null=True)
+
+    astrometric_n_good_obs_al = models.IntegerField(blank=True, null=True)
+    astrometric_gof_al = models.FloatField(blank=True, null=True)
+    astrometric_chi2_al = models.FloatField(blank=True, null=True)
+    astrometric_excess_noise = models.FloatField(blank=True, null=True)
+    astrometric_excess_noise_sig = models.FloatField(blank=True, null=True)
+    
+    pseudocolour = models.FloatField(blank=True, null=True)
+    pseudocolour_error = models.FloatField(blank=True, null=True)
+    
+    visibility_periods_used = models.IntegerField(blank=True, null=True)
+    ruwe = models.FloatField(blank=True, null=True)
+    duplicated_source = models.BooleanField(blank=True, null=True)
+    
+    phot_g_n_obs = models.IntegerField(blank=True, null=True)
+    phot_g_mean_mag = models.FloatField(blank=True, null=True)
+    phot_bp_mean_flux = models.FloatField(blank=True, null=True)
+    phot_bp_mean_flux_error = models.FloatField(blank=True, null=True)
+    phot_bp_mean_mag = models.FloatField(blank=True, null=True)
+    phot_rp_mean_flux = models.FloatField(blank=True, null=True)
+    phot_rp_mean_flux_error = models.FloatField(blank=True, null=True)
+    phot_rp_mean_mag = models.FloatField(blank=True, null=True)
+    
+    dr2_radial_velocity = models.FloatField(blank=True, null=True)
+    dr2_radial_velocity_error = models.FloatField(blank=True, null=True)
+    
+    l = models.FloatField(blank=True, null=True)
+    b = models.FloatField(blank=True, null=True)
+    
+    ecl_lon = models.FloatField(blank=True, null=True)
+    ecl_lat = models.FloatField(blank=True, null=True)
+    
+    phot_g_mean_flux = models.FloatField(blank=True, null=True)
+    phot_g_mean_flux_error = models.FloatField(blank=True, null=True)
+    
+    counterparts_number = models.FloatField(blank=True, null=True)
+    single_counterpart = models.BooleanField(blank=True, null=True)
+    counterparts_type = models.CharField(max_length=100, blank=True, null=True)
+
+    # xray sources near which gaia source was found
+    xray_sources = models.ManyToManyField(eROSITA, related_name='gaia_sources', blank=True)
+    # File from which source was loaded to system
+    origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='gaia_sources', blank=True,
+                                    null=True)
+
+    def __str__(self):
+        return '{} - GAIA Source: {}'.format(self.opt_hpidx, self.opt_id)
+
+    def __iter__(self):
+        for field in GAIA._meta.get_fields():
+            value = getattr(self, field.name, None)
+            yield field.name, value
+
+    class Meta:
+        verbose_name_plural = 'GAIA sources'
 
 
 # Class for comments on optical data
