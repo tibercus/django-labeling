@@ -9,31 +9,42 @@
 
 {% block content %}
 
-        {%  comment %} Form for filtering MetaObj table {% endcomment %}
-        {%  comment %} TODO: make grid system {% endcomment %}
-        <form id="filter_form" method="get">
-            <div class="row">
-                <div class="col-4">
-                    {% with filter.form as form %}
-                        {% include 'includes/filter_form.html' %}
-                    {% endwith %}
-                    <input type="submit" value="Filter" class="btn btn-primary btn-md"/>
-                    <a href="{% url 'home' %}" class="btn btn-secondary btn-md ml-2">Reset</a>
-                </div>
-                <div class="form-col-1 ml-1">
-                    {% for field_name in sort_fields %}
-                        <div class="form-group mt-5 mb-3" style="height: 36px">
-                            <input class="form-check-input" type="radio" name="sort_by" id="sort_by{{ field_name }}" value="{{ field_name }}" />
-                            <label class="form-check-label" for="sort_by{{ field_name }}">Sort by {{ field_name }}</label>
+        <p>
+          <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            Filters
+          </a>
+        </p>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+
+                {%  comment %} Form for filtering MetaObj table {% endcomment %}
+                {%  comment %} TODO: make grid system {% endcomment %}
+                <form id="filter_form" method="get">
+                    <div class="row">
+                        <div class="col-5">
+                            {% with filter.form as form %}
+                                {% include 'includes/filter_form.html' %}
+                            {% endwith %}
+                            <input type="submit" value="Filter" class="btn btn-primary btn-md"/>
+                            <a href="{% url 'home' %}" class="btn btn-secondary btn-md ml-2">Reset</a>
                         </div>
-                    {% endfor %}
-                    <div class="form-group mt-5 mb-3" style="height: 36px">
-                        <input class="form-check-input" type="radio" name="sort_by_group" id="sort_by_group" value="1" />
-                        <label class="form-check-label" for="sort_by_group">Sort by Group</label>
+                        <div class="form-col-1">
+                            {% for field_name in sort_fields %}
+                                <div class="form-group mt-5 mb-3" style="height: 36px">
+                                    <input class="form-check-input" type="radio" name="sort_by" id="sort_by{{ field_name }}" value="{{ field_name }}" />
+                                    <label class="form-check-label" for="sort_by{{ field_name }}">Sort by {{ field_name }}</label>
+                                </div>
+                            {% endfor %}
+                            <div class="form-group mt-5 mb-3" style="height: 36px">
+                                <input class="form-check-input" type="radio" name="sort_by_group" id="sort_by_group" value="1" />
+                                <label class="form-check-label" for="sort_by_group">Sort by Group</label>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </form>
+
             </div>
-        </form>
+        </div>
 
         <div class="table-responsive">
 

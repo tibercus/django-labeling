@@ -78,6 +78,23 @@ def relative_url(value, field_name, urlencode=None):
 
 
 @register.filter
+def get_opt_survey(opt_survey_sources):
+    """get not None opt survey looking at dict"""
+    opt_sources = opt_survey_sources.get('LS', None)
+    if opt_survey_sources.get('LS', None):
+        return 'LS'
+    else:
+        return 'PS'
+
+
+@register.filter
+def get_opt_sources(opt_survey_sources, survey):
+    """get not None opt_sources from dict"""
+    opt_sources = opt_survey_sources.get(survey, None)
+    return opt_sources
+
+
+@register.filter
 def get_survey_color(opt_survey):
     """get color for opt survey markers"""
     if opt_survey == 'LS':

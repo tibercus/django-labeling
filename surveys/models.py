@@ -10,6 +10,9 @@ from django import forms
 from django.db.models import FloatField, ExpressionWrapper, F, Func, Case, When, Value, IntegerField
 from decimal import Decimal
 
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+
 
 # Class for files from where sources were loaded
 class OriginFile(models.Model):
@@ -421,6 +424,13 @@ class eROSITA(models.Model):
 
     def get_opt_survey_sources(self, survey_name):
         opt_sources = None
+        # TODO: think about adding coords to eROSITA fields
+        # find cartesian coords for xray source
+        c_xray = SkyCoord(ra=self.RA * u.deg, dec = self.DEC * u.deg, distance = 1 * u.pc, frame = 'icrs')
+        c_x = c_xray.cartesian.x.value
+        c_y = c_xray.cartesian.y.value
+        c_z = c_xray.cartesian.z.value
+
         if survey_name == 'LS':
             opt_sources = self.ls_sources.all()
 
@@ -434,8 +444,8 @@ class eROSITA(models.Model):
             opt_sources = self.gaia_sources.all()
 
         # order optical sources by distance from xray source
-        opt_sources = opt_sources.annotate(separation=(Func(F('ra') - self.RA, function='ABS')
-                                                       + Func(F('dec') - self.DEC, function='ABS'))).order_by('separation')
+        opt_sources = opt_sources.annotate(separation=((F('c_x') - c_x)**2.0 + (F('c_y') - c_y)**2.0
+                                                       + (F('c_z') - c_z)**2.0)).order_by('separation')
         return opt_sources if opt_sources.exists() else None
 
     def __iter__(self):
@@ -479,6 +489,10 @@ class LS(models.Model):
     objID = models.PositiveIntegerField(blank=True, null=True)
     ra = models.FloatField()
     dec = models.FloatField()
+    # cartesian coordinates with radius = 1pc
+    c_x = models.FloatField(blank=True, null=True)
+    c_y = models.FloatField(blank=True, null=True)
+    c_z = models.FloatField(blank=True, null=True)
     # add heal pix index for identification
     opt_hpidx = models.BigIntegerField()
 
@@ -678,6 +692,10 @@ class SDSS(models.Model):
     objID = models.CharField(max_length=100, blank=True, null=True)
     ra = models.FloatField()
     dec = models.FloatField()
+    # cartesian coordinates with radius = 1pc
+    c_x = models.FloatField(blank=True, null=True)
+    c_y = models.FloatField(blank=True, null=True)
+    c_z = models.FloatField(blank=True, null=True)
     # add heal pix index for identification
     opt_hpidx = models.BigIntegerField()
     
@@ -741,6 +759,10 @@ class PS(models.Model):
     objID = models.CharField(max_length=100, blank=True, null=True)
     ra = models.FloatField()
     dec = models.FloatField()
+    # cartesian coordinates with radius = 1pc
+    c_x = models.FloatField(blank=True, null=True)
+    c_y = models.FloatField(blank=True, null=True)
+    c_z = models.FloatField(blank=True, null=True)
     # add heal pix index for identification
     opt_hpidx = models.BigIntegerField()
 
@@ -830,6 +852,10 @@ class GAIA(models.Model):
     objID = models.CharField(max_length=100, blank=True, null=True)
     ra = models.FloatField()
     dec = models.FloatField()
+    # cartesian coordinates with radius = 1pc
+    c_x = models.FloatField(blank=True, null=True)
+    c_y = models.FloatField(blank=True, null=True)
+    c_z = models.FloatField(blank=True, null=True)
     # add heal pix index for identification
     opt_hpidx = models.BigIntegerField()
 

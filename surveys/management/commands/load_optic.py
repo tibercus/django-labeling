@@ -21,8 +21,8 @@ from decimal import Decimal
 class Command(BaseCommand):
     help = "Load Optical data from Parquet file."
 
-    # def add_arguments(self, parser):
-    #     parser.add_argument("file_path", type=str, help='path for parquet file')
+    def add_arguments(self, parser):
+        parser.add_argument('survey_num', type=int, help='number of survey')
 
     @staticmethod
     def get_ls_fields():
@@ -91,12 +91,12 @@ class Command(BaseCommand):
         return fields
 
     @staticmethod
-    def find_dup_source(xray_sources, opt_source, opt_type):
+    def find_dup_source(xray_sources, opt_source, c_opt, opt_type):
         # for comparing float values
         TOLERANCE = 10 ** -6
-        c_opt = SkyCoord(ra=opt_source.ra * u.deg, dec=opt_source.dec * u.deg, frame='icrs')
+        # c_opt = SkyCoord(ra=opt_source.ra * u.deg, dec=opt_source.dec * u.deg, frame='icrs')
         for xray_source in xray_sources:
-            c_xray = SkyCoord(ra=xray_source.RA * u.deg, dec=xray_source.DEC * u.deg, frame='icrs')
+            c_xray = SkyCoord(ra=xray_source.RA * u.deg, dec=xray_source.DEC * u.deg, distance=1 * u.pc, frame='icrs')
             sep = c_xray.separation(c_opt).arcsecond
             # find/create new opt LS counterpart + get new separation
             if opt_type == 'LS' and (not xray_source.ls_dup or xray_source.ls_dup_sep > sep):
@@ -130,7 +130,9 @@ class Command(BaseCommand):
                 self.stdout.write(f'Create new file object for: {row.file_name}')
 
             # get heal pix index
-            opt_hpidx = hp.skycoord_to_healpix(SkyCoord(ra=row.ra * u.deg, dec=row.dec * u.deg, frame='icrs'))
+            # distance = 1*u.pc for futher calculation of cartesian coords
+            c_opt = SkyCoord(ra=row.ra * u.deg, dec=row.dec * u.deg, distance=1 * u.pc, frame='icrs')
+            opt_hpidx = hp.skycoord_to_healpix(c_opt)
 
             # find/create optical source
             if opt_type == 'LS':
@@ -159,6 +161,10 @@ class Command(BaseCommand):
                         if field not in filled_fields:
                             setattr(opt_source, field, row[i+3])  # Similar to source.field = row[i+3]
 
+                    # calculate cartesian coordinates with sphere radius = 1*u.pc
+                    opt_source.c_x = c_opt.cartesian.x.value
+                    opt_source.c_y = c_opt.cartesian.y.value
+                    opt_source.c_z = c_opt.cartesian.z.value
                     # sources.append(source)
                     opt_source.save()
                     # find xray sources for ls source
@@ -167,7 +173,7 @@ class Command(BaseCommand):
                     if xray_sources.exists():
                         opt_source.xray_sources.add(*xray_sources)
                         # find counter part for xray sources
-                        Command.find_dup_source(xray_sources, opt_source, opt_type)
+                        Command.find_dup_source(xray_sources, opt_source, c_opt, opt_type)
                         opt_source.save()
                         print(f'Link {opt_type} source: {opt_source} with xray sources: {xray_sources}\n')
                     else:
@@ -181,7 +187,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = timezone.now()
-        # file_path = options["file_path"]
+        survey_num = options['survey_num']
+        # get dir name by survey number
+        dir_name = 'eRASS' + str(survey_num)
+
         # heal pix map with pixel_resolution < 1/2 arcsec
         hp = HEALPix(nside=2 ** 19, order='nested', frame='icrs')
 
@@ -189,7 +198,7 @@ class Command(BaseCommand):
         # sources = []
 
         # Load DESI LIS sources
-        file_path = os.path.join(settings.WORK_DIR, 'opt_sources_ls.parquet')
+        file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_ls.parquet')
 
         table = pq.read_table(file_path)
         ls_data = table.to_pandas()
@@ -202,7 +211,7 @@ class Command(BaseCommand):
         Command.load_opt_survey(self, ls_data, ls_field_list, hp, opt_type='LS')
 
         # Load SDSS sources
-        file_path = os.path.join(settings.WORK_DIR, 'opt_sources_sdss.parquet')
+        file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_sdss.parquet')
 
         table = pq.read_table(file_path)
         sdss_data = table.to_pandas()
@@ -215,7 +224,7 @@ class Command(BaseCommand):
         Command.load_opt_survey(self, sdss_data, sdss_field_list, hp, opt_type='SDSS')
 
         # Load PS sources
-        file_path = os.path.join(settings.WORK_DIR, 'opt_sources_ps.parquet')
+        file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_ps.parquet')
 
         table = pq.read_table(file_path)
         ps_data = table.to_pandas()
@@ -228,7 +237,7 @@ class Command(BaseCommand):
         Command.load_opt_survey(self, ps_data, ps_field_list, hp, opt_type='PS')
 
         # Load GAIA sources
-        file_path = os.path.join(settings.WORK_DIR, 'opt_sources_gaia.parquet')
+        file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_gaia.parquet')
 
         table = pq.read_table(file_path)
         gaia_data = table.to_pandas()

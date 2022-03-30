@@ -307,7 +307,7 @@
             <div class="aladin_lite col-auto">
 
                 {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
-                <div id="aladin-lite-div" style="width:550px;height:300px;"></div>
+                <div id="aladin-lite-div" style="width:500px;height:450px;"></div>
                 <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
 
                 {% comment %} Radio buttons with surveys {% endcomment %}
@@ -318,7 +318,7 @@
 
                 {% comment %} Creation of Aladin Lite instance {% endcomment %}
                 <script type="text/javascript">
-                    var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-i-r-g", fov: 0.05, target: "{{ meta_object.RA }} {{ meta_object.DEC }}"});
+                    var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-i-r-g", fov: 0.03, target: "{{ meta_object.RA }} {{ meta_object.DEC }}"});
                     $('input[name=survey]').change(function() {
                         aladin.setImageSurvey($(this).val());
                     });
@@ -336,14 +336,25 @@
                     overlay.add(A.circle({{ meta_object.RA }}, {{ meta_object.DEC }}, {{ meta_object.R98|sec_in_deg }}, {color: 'red'})); // radius in degrees
 
                     // markers for optical sources
-                    {% for opt_survey, opt_sources in opt_survey_sources.items %}
-                        var markers = A.catalog({name: '{{ opt_survey }}', sourceSize: 13, color: '{{ opt_survey|get_survey_color }}'})
-                        aladin.addCatalog(markers);
-                        {% for opt_s in opt_sources %}
+                    {% define opt_survey_sources|get_opt_survey as opt_survey %}
+                    {% define opt_survey_sources|get_opt_sources:opt_survey as opt_sources %}
+                    {# markers for common optical sources #}
+                    var markers = A.catalog({name: '{{ opt_survey }}', sourceSize: 13, color: '{{ opt_survey|get_survey_color }}'})
+                    {# marker for counterpart optical source #}
+                    var marker_dup = A.catalog({name: '{{ opt_survey }} counterpart', sourceSize: 15, color: 'cyan'})
+                    aladin.addCatalog(markers);
+                    aladin.addCatalog(marker_dup);
+
+                    {% for opt_s in opt_sources %}
+                        {% if master_source in opt_s.dup_xray.all %}
+                            marker_dup.addSources([A.marker({{ opt_s.ra }}, {{ opt_s.dec }}, {popupTitle: '{{opt_s}}',
+                                popupDesc: '<em>RA:</em> {{ opt_s.ra }} <br/><em>DEC:</em> {{ opt_s.dec }} <br/>\
+                                            More info <a target="_blank" href="http://simbad.u-strasbg.fr/simbad/sim-coo?Coord={{opt_s.ra|stringformat:'+.6f'}}{{opt_s.dec|stringformat:'+.6f'|escape}}&CooFrame=FK5&CooEpoch=2000&CooEqui=2000&CooDefinedFrames=none&Radius=40&Radius.unit=arcsec&submit=submit+query&CoordList=>SIMBAD">in Simbad</a>'})]);
+                        {% else %}
                             markers.addSources([A.marker({{ opt_s.ra }}, {{ opt_s.dec }}, {popupTitle: '{{opt_s}}',
                                 popupDesc: '<em>RA:</em> {{ opt_s.ra }} <br/><em>DEC:</em> {{ opt_s.dec }} <br/>\
-                                            More info <a target="_blank" href="#">in Simbad</a>'})]);
-                        {% endfor %}
+                                            More info <a target="_blank" href="http://simbad.u-strasbg.fr/simbad/sim-coo?Coord={{opt_s.ra|stringformat:'+.6f'}}{{opt_s.dec|stringformat:'+.6f'|escape}}&CooFrame=FK5&CooEpoch=2000&CooEqui=2000&CooDefinedFrames=none&Radius=40&Radius.unit=arcsec&submit=submit+query&CoordList=>SIMBAD">in Simbad</a>'})]);
+                        {% endif %}
                     {% endfor %}
                 </script>
             </div>

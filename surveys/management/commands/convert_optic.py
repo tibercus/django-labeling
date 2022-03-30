@@ -17,6 +17,9 @@ import os
 class Command(BaseCommand):
     help = "Convert Optical sources from PKL to Parquet file."
 
+    def add_arguments(self, parser):
+        parser.add_argument('survey_num', type=int, help='number of survey')
+
     base_fields = ['srcname_fin', 'RA_fin', 'DEC_fin', 'hpidx', 'opt_id', 'opt_hpidx', 'survey', 'file_name']
 
     @staticmethod
@@ -461,6 +464,7 @@ class Command(BaseCommand):
 
         return schema
 
+    @staticmethod
     def get_opt_survey_sources(self, opt_sources, opt_fields, opt_type='ls_'):
         # take sources from optical survey
         obj_id = opt_type + 'objID'
@@ -482,10 +486,33 @@ class Command(BaseCommand):
 
         return survey_sources
 
+    def get_ls_ps_file_paths(survey_num):
+        # get file with ls data and ps data by survey number
+        if survey_num == 1:
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1_ps_50.pkl')
+        elif survey_num == 2:
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS2_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS2_ps_50.pkl')
+        elif survey_num == 3:
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS3_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS3_ps_50.pkl')
+        elif survey_num == 4:
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS4_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS4_ps_50.pkl')
+        elif survey_num == 9:
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ps_50.pkl')
+
+        return ls_file_path, ps_file_path
+
     def handle(self, *args, **options):
         start_time = timezone.now()
-        ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ls_50.pkl')
-        ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ps_50.pkl')
+        survey_num = options['survey_num']
+        # get dir name by survey number
+        dir_name = 'eRASS' + str(survey_num)
+        # get file paths by survey number
+        ls_file_path, ps_file_path = Command.get_ls_ps_file_paths(survey_num)
 
         # load opt sources correlated with DESI LIS
         with open(ls_file_path, 'rb') as f:
@@ -541,7 +568,7 @@ class Command(BaseCommand):
         # Save parquet table with specified schema
         ls_schema = Command.get_ls_table_schema()
         table = pa.Table.from_pandas(ls_sources, schema=ls_schema)
-        pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_ls.parquet'))
+        pq.write_table(table, os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_ls.parquet'))
 
         # # get SDSS source
         sdss_fields = Command.get_sdss_fields()
@@ -549,7 +576,7 @@ class Command(BaseCommand):
         # Save parquet table with specified schema
         sdss_schema = Command.get_sdss_table_schema()
         table = pa.Table.from_pandas(sdss_sources, schema=sdss_schema)
-        pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_sdss.parquet'))
+        pq.write_table(table, os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_sdss.parquet'))
 
         # # get PS source
         ps_fields = Command.get_ps_fields()
@@ -557,7 +584,7 @@ class Command(BaseCommand):
         # Save parquet table with specified schema
         ps_schema = Command.get_ps_table_schema()
         table = pa.Table.from_pandas(ps_sources, schema=ps_schema)
-        pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_ps.parquet'))
+        pq.write_table(table, os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_ps.parquet'))
 
         # # get GAIA source
         gaia_fields = Command.get_gaia_fields()
@@ -568,7 +595,7 @@ class Command(BaseCommand):
         # Save parquet table with specified schema
         gaia_schema = Command.get_gaia_table_schema()
         table = pa.Table.from_pandas(gaia_sources, schema=gaia_schema)
-        pq.write_table(table, os.path.join(settings.WORK_DIR, 'opt_sources_gaia.parquet'))
+        pq.write_table(table, os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_gaia.parquet'))
 
         self.stdout.write(f'End converting pkl')
         end_time = timezone.now()
