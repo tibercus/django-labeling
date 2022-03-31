@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_ls_fields():
-        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx',
+        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'flag_agn_wise',
                   'brick_primary', 'maskbits', 'fitbits', 'type', 'ra_ivar', 'dec_ivar', 'bx', 'by', 'ebv',
                   'mjd_min', 'mjd_max', 'ref_cat', 'ref_id', 'pmra', 'pmdec', 'parallax', 'pmra_ivar', 'pmdec_ivar',
                   'parallax_ivar', 'ref_epoch', 'gaia_phot_g_mean_mag', 'gaia_phot_g_mean_flux_over_error', 'gaia_phot_g_n_obs',
@@ -73,7 +73,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_gaia_fields():
-        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'ra_error', 'dec_error',
+        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'star', 'ra_error', 'dec_error',
                   'parallax', 'parallax_error', 'pm', 'pmra', 'pmra_error', 'pmdec', 'pmdec_error',
                   'astrometric_n_good_obs_al', 'astrometric_gof_al', 'astrometric_chi2_al', 'astrometric_excess_noise',
                   'astrometric_excess_noise_sig', 'pseudocolour', 'pseudocolour_error', 'visibility_periods_used', 'ruwe',
@@ -92,6 +92,8 @@ class Command(BaseCommand):
                   pa.field('ra', pa.float64(), False),
                   pa.field('dec', pa.float64(), False),
                   pa.field('opt_hpidx', pa.int64()),
+                  # flag for AGN wise
+                  pa.field('flag_agn_wise', pa.bool_()),
 
                   pa.field('brick_primary', pa.bool_()),
 
@@ -407,6 +409,7 @@ class Command(BaseCommand):
                   pa.field('ra', pa.float64(), False),
                   pa.field('dec', pa.float64(), False),
                   pa.field('opt_hpidx', pa.int64()),
+                  pa.field('star', pa.bool_()),
                   
                   pa.field('ra_error', pa.float64()),
                   pa.field('dec_error', pa.float64()),
@@ -486,6 +489,7 @@ class Command(BaseCommand):
 
         return survey_sources
 
+    @staticmethod
     def get_ls_ps_file_paths(survey_num):
         # get file with ls data and ps data by survey number
         if survey_num == 1:
@@ -565,6 +569,11 @@ class Command(BaseCommand):
         # # get DESI LIS sources
         ls_fields = Command.get_ls_fields()
         ls_sources = Command.get_opt_survey_sources(self, opt_sources, ls_fields, opt_type='ls_')
+        # calculate AGN WISE flag
+        ls_mag_w1 = 22.5 - 2.5 * np.log10(ls_sources['flux_w1'])  # if w1 < 0 -> None, flag=False
+        ls_mag_w2 = 22.5 - 2.5 * np.log10(ls_sources['flux_w2'])  # if w2 < 0 -> None, flag=False
+        ls_sources['flag_agn_wise'] = ((ls_mag_w1 - ls_mag_w2) > 0.8)
+
         # Save parquet table with specified schema
         ls_schema = Command.get_ls_table_schema()
         table = pa.Table.from_pandas(ls_sources, schema=ls_schema)
@@ -592,6 +601,11 @@ class Command(BaseCommand):
         # convert string column to boolean
         gaia_sources['duplicated_source'].replace({'True ': True, 'True': True,
                                                    'False': False, 'False ': False}, inplace=True)
+        # calculate star flag
+        gaia_sources['star'] = ((abs(gaia_sources['parallax'] / gaia_sources['parallax_error']) > 5)
+                                | (abs(gaia_sources['pmra'] / gaia_sources['pmra_error']) > 5)
+                                | (abs(gaia_sources['pmdec'] / gaia_sources['pmdec_error']) > 5))
+
         # Save parquet table with specified schema
         gaia_schema = Command.get_gaia_table_schema()
         table = pa.Table.from_pandas(gaia_sources, schema=gaia_schema)

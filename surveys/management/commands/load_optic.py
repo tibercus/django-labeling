@@ -26,12 +26,12 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_ls_fields():
-        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'brick_primary', 'maskbits', 'fitbits', 'type', 'ra_ivar',
-                  'dec_ivar', 'bx', 'by', 'ebv', 'mjd_min', 'mjd_max', 'ref_cat', 'ref_id', 'pmra', 'pmdec', 'parallax',
-                  'pmra_ivar', 'pmdec_ivar', 'parallax_ivar', 'ref_epoch', 'gaia_phot_g_mean_mag', 'gaia_phot_g_mean_flux_over_error',
-                  'gaia_phot_g_n_obs', 'gaia_phot_bp_mean_mag', 'gaia_phot_bp_mean_flux_over_error', 'gaia_phot_bp_n_obs',
-                  'gaia_phot_rp_mean_mag', 'gaia_phot_rp_mean_flux_over_error', 'gaia_phot_rp_n_obs', 'gaia_phot_variable_flag',
-                  'gaia_astrometric_excess_noise', 'gaia_astrometric_excess_noise_sig', 'gaia_astrometric_n_obs_al',
+        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'flag_agn_wise', 'brick_primary', 'maskbits', 'fitbits',
+                  'type', 'ra_ivar', 'dec_ivar', 'bx', 'by', 'ebv', 'mjd_min', 'mjd_max', 'ref_cat', 'ref_id', 'pmra', 'pmdec',
+                  'parallax', 'pmra_ivar', 'pmdec_ivar', 'parallax_ivar', 'ref_epoch', 'gaia_phot_g_mean_mag',
+                  'gaia_phot_g_mean_flux_over_error', 'gaia_phot_g_n_obs', 'gaia_phot_bp_mean_mag', 'gaia_phot_bp_mean_flux_over_error',
+                  'gaia_phot_bp_n_obs', 'gaia_phot_rp_mean_mag', 'gaia_phot_rp_mean_flux_over_error', 'gaia_phot_rp_n_obs',
+                  'gaia_phot_variable_flag', 'gaia_astrometric_excess_noise', 'gaia_astrometric_excess_noise_sig', 'gaia_astrometric_n_obs_al',
                   'gaia_astrometric_n_good_obs_al', 'gaia_astrometric_weight_al', 'gaia_duplicated_source', 'gaia_a_g_val',
                   'gaia_e_bp_min_rp_val', 'gaia_phot_bp_rp_excess_factor', 'gaia_astrometric_sigma5d_max', 'gaia_astrometric_params_solved',
                   'fiberflux_g', 'fiberflux_r', 'fiberflux_z', 'fibertotflux_g', 'fibertotflux_r', 'fibertotflux_z',
@@ -79,7 +79,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_gaia_fields():
-        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'ra_error', 'dec_error',
+        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'star', 'ra_error', 'dec_error',
                   'parallax', 'parallax_error', 'pm', 'pmra', 'pmra_error', 'pmdec', 'pmdec_error',
                   'astrometric_n_good_obs_al', 'astrometric_gof_al', 'astrometric_chi2_al', 'astrometric_excess_noise',
                   'astrometric_excess_noise_sig', 'pseudocolour', 'pseudocolour_error', 'visibility_periods_used',

@@ -17,6 +17,9 @@ import os
 class Command(BaseCommand):
     help = "Convert eROSITA sources from PKL to Parquet file."
 
+    def add_arguments(self, parser):
+        parser.add_argument('survey_num', type=int, help='number of survey')
+
     @staticmethod
     def get_fields():
         fields = ['survey_ind', 'name', 'RA', 'DEC', 'comment', 'source_class', 'GLON', 'GLAT',
@@ -141,9 +144,28 @@ class Command(BaseCommand):
 
         return schema
 
+    @staticmethod
+    def get_file_paths(survey_num):
+        # get file with ls data and ps data by survey number
+        if survey_num == 1:
+            file_path = os.path.join(settings.MASTER_DIR, 'ecat_43691_44775_03_23_sd01_a15_g15_r7.pkl')
+        elif survey_num == 2:
+            file_path = os.path.join(settings.MASTER_DIR, 'ecat_44775_45897_03_23_sd01_a15_g15_r7.pkl')
+        elif survey_num == 3:
+            file_path = os.path.join(settings.MASTER_DIR, 'ecat_45897_46992_03_23_sd01_a15_g15_r7.pkl')
+        elif survey_num == 4:
+            file_path = os.path.join(settings.MASTER_DIR, 'ecat_46992_48110_03_23_sd01_a15_g15_r7.pkl')
+        elif survey_num == 9:
+            file_path = os.path.join(settings.MASTER_DIR, 'ecat_43691_48110_03_23_sd01_a15_g14_r7.pkl')
+
+        return file_path
+
     def handle(self, *args, **options):
         start_time = timezone.now()
-        file_path = os.path.join(settings.MASTER_DIR, 'ecat_43691_48110_03_23_sd01_a15_g14_r7.pkl')
+        # get number of loading survey
+        survey_num = options['survey_num']
+        # get file path by survey number
+        file_path = Command.get_file_paths(survey_num)
 
         with open(file_path, 'rb') as f:
             data = pickle.load(f)
@@ -163,9 +185,8 @@ class Command(BaseCommand):
                 xray_sources[col] = xray_sources[col].astype(str)
 
         xray_sources['survey_ind'] = xray_sources.index
-        # TODO: remove this later (set survey)
         xray_sources.reset_index(drop=True, inplace=True)
-        xray_sources['survey'] = 9
+        xray_sources['survey'] = survey_num
 
         file_name = os.path.splitext(os.path.basename(file_path))[0]
         xray_sources['file_name'] = file_name
@@ -182,7 +203,8 @@ class Command(BaseCommand):
         # Save parquet table with specified schema
         schema = Command.get_table_schema()
         table = pa.Table.from_pandas(xray_sources, schema=schema)
-        pq.write_table(table, os.path.join(settings.WORK_DIR, 'xray_sources_9.parquet'))
+        convert_file_name = 'xray_sources_' + str(survey_num) + '.parquet'
+        pq.write_table(table, os.path.join(settings.WORK_DIR, convert_file_name))
 
         self.stdout.write(f'End converting pkl')
         end_time = timezone.now()

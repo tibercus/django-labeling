@@ -1,9 +1,9 @@
 {% load form_tags widget_tweaks %}
-
-<div class = "row">
+<div class="row">
     {% for field in form %}
+        {% if field.label not in not_simple_filter %}
         <div class="form-group">
-            <div class="col-lg">
+            <div class="col">
                 {{ field.label_tag }}
                 {{ field|add_class:'form-control' }}
                 {% for error in field.errors %}
@@ -16,5 +16,6 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
     {% endfor %}
 </div>

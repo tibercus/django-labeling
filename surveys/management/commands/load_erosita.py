@@ -17,8 +17,8 @@ from astropy.coordinates import SkyCoord
 class Command(BaseCommand):
     help = "Load data from Parquet file."
 
-    # def add_arguments(self, parser):
-    #     parser.add_argument("file_path", type=str, help='path for parquet file')
+    def add_arguments(self, parser):
+        parser.add_argument('survey_num', type=int, help='number of survey')
 
     @staticmethod
     def get_fields():
@@ -39,8 +39,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = timezone.now()
-        # file_path = options["file_path"]
-        file_path = os.path.join(settings.WORK_DIR, 'xray_sources_9.parquet')
+        # get number of loading survey
+        survey_num = options['survey_num']
+        load_file_name = 'xray_sources_' + str(survey_num) + '.parquet'
+        file_path = os.path.join(settings.WORK_DIR, load_file_name)
 
         # Field list in the order in which the columns should be in the table
         field_list = Command.get_fields()

@@ -37,6 +37,30 @@
                 <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'spec_'|add:id|add:'.pdf'|file_exists%}"
                         width="500px" height="430px"></iframe>
         </div>
+
+        {%  comment %} Show Pre-Classes {% endcomment %}
+        <table class="table table-bordered mt-2" >
+            <thead class="thead-light">
+                <tr>
+                    <th>Pre-Class</th>
+                   <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ 'GAIA Star' }}</td>
+                    <td>{{ master_source.g_s }}</td>
+                </tr>
+                <tr>
+                    <td>{{ 'AGN wise' }}</td>
+                    <td>{{ master_source.flag_agn_wise }}</td>
+                </tr>
+                <tr>
+                    <td>{{ 'TDE v.3' }}</td>
+                    <td>{{ '--' }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
 {% endwith %}

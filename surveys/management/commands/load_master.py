@@ -135,12 +135,15 @@ class Command(BaseCommand):
             meta_object.master_survey = master_source.survey.name
             meta_object.RA = master_source.RA
             meta_object.DEC = master_source.DEC
-            # add galactic coordinates
-            meta_object.GLON = master_source.GLON
-            meta_object.GLAT = master_source.GLAT
             meta_object.EXT = master_source.EXT
             meta_object.R98 = master_source.pos_r98
             meta_object.LIKE = master_source.DET_LIKE_0
+            # add galactic coordinates
+            meta_object.GLON = master_source.GLON
+            meta_object.GLAT = master_source.GLAT
+            # add pre class flags
+            meta_object.g_s = master_source.g_s
+            meta_object.flag_agn_wise = master_source.flag_agn_wise
             meta_object.save()
 
     @staticmethod

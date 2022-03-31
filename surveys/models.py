@@ -75,6 +75,11 @@ class MetaObject(models.Model):
         blank=True, null=True,
     )
 
+    # GAIA Star flag of master source
+    g_s = models.IntegerField(blank=True, null=True)  # values: -1, 0, 1, 2
+    # AGN Wise flag of master source
+    flag_agn_wise = models.BooleanField(blank=True, null=True)
+
     # Columns of Master Table
     EXT = models.FloatField(blank=True, null=True)
     R98 = models.FloatField(blank=True, null=True)
@@ -171,7 +176,7 @@ class MetaObject(models.Model):
     @staticmethod
     def fields_to_show():
         fields = ['meta_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'GLON', 'GLAT',
-                  'unchange_flag', 'comment', 'object_class', 'EXT', 'R98', 'LIKE',
+                  'unchange_flag', 'comment', 'object_class', 'g_s', 'flag_agn_wise', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_e5m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4', 'D2D_me5',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e5', 'EXP_e1234',
                   'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m', 'ID_FLAG_e5m',
@@ -185,12 +190,21 @@ class MetaObject(models.Model):
                   'TSTOP_e1', 'TSTOP_e2', 'TSTOP_e3', 'TSTOP_e4', 'TSTOP_e5']
         return fields
 
-    def find_master_source(self):
-        sources = self.object_sources.all()
-        if sources:
-            max_dl0 = sources.aggregate(Max('DET_LIKE_0'))['DET_LIKE_0__max']
-            master_source = sources.get(DET_LIKE_0=max_dl0)
-            print(f'Found master_source  - {master_source.name} with DET_LIKE_0: {max_dl0}')
+    def find_master_source(self, req_source=None):
+        if req_source is None:
+            sources = self.object_sources.all()
+            master_source = None
+            if sources:
+                # find master source
+                max_dl0 = sources.aggregate(Max('DET_LIKE_0'))['DET_LIKE_0__max']
+                master_source = sources.get(DET_LIKE_0=max_dl0)
+                print(f'Found master_source  - {master_source.name} with DET_LIKE_0: {max_dl0}')
+        else:
+            # take requested master source
+            master_source = req_source
+            print(f'Take requested master_source  - {master_source.name} with DET_LIKE_0: {master_source.DET_LIKE_0}.')
+
+        if master_source:
             # take name, survey, RA, DEC, EXT, R98, LIKE from master_source
             self.master_name = master_source.name
             self.master_survey = master_source.survey.name
@@ -199,6 +213,12 @@ class MetaObject(models.Model):
             self.EXT = master_source.EXT
             self.R98 = master_source.pos_r98
             self.LIKE = master_source.DET_LIKE_0
+            # take galactic coordinates
+            self.GLON = master_source.GLON
+            self.GLAT = master_source.GLAT
+            # take pre class flags
+            self.g_s = master_source.g_s
+            self.flag_agn_wise = master_source.flag_agn_wise
             self.save()
 
     def __iter__(self):
@@ -210,6 +230,7 @@ class MetaObject(models.Model):
 # Class for filtering Meta Objects by requested fields
 class MetaObjFilter(django_filters.FilterSet):
     CHOICES = ((True, 'Primary'), (False, 'Secondary'))
+    GAIA_CHOICES = ((-1, 'No sources'), (0, 'Not stars'), (1, 'Stars'), (2, 'Combined'))
 
     is_primary = django_filters.BooleanFilter(
         field_name='primary_object', label='Status', required=False,
@@ -218,6 +239,16 @@ class MetaObjFilter(django_filters.FilterSet):
 
     ext_gt_0 = django_filters.BooleanFilter(label='EXT > 0', method='ext_gt_zero',
                                             widget=BooleanWidget(attrs={'class': 'custom_bool'}))
+
+    # filters for pre-class flags of master source
+    agn_wise = django_filters.BooleanFilter(field_name='flag_agn_wise', label='AGN Wise',
+                                            widget=BooleanWidget(attrs={'class': 'custom_bool'}))
+
+    gaia_star = django_filters.NumberFilter(
+        field_name='g_s', label='GAIA Star', required=False,
+        widget=forms.RadioSelect(attrs={'class': 'gaia_star_radio form-check'},
+                                 choices=GAIA_CHOICES),
+    )
 
     class Meta:
         model = MetaObject
@@ -235,7 +266,8 @@ class MetaObjFilter(django_filters.FilterSet):
                   # 'test_name__set_test_name': ['icontains'],
                   }
 
-    def ext_gt_zero(self, queryset, name, value):
+    @staticmethod
+    def ext_gt_zero(queryset, name, value):
         if value is not None:
             queryset = queryset.annotate(
                 ext_is_gt=Case(
@@ -282,7 +314,10 @@ class eROSITA(models.Model):
         blank=True, null=True,
     )
 
-    # master_source = models.BooleanField(default=True, blank=True, null=True)
+    # GAIA Star flag
+    g_s = models.IntegerField(blank=True, null=True)  # values: -1, 0, 1, 2
+    # AGN Wise flag
+    flag_agn_wise = models.BooleanField(blank=True, null=True)
 
     GLON = models.FloatField(blank=True, null=True)
     GLAT = models.FloatField(blank=True, null=True)
@@ -495,6 +530,8 @@ class LS(models.Model):
     c_z = models.FloatField(blank=True, null=True)
     # add heal pix index for identification
     opt_hpidx = models.BigIntegerField()
+    # agn wise flag
+    flag_agn_wise = models.BooleanField(blank=True, null=True)
 
     brick_primary = models.BooleanField(blank=True, null=True)
 
@@ -858,6 +895,8 @@ class GAIA(models.Model):
     c_z = models.FloatField(blank=True, null=True)
     # add heal pix index for identification
     opt_hpidx = models.BigIntegerField()
+    # gaia star flag
+    star = models.BooleanField(blank=True, null=True)
 
     ra_error = models.FloatField(blank=True, null=True)
     dec_error = models.FloatField(blank=True, null=True)

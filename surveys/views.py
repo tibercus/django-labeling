@@ -17,6 +17,8 @@ from django.http import QueryDict
 def home(request):
     master_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'EXT', 'R98', 'LIKE']
     sort_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'LIKE', 'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3']
+    # form field names of pre-class filters
+    pre_class_filters = ['GAIA Star', 'AGN Wise', 'TDE v.3']
     # filter meta objects
     f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)))
     meta_queryset = f.qs
@@ -50,7 +52,8 @@ def home(request):
         meta_objects = paginator.page(paginator.num_pages)
 
     return render(request, 'home.html', {'filter': f, 'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show(),
-                                         'master_fields': master_fields, 'sort_fields': sort_fields})
+                                         'master_fields': master_fields, 'sort_fields': sort_fields,
+                                         'pre_class_filters': pre_class_filters})
 
 
 @login_required
@@ -73,10 +76,6 @@ def source(request, pk):
     opt_survey_sources = dict(zip(opt_surveys, opt_sources))
     print(f'Opt Sources by Survey: {opt_survey_sources}\n')
 
-    # make flat array from list of query sets
-    # opt_sources_flat = sum([list(opt_s) for opt_s in opt_sources if opt_s], [])
-    # print(f'Flat array: {opt_sources_flat}')
-
     # get class chosen by superuser
     try:
         admin_comment = meta_object.comments.get(created_by__is_superuser=True)
@@ -95,16 +94,8 @@ def source(request, pk):
                 # make master source - source with max DET_LIKE_0
                 MetaObject.find_master_source(meta_object)
             else:
-                meta_object.master_name = req_source.name
-                meta_object.master_survey = req_source.survey.name
-                meta_object.RA = req_source.RA
-                meta_object.DEC = req_source.DEC
-                meta_object.GLON = req_source.GLON
-                meta_object.GLAT = req_source.GLAT
-                meta_object.EXT = req_source.EXT
-                meta_object.R98 = req_source.pos_r98
-                meta_object.LIKE = req_source.DET_LIKE_0
-                meta_object.save()
+                # make requested source - master
+                MetaObject.find_master_source(meta_object, req_source)
 
             return redirect('source', pk=meta_object.pk)
 
@@ -163,10 +154,9 @@ def source(request, pk):
 
 @login_required
 def criteria(request):
-    criteria_list = [('TDE', 'Criteria 1: Parameter A > a1, Parameter B > b2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
-                     ('TDE', 'Criteria 2: Parameter B > b1, Parameter C > c2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
-                     ('TDE', 'Criteria 3: Parameter D > d1, Parameter E > e2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
-                     ('NOT TDE', 'Criteria 1: Parameter A < a1, Parameter B < b2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
-                     ('NOT TDE', 'Criteria 2: Parameter B < b1, Parameter C < c2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'),
-                     ('NOT TDE', 'Criteria 3: Parameter D < d1, Parameter E < e2', 'Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')]
+    criteria_list = [('TDE v.1', 'ID_e1 == -1 & ID_e2 == -1 & ID_e3 == -1 & ID_e123 == -1 & flag_xray==0  & flag_radio==0 & g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 10', 'Отсутствие любого рентгеновского детектирования в прошлом и детектирований в радио, не звзда и не АЯГ'),
+                     ('TDE v.2', 'ID_e1 == -1 & ID_e2 == -1 & ID_e3 == -1 & ID_e123 == -1 & g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 7', 'Текущая версия'),
+                     ('TDE v.3', 'ID_e3 == -1 & g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 7', 'Предложенная, но не опробованная'),
+                     ('GAIA Star', 'parallax_over_error > 5 or pmra/pmra_error > 5 or pmdec / pmdec_error > 5', 'Звезда по данным Гайя (g_s) eDR3'),
+                     ('AGN WISE', 'w1-w2 > 0.8', 'АГН по цветам WISE (flag_agn_wise); If ls_flux_w1 < 0 or ls_flux_w2 < 0 then flag_agn_wise for this LS source = False')]
     return render(request, 'criteria.html', {'criteria_list': criteria_list})

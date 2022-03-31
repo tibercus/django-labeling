@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load filters_tags %}
+{% load form_tags widget_tweaks %}
 
 {% block style %}
     <link rel="stylesheet" href="{% static "css/home_style.css" %}" />
@@ -18,16 +19,18 @@
             <div class="card card-body">
 
                 {%  comment %} Form for filtering MetaObj table {% endcomment %}
-                {%  comment %} TODO: make grid system {% endcomment %}
                 <form id="filter_form" method="get">
                     <div class="row">
+                        {%  comment %} Simple Filters less/greater {% endcomment %}
                         <div class="col-5">
-                            {% with filter.form as form %}
+                            <h5 class="text-center"> Field Filters </h5>
+                            {% with form=filter.form  not_simple_filter=pre_class_filters %}
                                 {% include 'includes/filter_form.html' %}
                             {% endwith %}
                             <input type="submit" value="Filter" class="btn btn-primary btn-md"/>
                             <a href="{% url 'home' %}" class="btn btn-secondary btn-md ml-2">Reset</a>
                         </div>
+                        {%  comment %} Sorting Meta Objects {% endcomment %}
                         <div class="form-col-1">
                             {% for field_name in sort_fields %}
                                 <div class="form-group mt-5 mb-3" style="height: 36px">
@@ -35,10 +38,31 @@
                                     <label class="form-check-label" for="sort_by{{ field_name }}">Sort by {{ field_name }}</label>
                                 </div>
                             {% endfor %}
+                            {%  comment %} Get Meta Object the only one in the Meta Group {% endcomment %}
                             <div class="form-group mt-5 mb-3" style="height: 36px">
                                 <input class="form-check-input" type="radio" name="sort_by_group" id="sort_by_group" value="1" />
                                 <label class="form-check-label" for="sort_by_group">Sort by Group</label>
                             </div>
+                        </div>
+                        {%  comment %} Filter Meta Obj by pre-class flags {% endcomment %}
+                        <div class="col-5 text-center">
+                           <h5> Pre-Class Filters <a href="{% url 'criteria' %}"> Info </a></h5>
+                            {% for field in filter.form %}
+                                {% if field.label in pre_class_filters %}
+                                    <div class="mx-auto mt-3" style="width: 200px;">
+                                        {{ field.label_tag }}
+                                        {{ field|add_class:'form-control' }}
+                                        {% for error in field.errors %}
+                                            <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                        {% if field.help_text %}
+                                            <small class="form-text text-muted">
+                                                {{ field.help_text|safe }}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
                 </form>
