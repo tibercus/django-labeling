@@ -5,6 +5,9 @@ from ..models import *
 from django.conf import settings
 import os
 
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+
 register = template.Library()
 
 
@@ -108,8 +111,27 @@ def get_survey_color(opt_survey):
 
 
 @register.simple_tag
-def opt_row_class(opt_source, master_source):
+def opt_row_class(opt_source, master_source, sep=None):
     if master_source in opt_source.dup_xray.all():
+        return "table-success"
+    elif sep and sep < 1.1*master_source.pos_r98:
         return "table-primary"
     else:
         return ""
+
+
+@register.filter
+def get_sep(master_source, opt_source):
+    """get separation between master source and optical source"""
+    c_xray = SkyCoord(ra=master_source.RA*u.degree, dec=master_source.DEC*u.degree, distance=1*u.pc, frame='icrs')
+    c_opt = SkyCoord(ra=opt_source.ra*u.degree, dec=opt_source.dec*u.degree, distance=1*u.pc, frame='icrs')
+    sep = c_xray.separation(c_opt)
+    return sep.arcsecond
+
+
+@register.filter
+def is_gaia_star(master_source, opt_id):
+    """get separation between master source and optical source"""
+    gaia_source = master_source.gaia_sources.filter(opt_id=opt_id, star=True)
+    return gaia_source.exists()
+

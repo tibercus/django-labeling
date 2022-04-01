@@ -22,8 +22,9 @@ class Command(BaseCommand):
     @staticmethod
     def calculate_wise_agn(xray_source, c_xray, Rc):
         ls_sources = xray_source.ls_sources.all()
+        # TODO: what to return - False or None?
         if not ls_sources.exists():
-            return False
+            return None
         else:
             # get ra, dec of ls sources
             ra = ls_sources.values_list('ra', flat=True)
@@ -48,8 +49,9 @@ class Command(BaseCommand):
     @staticmethod
     def calculate_gaia_star(xray_source, c_xray, Rc):
         gaia_sources = xray_source.gaia_sources.all()
+        # TODO: what to return - -1 or None?
         if not gaia_sources.exists():
-            return -1
+            return None
         else:
             # get ra, dec of gaia sources
             ra = gaia_sources.values_list('ra', flat=True)
@@ -79,6 +81,10 @@ class Command(BaseCommand):
             # return 0 - no stars in Rc, 1 - all stars in Rc, 2 - stars and no stars
             return g_s
 
+    @staticmethod
+    def calculate_tde_v3(meta_object, master_source):
+        pass
+
     def handle(self, *args, **options):
         start_time = timezone.now()
         for xray_source in eROSITA.objects.all():
@@ -98,6 +104,11 @@ class Command(BaseCommand):
                 xray_source.g_s = Command.calculate_gaia_star(xray_source, c_xray, Rc)
                 print(f'GAIA Star Flag for {xray_source.survey.name} {xray_source}: {xray_source.g_s}\n')
             xray_source.save()
+
+        for meta_obj in MetaObject.objects.all():
+            master_source = meta_obj.object_sources.get(survey__name=meta_obj.master_survey)
+            # meta_obj.tde_v3 = Command.calculate_tde_v3(meta_obj, master_source)
+            # meta_obj.save()
 
         self.stdout.write(f'End calculating pre-class')
         end_time = timezone.now()

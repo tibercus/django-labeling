@@ -79,6 +79,8 @@ class MetaObject(models.Model):
     g_s = models.IntegerField(blank=True, null=True)  # values: -1, 0, 1, 2
     # AGN Wise flag of master source
     flag_agn_wise = models.BooleanField(blank=True, null=True)
+    # TDE v.3 flag
+    tde_v3 = models.BooleanField(blank=True, null=True)
 
     # Columns of Master Table
     EXT = models.FloatField(blank=True, null=True)
