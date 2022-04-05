@@ -143,6 +143,7 @@ class Command(BaseCommand):
             meta_object.GLAT = master_source.GLAT
             # add pre class flags
             meta_object.g_s = master_source.g_s
+            meta_object.ls_g_s = master_source.ls_g_s
             meta_object.flag_agn_wise = master_source.flag_agn_wise
             meta_object.save()
 

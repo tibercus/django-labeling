@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_ls_fields():
-        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'flag_agn_wise',
+        fields = ['srcname_fin', 'hpidx', 'opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'flag_agn_wise', 'star',
                   'brick_primary', 'maskbits', 'fitbits', 'type', 'ra_ivar', 'dec_ivar', 'bx', 'by', 'ebv',
                   'mjd_min', 'mjd_max', 'ref_cat', 'ref_id', 'pmra', 'pmdec', 'parallax', 'pmra_ivar', 'pmdec_ivar',
                   'parallax_ivar', 'ref_epoch', 'gaia_phot_g_mean_mag', 'gaia_phot_g_mean_flux_over_error', 'gaia_phot_g_n_obs',
@@ -94,6 +94,8 @@ class Command(BaseCommand):
                   pa.field('opt_hpidx', pa.int64()),
                   # flag for AGN wise
                   pa.field('flag_agn_wise', pa.bool_()),
+                  # flag for GAIA EDR2 Star
+                  pa.field('star', pa.bool_()),
 
                   pa.field('brick_primary', pa.bool_()),
 
@@ -490,23 +492,23 @@ class Command(BaseCommand):
         return survey_sources
 
     @staticmethod
-    def get_ls_ps_file_paths(survey_num):
+    def get_ls_ps_file_paths(dir_name, survey_num):
         # get file with ls data and ps data by survey number
         if survey_num == 1:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS1_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS1_ps_50.pkl')
         elif survey_num == 2:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS2_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS2_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS2_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS2_ps_50.pkl')
         elif survey_num == 3:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS3_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS3_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS3_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS3_ps_50.pkl')
         elif survey_num == 4:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS4_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS4_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS4_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS4_ps_50.pkl')
         elif survey_num == 9:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS1234_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS1234_ps_50.pkl')
 
         return ls_file_path, ps_file_path
 
@@ -516,7 +518,7 @@ class Command(BaseCommand):
         # get dir name by survey number
         dir_name = 'eRASS' + str(survey_num)
         # get file paths by survey number
-        ls_file_path, ps_file_path = Command.get_ls_ps_file_paths(survey_num)
+        ls_file_path, ps_file_path = Command.get_ls_ps_file_paths(dir_name, survey_num)
 
         # load opt sources correlated with DESI LIS
         with open(ls_file_path, 'rb') as f:
@@ -533,14 +535,18 @@ class Command(BaseCommand):
         null_ls_sources = list(opt_sources_ls[opt_sources_ls['ls_objid'].isnull()]['srcname_fin'])
         # delete NULL rows
         opt_sources_ls = opt_sources_ls[opt_sources_ls['ls_objid'].notnull()]
-        print(f'Table with filtered opt_sources_ls:\n', opt_sources_ls)
+        print(f'Table with notnull opt_sources_ls:\n', opt_sources_ls)
 
         # get ps correlated optical sources for xray sources found earlier
         opt_sources_ps = opt_sources_ps.query('srcname_fin in @null_ls_sources')
+        # shuffle and limit number of ps opt sources
+        # opt_sources_ps = opt_sources_ps.sample(frac=1)
+        # opt_sources_ps = opt_sources_ps.groupby('srcname_fin').head(20)
         print(f'Table with filtered opt_sources_ps:\n', opt_sources_ps)
 
         # Concatenate sources correlated with ls and correlated with ps
         opt_sources = pd.concat([opt_sources_ps, opt_sources_ls])
+        print(f'Table with concatenated ps sources and ls sources:\n', opt_sources)
 
         # rename columns of opt sources
         opt_sources = opt_sources.rename(columns={'ls_objid': 'ls_objID', 'ps_raBest': 'ps_ra', 'ps_decBest': 'ps_dec',
@@ -559,12 +565,7 @@ class Command(BaseCommand):
                 opt_sources[col] = pd.to_datetime(opt_sources[col]).dt.date
                 opt_sources[col] = opt_sources[col].astype(str)
 
-        # TODO: change this later!
-        opt_sources['survey'] = 9
-
-        # TODO: delete this later
-        # opt_sources = opt_sources.groupby('srcname_fin').head(10)
-        # print(f'Table with opt_sources:\n', opt_sources)
+        opt_sources['survey'] = survey_num
 
         # # get DESI LIS sources
         ls_fields = Command.get_ls_fields()
@@ -573,6 +574,10 @@ class Command(BaseCommand):
         ls_mag_w1 = 22.5 - 2.5 * np.log10(ls_sources['flux_w1'])  # if w1 < 0 -> None, flag=False
         ls_mag_w2 = 22.5 - 2.5 * np.log10(ls_sources['flux_w2'])  # if w2 < 0 -> None, flag=False
         ls_sources['flag_agn_wise'] = ((ls_mag_w1 - ls_mag_w2) > 0.8)
+        # calculate star flag GAIA EDR2
+        ls_sources['star'] = ((abs(ls_sources['parallax'] * np.sqrt(ls_sources['parallax_ivar'])) > 5)
+                              | (abs(ls_sources['pmra'] * np.sqrt(ls_sources['pmra_ivar'])) > 5)
+                              | (abs(ls_sources['pmdec'] * np.sqrt(ls_sources['pmdec_ivar'])) > 5))
 
         # Save parquet table with specified schema
         ls_schema = Command.get_ls_table_schema()
@@ -601,7 +606,7 @@ class Command(BaseCommand):
         # convert string column to boolean
         gaia_sources['duplicated_source'].replace({'True ': True, 'True': True,
                                                    'False': False, 'False ': False}, inplace=True)
-        # calculate star flag
+        # calculate star flag GAIA EDR3
         gaia_sources['star'] = ((abs(gaia_sources['parallax'] / gaia_sources['parallax_error']) > 5)
                                 | (abs(gaia_sources['pmra'] / gaia_sources['pmra_error']) > 5)
                                 | (abs(gaia_sources['pmdec'] / gaia_sources['pmdec_error']) > 5))

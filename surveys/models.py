@@ -75,8 +75,10 @@ class MetaObject(models.Model):
         blank=True, null=True,
     )
 
-    # GAIA Star flag of master source
+    # GAIA EDR3 Star flag of master source
     g_s = models.IntegerField(blank=True, null=True)  # values: -1, 0, 1, 2
+    # GAIA EDR2 Star flag of master source
+    ls_g_s = models.IntegerField(blank=True, null=True)  # values: -1, 0, 1, 2
     # AGN Wise flag of master source
     flag_agn_wise = models.BooleanField(blank=True, null=True)
     # TDE v.3 flag
@@ -178,7 +180,7 @@ class MetaObject(models.Model):
     @staticmethod
     def fields_to_show():
         fields = ['meta_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'GLON', 'GLAT',
-                  'unchange_flag', 'comment', 'object_class', 'g_s', 'flag_agn_wise', 'EXT', 'R98', 'LIKE',
+                  'unchange_flag', 'comment', 'object_class', 'g_s', 'ls_g_s', 'flag_agn_wise', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_e5m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4', 'D2D_me5',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e5', 'EXP_e1234',
                   'ID_FLAG_e1m', 'ID_FLAG_e2m', 'ID_FLAG_e3m', 'ID_FLAG_e4m', 'ID_FLAG_e5m',
@@ -220,6 +222,7 @@ class MetaObject(models.Model):
             self.GLAT = master_source.GLAT
             # take pre class flags
             self.g_s = master_source.g_s
+            self.ls_g_s = master_source.ls_g_s
             self.flag_agn_wise = master_source.flag_agn_wise
             self.save()
 
@@ -247,7 +250,7 @@ class MetaObjFilter(django_filters.FilterSet):
                                             widget=BooleanWidget(attrs={'class': 'custom_bool'}))
 
     gaia_star = django_filters.NumberFilter(
-        field_name='g_s', label='GAIA Star', required=False,
+        field_name='g_s', label='GAIA EDR3 Star', required=False,
         widget=forms.RadioSelect(attrs={'class': 'gaia_star_radio form-check'},
                                  choices=GAIA_CHOICES),
     )
@@ -265,7 +268,6 @@ class MetaObjFilter(django_filters.FilterSet):
                   'RFLAG_e3e2': ['gt', 'lt'],
                   'RATIO_e4e3': ['gt', 'lt'],
                   'RFLAG_e4e3': ['gt', 'lt'],
-                  # 'test_name__set_test_name': ['icontains'],
                   }
 
     @staticmethod
@@ -316,8 +318,10 @@ class eROSITA(models.Model):
         blank=True, null=True,
     )
 
-    # GAIA Star flag
+    # GAIA EDR3 Star flag
     g_s = models.IntegerField(blank=True, null=True)  # values: -1, 0, 1, 2
+    # GAIA EDR2 Star flag
+    ls_g_s = models.IntegerField(blank=True, null=True)  # values: -1, 0, 1, 2
     # AGN Wise flag
     flag_agn_wise = models.BooleanField(blank=True, null=True)
 
@@ -534,6 +538,8 @@ class LS(models.Model):
     opt_hpidx = models.BigIntegerField()
     # agn wise flag
     flag_agn_wise = models.BooleanField(blank=True, null=True)
+    # gaiaedr2 star flag
+    star = models.BooleanField(blank=True, null=True)
 
     brick_primary = models.BooleanField(blank=True, null=True)
 

@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_ls_fields():
-        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'flag_agn_wise', 'brick_primary', 'maskbits', 'fitbits',
+        fields = ['opt_id', 'objID', 'ra', 'dec', 'opt_hpidx', 'flag_agn_wise',  'star', 'brick_primary', 'maskbits', 'fitbits',
                   'type', 'ra_ivar', 'dec_ivar', 'bx', 'by', 'ebv', 'mjd_min', 'mjd_max', 'ref_cat', 'ref_id', 'pmra', 'pmdec',
                   'parallax', 'pmra_ivar', 'pmdec_ivar', 'parallax_ivar', 'ref_epoch', 'gaia_phot_g_mean_mag',
                   'gaia_phot_g_mean_flux_over_error', 'gaia_phot_g_n_obs', 'gaia_phot_bp_mean_mag', 'gaia_phot_bp_mean_flux_over_error',
@@ -100,22 +100,22 @@ class Command(BaseCommand):
             sep = c_xray.separation(c_opt).arcsecond
             # find/create new opt LS counterpart + get new separation
             if opt_type == 'LS' and (not xray_source.ls_dup or xray_source.ls_dup_sep > sep):
-                print(f'Old Sep: {xray_source.ls_dup_sep} New Sep: {sep}')
+                # print(f'Old Sep: {xray_source.ls_dup_sep} New Sep: {sep}')
                 xray_source.ls_dup = opt_source
                 xray_source.ls_dup_sep = sep
             # find/create new opt SDSS counterpart
             elif opt_type == 'SDSS' and (not xray_source.sdss_dup or xray_source.sdss_dup_sep > sep):
-                print(f'Old Sep: {xray_source.sdss_dup_sep} New Sep: {sep}')
+                # print(f'Old Sep: {xray_source.sdss_dup_sep} New Sep: {sep}')
                 xray_source.sdss_dup = opt_source
                 xray_source.sdss_dup_sep = sep
             # find/create new opt PS counterpart
             elif opt_type == 'PS' and (not xray_source.ps_dup or xray_source.ps_dup_sep > sep):
-                print(f'Old Sep: {xray_source.ps_dup_sep} New Sep: {sep}')
+                # print(f'Old Sep: {xray_source.ps_dup_sep} New Sep: {sep}')
                 xray_source.ps_dup = opt_source
                 xray_source.ps_dup_sep = sep
             # find/create new opt PS counterpart
             elif opt_type == 'GAIA' and (not xray_source.gaia_dup or xray_source.gaia_dup_sep > sep):
-                print(f'Old Sep: {xray_source.gaia_dup_sep} New Sep: {sep}')
+                # print(f'Old Sep: {xray_source.gaia_dup_sep} New Sep: {sep}')
                 xray_source.gaia_dup = opt_source
                 xray_source.gaia_dup_sep = sep
 
@@ -136,25 +136,29 @@ class Command(BaseCommand):
 
             # find/create optical source
             if opt_type == 'LS':
-                opt_source, created = LS.objects.get_or_create(opt_hpidx=opt_hpidx, origin_file=origin_file,
-                                                               defaults={'objID': row.objID, 'ra': row.ra, 'dec': row.dec})
+                opt_source, created = LS.objects.get_or_create(opt_hpidx=opt_hpidx, defaults={'objID': row.objID,
+                                                                                              'ra': row.ra, 'dec': row.dec,
+                                                                                              'origin_file': origin_file})
             elif opt_type == 'SDSS':
-                opt_source, created = SDSS.objects.get_or_create(opt_hpidx=opt_hpidx, origin_file=origin_file,
-                                                                 defaults={'objID': row.objID, 'ra': row.ra, 'dec': row.dec})
+                opt_source, created = SDSS.objects.get_or_create(opt_hpidx=opt_hpidx, defaults={'objID': row.objID,
+                                                                                                'ra': row.ra, 'dec': row.dec,
+                                                                                                'origin_file': origin_file})
             elif opt_type == 'PS':
-                opt_source, created = PS.objects.get_or_create(opt_hpidx=opt_hpidx, origin_file=origin_file,
-                                                               defaults={'objID': row.objID, 'ra': row.ra, 'dec': row.dec})
+                opt_source, created = PS.objects.get_or_create(opt_hpidx=opt_hpidx, defaults={'objID': row.objID,
+                                                                                              'ra': row.ra, 'dec': row.dec,
+                                                                                              'origin_file': origin_file})
             elif opt_type == 'GAIA':
-                opt_source, created = GAIA.objects.get_or_create(opt_hpidx=opt_hpidx, origin_file=origin_file,
-                                                                 defaults={'objID': row.objID, 'ra': row.ra, 'dec': row.dec})
+                opt_source, created = GAIA.objects.get_or_create(opt_hpidx=opt_hpidx, defaults={'objID': row.objID,
+                                                                                                'ra': row.ra, 'dec': row.dec,
+                                                                                                'origin_file': origin_file})
 
-            if created:
+            if created and row[0]/500 == 0:
                 self.stdout.write(f'{row[0]} - Create new {opt_type} source {opt_hpidx} with objID: {row.objID}')
 
             # Check that it is new source or new file
-            if f_created or created:
+            if created:
                 try:
-                    self.stdout.write(f'Start filling {opt_type} fields...\n')
+                    # self.stdout.write(f'Start filling {opt_type} fields...\n')
                     for i, field in enumerate(field_list):
                         # self.stdout.write(f'Num:{i} - {field} - {row[i+3]}')  # i+3 skip index and xray fields
                         filled_fields = ['objID', 'opt_hpidx', 'survey', 'file_name', 'ra', 'dec']
@@ -167,23 +171,28 @@ class Command(BaseCommand):
                     opt_source.c_z = c_opt.cartesian.z.value
                     # sources.append(source)
                     opt_source.save()
-                    # find xray sources for ls source
-                    xray_sources = eROSITA.objects.filter(name=row.srcname_fin, survey__name=row.survey,
-                                                          hpidx=row.hpidx)
-                    if xray_sources.exists():
-                        opt_source.xray_sources.add(*xray_sources)
-                        # find counter part for xray sources
-                        Command.find_dup_source(xray_sources, opt_source, c_opt, opt_type)
-                        opt_source.save()
-                        print(f'Link {opt_type} source: {opt_source} with xray sources: {xray_sources}\n')
-                    else:
-                        raise CommandError(f'Cant find xray sources with name: {row.srcname_fin} hpidx: {row.hpidx}'
-                                           f'from survey {row.survey}')
 
                 except Exception as e:
                     # Delete created source if there was ERROR while filling fields
                     if created: opt_source.delete()
                     raise CommandError(e)
+
+            # find xray sources for opt source
+            xray_sources = eROSITA.objects.filter(name=row.srcname_fin, survey__name=row.survey,
+                                                  hpidx=row.hpidx)
+            # check if xray sources already linked with opt source
+            already_linked = opt_source.xray_sources.filter(name=row.srcname_fin, survey__name=row.survey, hpidx=row.hpidx).exists()
+            # already_linked = set((xray_sources)).issubset((opt_source.xray_sources.all()))
+            if xray_sources.exists() and not already_linked:
+                opt_source.xray_sources.add(*xray_sources)
+                # find counter part for xray sources
+                Command.find_dup_source(xray_sources, opt_source, c_opt, opt_type)
+                opt_source.save()
+                if row[0]/500 == 0:
+                    print(f'{row[0]} - Link {opt_type} source: {opt_source} with xray sources: {xray_sources} from survey {row.survey}\n')
+            elif not xray_sources.exists():
+                raise CommandError(f'{row[0]} - Cant find xray sources with name: {row.srcname_fin} hpidx: {row.hpidx}'
+                                   f'from survey {row.survey}')
 
     def handle(self, *args, **options):
         start_time = timezone.now()
