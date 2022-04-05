@@ -152,7 +152,7 @@ class Command(BaseCommand):
                                                                                                 'ra': row.ra, 'dec': row.dec,
                                                                                                 'origin_file': origin_file})
 
-            if created and row[0]/500 == 0:
+            if created and int(row[0]/500) == 0:
                 self.stdout.write(f'{row[0]} - Create new {opt_type} source {opt_hpidx} with objID: {row.objID}')
 
             # Check that it is new source or new file
@@ -188,7 +188,7 @@ class Command(BaseCommand):
                 # find counter part for xray sources
                 Command.find_dup_source(xray_sources, opt_source, c_opt, opt_type)
                 opt_source.save()
-                if row[0]/500 == 0:
+                if int(row[0]/500) == 0:
                     print(f'{row[0]} - Link {opt_type} source: {opt_source} with xray sources: {xray_sources} from survey {row.survey}\n')
             elif not xray_sources.exists():
                 raise CommandError(f'{row[0]} - Cant find xray sources with name: {row.srcname_fin} hpidx: {row.hpidx}'

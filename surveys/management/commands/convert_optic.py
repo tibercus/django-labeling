@@ -552,8 +552,8 @@ class Command(BaseCommand):
         opt_sources = opt_sources.rename(columns={'ls_objid': 'ls_objID', 'ps_raBest': 'ps_ra', 'ps_decBest': 'ps_dec',
                                                   'gaiaedr3_designation': 'gaiaedr3_objID'})
 
-        # index sources in each group(same xray source)
-        opt_sources['opt_id'] = opt_sources.groupby('srcname_fin').cumcount()
+        # index sources in each group(same xray source) + const for complicated cases with opt sources from dif surveys
+        opt_sources['opt_id'] = opt_sources.groupby('srcname_fin').cumcount() + (survey_num-1)*100
         # add file name
         file_name = os.path.splitext(os.path.basename(ls_file_path))[0]
         opt_sources['file_name'] = file_name
