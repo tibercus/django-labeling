@@ -21,8 +21,8 @@ from decimal import Decimal
 class Command(BaseCommand):
     help = "Load Optical data from Parquet file."
 
-    def add_arguments(self, parser):
-        parser.add_argument('survey_num', type=int, help='number of survey')
+    # def add_arguments(self, parser):
+    #     parser.add_argument('survey_num', type=int, help='number of survey')
 
     @staticmethod
     def get_ls_fields():
@@ -196,67 +196,73 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = timezone.now()
-        survey_num = options['survey_num']
-        # get dir name by survey number
-        dir_name = 'eRASS' + str(survey_num)
+        # survey_num = options['survey_num']
+        # iterate over surveys
+        for survey_num in ([1, 2, 3, 4, 9]):
+            start_time_ = timezone.now()
+            # get dir name by survey number
+            dir_name = 'eRASS' + str(survey_num)
 
-        # heal pix map with pixel_resolution < 1/2 arcsec
-        hp = HEALPix(nside=2 ** 19, order='nested', frame='icrs')
+            # heal pix map with pixel_resolution < 1/2 arcsec
+            hp = HEALPix(nside=2 ** 19, order='nested', frame='icrs')
 
-        self.stdout.write(f'Start reading optical data')
-        # sources = []
+            self.stdout.write(f'Start reading optical data')
+            # sources = []
 
-        # Load DESI LIS sources
-        file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_ls.parquet')
+            # Load DESI LIS sources
+            file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_ls.parquet')
 
-        table = pq.read_table(file_path)
-        ls_data = table.to_pandas()
+            table = pq.read_table(file_path)
+            ls_data = table.to_pandas()
 
-        # replace all nan with None
-        ls_data = ls_data.replace({np.nan: None})
-        print(f'\nTable with LS sources:\n', ls_data)
+            # replace all nan with None
+            ls_data = ls_data.replace({np.nan: None})
+            print(f'\nTable with LS sources:\n', ls_data)
 
-        ls_field_list = Command.get_ls_fields()
-        Command.load_opt_survey(self, ls_data, ls_field_list, hp, opt_type='LS')
+            ls_field_list = Command.get_ls_fields()
+            Command.load_opt_survey(self, ls_data, ls_field_list, hp, opt_type='LS')
 
-        # Load SDSS sources
-        file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_sdss.parquet')
+            # Load SDSS sources
+            file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_sdss.parquet')
 
-        table = pq.read_table(file_path)
-        sdss_data = table.to_pandas()
+            table = pq.read_table(file_path)
+            sdss_data = table.to_pandas()
 
-        # replace all nan with None
-        sdss_data = sdss_data.replace({np.nan: None})
-        print(f'\nTable with SDSS sources:\n', sdss_data)
+            # replace all nan with None
+            sdss_data = sdss_data.replace({np.nan: None})
+            print(f'\nTable with SDSS sources:\n', sdss_data)
 
-        sdss_field_list = Command.get_sdss_fields()
-        Command.load_opt_survey(self, sdss_data, sdss_field_list, hp, opt_type='SDSS')
+            sdss_field_list = Command.get_sdss_fields()
+            Command.load_opt_survey(self, sdss_data, sdss_field_list, hp, opt_type='SDSS')
 
-        # Load PS sources
-        file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_ps.parquet')
+            # Load PS sources
+            file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_ps.parquet')
 
-        table = pq.read_table(file_path)
-        ps_data = table.to_pandas()
+            table = pq.read_table(file_path)
+            ps_data = table.to_pandas()
 
-        # replace all nan with None
-        ps_data = ps_data.replace({np.nan: None})
-        print(f'\nTable with PS sources:\n', ps_data)
+            # replace all nan with None
+            ps_data = ps_data.replace({np.nan: None})
+            print(f'\nTable with PS sources:\n', ps_data)
 
-        ps_field_list = Command.get_ps_fields()
-        Command.load_opt_survey(self, ps_data, ps_field_list, hp, opt_type='PS')
+            ps_field_list = Command.get_ps_fields()
+            Command.load_opt_survey(self, ps_data, ps_field_list, hp, opt_type='PS')
 
-        # Load GAIA sources
-        file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_gaia.parquet')
+            # Load GAIA sources
+            file_path = os.path.join(settings.WORK_DIR, dir_name, 'opt_sources_gaia.parquet')
 
-        table = pq.read_table(file_path)
-        gaia_data = table.to_pandas()
+            table = pq.read_table(file_path)
+            gaia_data = table.to_pandas()
 
-        # replace all nan with None
-        gaia_data = gaia_data.replace({np.nan: None})
-        print(f'\nTable with GAIA sources:\n', gaia_data)
+            # replace all nan with None
+            gaia_data = gaia_data.replace({np.nan: None})
+            print(f'\nTable with GAIA sources:\n', gaia_data)
 
-        gaia_field_list = Command.get_gaia_fields()
-        Command.load_opt_survey(self, gaia_data, gaia_field_list, hp, opt_type='GAIA')
+            gaia_field_list = Command.get_gaia_fields()
+            Command.load_opt_survey(self, gaia_data, gaia_field_list, hp, opt_type='GAIA')
+
+            end_time_ = timezone.now()
+            self.stdout.write(f'End reading {dir_name} optical data, time: {(end_time_-start_time_).total_seconds()} seconds.')
 
         # maybe use this later
         # if len(sources) > 500:

@@ -494,21 +494,22 @@ class Command(BaseCommand):
     @staticmethod
     def get_ls_ps_file_paths(dir_name, survey_num):
         # get file with ls data and ps data by survey number
+        # TODO: change file path later
         if survey_num == 1:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS1_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS1_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1_ps_50.pkl')
         elif survey_num == 2:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS2_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS2_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS2_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS2_ps_50.pkl')
         elif survey_num == 3:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS3_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS3_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS3_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS3_ps_50.pkl')
         elif survey_num == 4:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS4_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS4_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS4_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS4_ps_50.pkl')
         elif survey_num == 9:
-            ls_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS1234_ls_50.pkl')
-            ps_file_path = os.path.join(settings.OPTICAL_DIR, dir_name, 'eRASS1234_ps_50.pkl')
+            ls_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ls_50.pkl')
+            ps_file_path = os.path.join(settings.OPTICAL_DIR, 'eRASS1234_ps_50.pkl')
 
         return ls_file_path, ps_file_path
 
@@ -519,6 +520,11 @@ class Command(BaseCommand):
         dir_name = 'eRASS' + str(survey_num)
         # get file paths by survey number
         ls_file_path, ps_file_path = Command.get_ls_ps_file_paths(dir_name, survey_num)
+        # create dirs for optic data
+        # check path
+        print(os.path.join(settings.WORK_DIR, dir_name))
+        if not os.path.exists(os.path.join(settings.WORK_DIR, dir_name)):
+            os.makedirs(os.path.join(settings.WORK_DIR, dir_name))
 
         # load opt sources correlated with DESI LIS
         with open(ls_file_path, 'rb') as f:
