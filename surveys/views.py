@@ -96,6 +96,9 @@ def source(request, pk):
             else:
                 # make requested source - master
                 MetaObject.find_master_source(meta_object, req_source)
+                # calculate TDE v.3 flags
+                MetaObject.calculate_tde_v3(meta_object)
+                MetaObject.calculate_tde_v3_ls(meta_object)
 
             return redirect('source', pk=meta_object.pk)
 

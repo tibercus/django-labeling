@@ -21,6 +21,8 @@ class Command(BaseCommand):
 
     @staticmethod
     def calculate_wise_agn(xray_source, c_xray, Rc):
+        # flag_agn_wise = 1 - w1 - w2 > 0.8 для ВСЕХ источников в кружке Rc
+        # flag_agn_wise = 0 - все остальные случаи
         ls_sources = xray_source.ls_sources.all()
         # TODO: what to return - False or None?
         if not ls_sources.exists():
@@ -30,7 +32,7 @@ class Command(BaseCommand):
             ra = ls_sources.values_list('ra', flat=True)
             dec = ls_sources.values_list('dec', flat=True)
             # get sky coords for ls sources
-            c_opts = SkyCoord(ra=ra*u.degree, dec=dec*u.degree, distance=1*u.pc, frame='icrs')
+            c_opts = SkyCoord(ra=ra * u.degree, dec=dec * u.degree, distance=1 * u.pc, frame='icrs')
             # get separations in arcseconds
             sep_arcsec = np.array(c_xray.separation(c_opts).arcsecond)
             # get indices of near sources
@@ -48,6 +50,10 @@ class Command(BaseCommand):
 
     @staticmethod
     def calculate_gaia_star(xray_source, c_xray, Rc):
+        # g_s = 1 - все источники Гаяй внутри Rc звезды
+        # g_s = 0 - ... не звезды
+        # g_s = 2	- звезды и не звезды
+        # g_s = -1 - нет источников Гайя внутри Rc
         gaia_sources = xray_source.gaia_sources.all()
         # TODO: what to return - -1 or None?
         if not gaia_sources.exists():
@@ -83,6 +89,10 @@ class Command(BaseCommand):
 
     @staticmethod
     def calculate_ls_star(xray_source, c_xray, Rc):
+        # g_s = 1 - все источники DESI LS внутри Rc звезды
+        # g_s = 0 - ... не звезды
+        # g_s = 2	- звезды и не звезды
+        # g_s = -1 - нет источников DESI LS внутри Rc
         ls_sources = xray_source.ls_sources.all()
         # TODO: what to return - -1 or None?
         if not ls_sources.exists():
@@ -117,8 +127,50 @@ class Command(BaseCommand):
             return ls_g_s
 
     @staticmethod
-    def calculate_tde_v3(meta_object, master_source):
-        pass
+    def calculate_tde_v3(meta_object):
+        # ID_e3 == -1 & g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 7
+        survey_2_flag = meta_object.ID_e1 == -1 and (meta_object.g_s is not None) and meta_object.g_s != 1 \
+                        and (meta_object.flag_agn_wise is not None) and meta_object.flag_agn_wise != 1 \
+                        and (meta_object.RATIO_e2e1 is not None) and meta_object.RATIO_e2e1 > 7
+
+        survey_3_flag = meta_object.ID_e2 == -1 and (meta_object.g_s is not None) and meta_object.g_s != 1 \
+                        and (meta_object.flag_agn_wise is not None) and meta_object.flag_agn_wise != 1 \
+                        and (meta_object.RATIO_e3e2 is not None) and meta_object.RATIO_e3e2 > 7
+
+        survey_4_flag = meta_object.ID_e3 == -1 and (meta_object.g_s is not None) and meta_object.g_s != 1 \
+                        and (meta_object.flag_agn_wise is not None) and meta_object.flag_agn_wise != 1 \
+                        and (meta_object.RATIO_e4e3 is not None) and meta_object.RATIO_e4e3 > 7
+
+        # survey_5_flag = meta_object.ID_e4 == -1 and meta_object.g_s and meta_object.g_s != 1 \
+        #                         and meta_object.flag_agn_wise and meta_object.flag_agn_wise != 1 \
+        #                         and meta_object.RATIO_e5e4 and meta_object.RATIO_e5e4 > 7
+
+        tde_v3 = survey_2_flag or survey_3_flag or survey_4_flag
+        print(f'Surveys flags: {survey_2_flag}, {survey_3_flag}, {survey_4_flag} = {tde_v3}\n')
+        return tde_v3
+
+    @staticmethod
+    def calculate_tde_v3_ls(meta_object):
+        # ID_e3 == -1 & ls_g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 7
+        survey_2_flag = meta_object.ID_e1 == -1 and (meta_object.ls_g_s is not None) and meta_object.ls_g_s != 1 \
+                        and (meta_object.flag_agn_wise is not None) and meta_object.flag_agn_wise != 1 \
+                        and (meta_object.RATIO_e2e1 is not None) and meta_object.RATIO_e2e1 > 7
+
+        survey_3_flag = meta_object.ID_e2 == -1 and (meta_object.ls_g_s is not None) and meta_object.ls_g_s != 1 \
+                        and (meta_object.flag_agn_wise is not None) and meta_object.flag_agn_wise != 1 \
+                        and (meta_object.RATIO_e3e2 is not None) and meta_object.RATIO_e3e2 > 7
+
+        survey_4_flag = meta_object.ID_e3 == -1 and (meta_object.ls_g_s is not None) and meta_object.ls_g_s != 1 \
+                        and (meta_object.flag_agn_wise is not None) and meta_object.flag_agn_wise != 1 \
+                        and (meta_object.RATIO_e4e3 is not None) and meta_object.RATIO_e4e3 > 7
+
+        # survey_5_flag = meta_object.ID_e4 == -1 and meta_object.ls_g_s and meta_object.ls_g_s != 1 \
+        #                         and meta_object.flag_agn_wise and meta_object.flag_agn_wise != 1 \
+        #                         and meta_object.RATIO_e5e4 and meta_object.RATIO_e5e4 > 7
+
+        tde_v3_ls = survey_2_flag or survey_3_flag or survey_4_flag
+        print(f'Surveys flags: {survey_2_flag}, {survey_3_flag}, {survey_4_flag} = {tde_v3_ls}\n')
+        return tde_v3_ls
 
     def handle(self, *args, **options):
         start_time = timezone.now()
@@ -126,7 +178,8 @@ class Command(BaseCommand):
             # calculate radius of correlation
             Rc = np.clip(1.1 * xray_source.pos_r98, 4, 20)
             # get SkyCoord for calculating separation
-            c_xray = SkyCoord(ra=xray_source.RA*u.degree, dec=xray_source.DEC*u.degree, distance=1*u.pc, frame='icrs')
+            c_xray = SkyCoord(ra=xray_source.RA * u.degree, dec=xray_source.DEC * u.degree, distance=1 * u.pc,
+                              frame='icrs')
             print(f'Radius of correlation:{Rc}')
             # get flag values
             if xray_source.flag_agn_wise is None:
@@ -142,11 +195,17 @@ class Command(BaseCommand):
                 print(f'GAIA EDR2 Star Flag for {xray_source.survey.name} - {xray_source}: {xray_source.ls_g_s}\n')
             xray_source.save()
 
-        # for meta_obj in MetaObject.objects.all():
-        #     master_source = meta_obj.object_sources.get(survey__name=meta_obj.master_survey)
-            # meta_obj.tde_v3 = Command.calculate_tde_v3(meta_obj, master_source)
-            # meta_obj.save()
+        # get TDE v.3 and to copy pre-class flags to meta object
+        for meta_obj in MetaObject.objects.all():
+            master_source = meta_obj.object_sources.get(survey__name=meta_obj.master_survey)
+            print(f'Meta Obj {meta_obj} - master source {master_source}\n')
+            meta_obj.g_s = master_source.g_s
+            meta_obj.ls_g_s = master_source.ls_g_s
+            meta_obj.flag_agn_wise = master_source.flag_agn_wise
+            meta_obj.tde_v3 = Command.calculate_tde_v3(meta_obj)
+            meta_obj.tde_v3_ls = Command.calculate_tde_v3_ls(meta_obj)
+            meta_obj.save()
 
         self.stdout.write(f'End calculating pre-class')
         end_time = timezone.now()
-        self.stdout.write(self.style.SUCCESS(f'Calculating took: {(end_time-start_time).total_seconds()} seconds.'))
+        self.stdout.write(self.style.SUCCESS(f'Calculating took: {(end_time - start_time).total_seconds()} seconds.'))

@@ -83,6 +83,8 @@ class MetaObject(models.Model):
     flag_agn_wise = models.BooleanField(blank=True, null=True)
     # TDE v.3 flag
     tde_v3 = models.BooleanField(blank=True, null=True)
+    # LS TDE v.3 flag
+    tde_v3_ls = models.BooleanField(blank=True, null=True)
 
     # Columns of Master Table
     EXT = models.FloatField(blank=True, null=True)
@@ -226,6 +228,42 @@ class MetaObject(models.Model):
             self.flag_agn_wise = master_source.flag_agn_wise
             self.save()
 
+    def calculate_tde_v3(self):
+        # ID_e3 == -1 & g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 7
+        survey_2_flag = self.ID_e1 == -1 and (self.g_s is not None) and self.g_s != 1 \
+                        and (self.flag_agn_wise is not None) and self.flag_agn_wise != 1 \
+                        and (self.RATIO_e2e1 is not None) and self.RATIO_e2e1 > 7
+
+        survey_3_flag = self.ID_e2 == -1 and (self.g_s is not None) and self.g_s != 1 \
+                        and (self.flag_agn_wise is not None) and self.flag_agn_wise != 1 \
+                        and (self.RATIO_e3e2 is not None) and self.RATIO_e3e2 > 7
+
+        survey_4_flag = self.ID_e3 == -1 and (self.g_s is not None) and self.g_s != 1 \
+                        and (self.flag_agn_wise is not None) and self.flag_agn_wise != 1 \
+                        and (self.RATIO_e4e3 is not None) and self.RATIO_e4e3 > 7
+
+        self.tde_v3 = survey_2_flag or survey_3_flag or survey_4_flag
+        # print(f'Surveys flags: {survey_2_flag}, {survey_3_flag}, {survey_4_flag} = {self.tde_v3}\n')
+        self.save()
+
+    def calculate_tde_v3_ls(self):
+        # ID_e3 == -1 & ls_g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 7
+        survey_2_flag = self.ID_e1 == -1 and (self.ls_g_s is not None) and self.ls_g_s != 1 \
+                        and (self.flag_agn_wise is not None) and self.flag_agn_wise != 1 \
+                        and (self.RATIO_e2e1 is not None) and self.RATIO_e2e1 > 7
+
+        survey_3_flag = self.ID_e2 == -1 and (self.ls_g_s is not None) and self.ls_g_s != 1 \
+                        and (self.flag_agn_wise is not None) and self.flag_agn_wise != 1 \
+                        and (self.RATIO_e3e2 is not None) and self.RATIO_e3e2 > 7
+
+        survey_4_flag = self.ID_e3 == -1 and (self.ls_g_s is not None) and self.ls_g_s != 1 \
+                        and (self.flag_agn_wise is not None) and self.flag_agn_wise != 1 \
+                        and (self.RATIO_e4e3 is not None) and self.RATIO_e4e3 > 7
+
+        self.tde_v3_ls = survey_2_flag or survey_3_flag or survey_4_flag
+        # print(f'Surveys flags: {survey_2_flag}, {survey_3_flag}, {survey_4_flag} = {self.tde_v3_ls}\n')
+        self.save()
+
     def __iter__(self):
         for field in MetaObject.fields_to_show():
             value = getattr(self, field, None)
@@ -254,6 +292,9 @@ class MetaObjFilter(django_filters.FilterSet):
         widget=forms.RadioSelect(attrs={'class': 'gaia_star_radio form-check'},
                                  choices=GAIA_CHOICES),
     )
+
+    tde_v3 = django_filters.BooleanFilter(field_name='tde_v3', label='TDE v.3',
+                                          widget=BooleanWidget(attrs={'class': 'custom_bool'}))
 
     class Meta:
         model = MetaObject
