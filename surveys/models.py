@@ -53,19 +53,11 @@ class MetaObject(models.Model):
 
     comment = models.TextField(max_length=2000, blank=True, null=True)
 
-    # TODO: change this later
-    # CLASS_CHOICES = [
-    #     ('TDE: Criteria 1', 'TDE: Parameter A > a1, Parameter B > b2'),
-    #     ('TDE: Criteria 2', 'TDE: Parameter B > b1, Parameter C > c2'),
-    #     ('TDE: Criteria 3', 'TDE: Parameter D > d1, Parameter E > e2'),
-    #     ('NOT TDE: Criteria 1', 'Not TDE: Parameter A < a1, Parameter B < b2'),
-    #     ('NOT TDE: Criteria 2', 'Not TDE: Parameter B < b1, Parameter C < c2'),
-    #     ('NOT TDE: Criteria 3', 'Not TDE: Parameter D < d1, Parameter E < e2'),
-    #     (None, 'Unknown Source'),
-    # ]
     CLASS_CHOICES = [
             ('TDE', 'Class TDE'),
-            ('NOT TDE', 'Not Class TDE'),
+            ('AGN', 'Class AGN'),
+            ('Galactic', 'Class Galactic'),
+            ('Other', 'Other Class'),
             (None, 'Unknown Source'),
         ]
     object_class = models.CharField(

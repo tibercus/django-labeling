@@ -13,7 +13,6 @@ from astropy.coordinates import SkyCoord
 
 import astropy_healpix
 from astropy_healpix import HEALPix
-from decimal import Decimal
 
 
 class Command(BaseCommand):
@@ -204,6 +203,9 @@ class Command(BaseCommand):
             meta_obj.flag_agn_wise = master_source.flag_agn_wise
             meta_obj.tde_v3 = Command.calculate_tde_v3(meta_obj)
             meta_obj.tde_v3_ls = Command.calculate_tde_v3_ls(meta_obj)
+            # TODO: delete this later
+            meta_obj.GLON = master_source.GLON
+            meta_obj.GLAT = master_source.GLAT
             meta_obj.save()
 
         self.stdout.write(f'End calculating pre-class')

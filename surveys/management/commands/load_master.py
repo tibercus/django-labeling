@@ -69,7 +69,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def link_source_with_meta(meta_object, row_values):
-        if row_values.ID_e1 > 0 and row_values.ID_e1 > 0:
+        if row_values.ID_e1 and row_values.ID_e1 > 0:
             try:
                 source = eROSITA.objects.get(survey_ind=row_values.ID_e1, survey=Survey.objects.get(name=1))
                 source.meta_objects.add(meta_object)
@@ -141,10 +141,6 @@ class Command(BaseCommand):
             # add galactic coordinates
             meta_object.GLON = master_source.GLON
             meta_object.GLAT = master_source.GLAT
-            # add pre class flags
-            meta_object.g_s = master_source.g_s
-            meta_object.ls_g_s = master_source.ls_g_s
-            meta_object.flag_agn_wise = master_source.flag_agn_wise
             meta_object.save()
 
     @staticmethod
@@ -292,10 +288,11 @@ class Command(BaseCommand):
         print(data)
 
         for row in data.itertuples():
+            # TODO: think about 5th survey load
             # find/create meta object
-            meta_object, created = MetaObject.objects.get_or_create(ID_e1=row.ID_e1, ID_e2=row.ID_e2, ID_e3=row.ID_e3,
-                                                                    ID_e4=row.ID_e4, ID_e5=row.ID_e5, ID_e1234=row.ID_e1234,
-                                                                    defaults={'meta_ind': row.img_id, 'RA': row.RA, 'DEC': row.DEC})
+            meta_object, created = MetaObject.objects.get_or_create(meta_ind=row.img_id, ID_e1=row.ID_e1, ID_e2=row.ID_e2,
+                                                                    ID_e3=row.ID_e3, ID_e4=row.ID_e4, ID_e1234=row.ID_e1234,
+                                                                    defaults={'ID_e5': row.ID_e5, 'RA': row.RA, 'DEC': row.DEC})
 
             # Check that it is new meta object
             if created:
