@@ -40,7 +40,7 @@ class Command(BaseCommand):
             # get near ls sources
             for ls_ind in ls_indices:
                 near_ls = ls_sources[int(ls_ind)]
-                print(f'{ls_ind}: LS Source in radius of correlation: {near_ls} flag_agn_wise: {near_ls.flag_agn_wise}')
+                # print(f'{ls_ind}: LS Source in radius of correlation: {near_ls} flag_agn_wise: {near_ls.flag_agn_wise}')
                 # return False if any source has False flag
                 if not near_ls.flag_agn_wise:
                     return False
@@ -76,7 +76,7 @@ class Command(BaseCommand):
             # get near gaia sources
             for gaia_ind in gaia_indices:
                 near_gaia = gaia_sources[int(gaia_ind)]
-                print(f'{gaia_ind}: GAIA Source in radius of correlation: {near_gaia} star: {near_gaia.star}')
+                # print(f'{gaia_ind}: GAIA Source in radius of correlation: {near_gaia} star: {near_gaia.star}')
                 if not near_gaia.star and g_s == -1:
                     g_s = 0
                 elif near_gaia.star and g_s == -1:
@@ -115,7 +115,7 @@ class Command(BaseCommand):
             # get near gaia sources
             for ls_ind in ls_indices:
                 near_ls = ls_sources[int(ls_ind)]
-                print(f'{ls_ind}: LS Source in radius of correlation: {near_ls} star: {near_ls.star}')
+                # print(f'{ls_ind}: LS Source in radius of correlation: {near_ls} star: {near_ls.star}')
                 if not near_ls.star and ls_g_s == -1:
                     ls_g_s = 0
                 elif near_ls.star and ls_g_s == -1:
@@ -145,7 +145,7 @@ class Command(BaseCommand):
         #                         and meta_object.RATIO_e5e4 and meta_object.RATIO_e5e4 > 7
 
         tde_v3 = survey_2_flag or survey_3_flag or survey_4_flag
-        print(f'Surveys flags: {survey_2_flag}, {survey_3_flag}, {survey_4_flag} = {tde_v3}\n')
+        # print(f'Surveys flags: {survey_2_flag}, {survey_3_flag}, {survey_4_flag} = {tde_v3}\n')
         return tde_v3
 
     @staticmethod
@@ -168,7 +168,7 @@ class Command(BaseCommand):
         #                         and meta_object.RATIO_e5e4 and meta_object.RATIO_e5e4 > 7
 
         tde_v3_ls = survey_2_flag or survey_3_flag or survey_4_flag
-        print(f'Surveys flags: {survey_2_flag}, {survey_3_flag}, {survey_4_flag} = {tde_v3_ls}\n')
+        # print(f'Surveys flags: {survey_2_flag}, {survey_3_flag}, {survey_4_flag} = {tde_v3_ls}\n')
         return tde_v3_ls
 
     def handle(self, *args, **options):
@@ -179,7 +179,7 @@ class Command(BaseCommand):
             # get SkyCoord for calculating separation
             c_xray = SkyCoord(ra=xray_source.RA * u.degree, dec=xray_source.DEC * u.degree, distance=1 * u.pc,
                               frame='icrs')
-            print(f'Radius of correlation:{Rc}')
+            # print(f'Radius of correlation:{Rc}')
             # get flag values
             if xray_source.flag_agn_wise is None:
                 xray_source.flag_agn_wise = Command.calculate_wise_agn(xray_source, c_xray, Rc)
@@ -197,7 +197,7 @@ class Command(BaseCommand):
         # get TDE v.3 and to copy pre-class flags to meta object
         for meta_obj in MetaObject.objects.all():
             master_source = meta_obj.object_sources.get(survey__name=meta_obj.master_survey)
-            print(f'Meta Obj {meta_obj} - master source {master_source}\n')
+            # print(f'Meta Obj {meta_obj} - master source {master_source}\n')
             meta_obj.g_s = master_source.g_s
             meta_obj.ls_g_s = master_source.ls_g_s
             meta_obj.flag_agn_wise = master_source.flag_agn_wise
