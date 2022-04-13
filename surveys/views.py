@@ -23,9 +23,9 @@ def home(request):
     f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)))
     meta_queryset = f.qs
     # print current GET request and previous
-    print(f'Request: {request.GET.urlencode}')
-    print(f'Sort by: {request.GET.get("sort_by")}')
-    print(f'Sort by group: {request.GET.get("sort_by_group")}')
+    # print(f'Request: {request.GET.urlencode}')
+    # print(f'Sort by: {request.GET.get("sort_by")}')
+    # print(f'Sort by group: {request.GET.get("sort_by_group")}')
 
     sort_by_group = request.GET.get("sort_by_group")
     if sort_by_group:
@@ -64,7 +64,7 @@ def source(request, pk):
     sources = meta_object.object_sources.all()
     # get master source for meta object
     master_source = sources.get(survey__name=meta_object.master_survey)
-    print(f'Master source:{master_source}\n')
+    # print(f'Master source:{master_source}\n')
 
     opt_surveys = ['LS', 'PS', 'SDSS', 'GAIA']
     # get list of query sets - optical sources from different surveys
@@ -74,7 +74,7 @@ def source(request, pk):
 
     # zip surveys and corresponding optical sources for template nested nav-tabs
     opt_survey_sources = dict(zip(opt_surveys, opt_sources))
-    print(f'Opt Sources by Survey: {opt_survey_sources}\n')
+    # print(f'Opt Sources by Survey: {opt_survey_sources}\n')
 
     # get class chosen by superuser
     try:
