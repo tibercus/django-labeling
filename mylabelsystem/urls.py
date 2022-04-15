@@ -28,6 +28,7 @@ urlpatterns = [
     re_path(r'^login/$', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     re_path(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
     re_path(r'^criteria/', views.criteria, name='criteria'),
+    re_path(r'^export_meta/', views.export_meta_csv, name='export_meta_csv'),
     re_path(r'^settings/password/$', auth_views.PasswordChangeView.as_view(template_name='password_change.html'),
         name='password_change'),
     re_path(r'^settings/password/done/$', auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),

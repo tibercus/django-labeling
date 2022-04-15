@@ -6,10 +6,6 @@ import pickle
 from surveys.models import *
 from django.contrib.auth.models import User
 
-from django.conf import settings
-import os
-import datetime
-
 from surveys.utils import backup_comments
 
 

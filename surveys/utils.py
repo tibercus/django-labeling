@@ -2,6 +2,7 @@ from django.core.management import BaseCommand
 from django.utils import timezone
 import pandas as pd
 import pickle
+import pyarrow.parquet as pq
 
 from surveys.models import *
 from django.contrib.auth.models import User
@@ -9,6 +10,8 @@ from django.contrib.auth.models import User
 from django.conf import settings
 import os
 import datetime
+
+from django.utils.timezone import make_aware
 
 
 def add_metadata_fields(comment_df):
@@ -31,8 +34,8 @@ def backup_comments():
 
     if not comment_df.empty:
         comment_df = add_metadata_fields(comment_df)
-        pd.set_option('display.width', 120)
-        print('Saved xray comments:\n', comment_df)
+        # pd.set_option('display.width', 120)
+        # print('Saved xray comments:\n', comment_df)
         # add date to file name
         file_name = 'saved_comments_' + str(datetime.datetime.now().strftime('%Y-%m-%d-%H%M%S')) + '.parquet'
         comment_df.to_parquet(os.path.join(settings.WORK_DIR, file_name), engine='fastparquet')
@@ -43,8 +46,56 @@ def backup_comments():
     # Add metadata fields
     if not opt_comment_df.empty:
         opt_comment_df = add_metadata_fields(opt_comment_df)
-        pd.set_option('display.width', 120)
-        print('Saved optical comments:\n', opt_comment_df)
+        # pd.set_option('display.width', 120)
+        # print('Saved optical comments:\n', opt_comment_df)
         # add date to file name
         file_name = 'saved_opt_comments_' + str(datetime.datetime.now().strftime('%Y-%m-%d-%H%M%S')) + '.parquet'
         opt_comment_df.to_parquet(os.path.join(settings.WORK_DIR, file_name), engine='fastparquet')
+
+
+def restore_comments(saved_comments, com_type='Xray'):
+    print(f'Start reading saved comments')
+    for row in saved_comments.itertuples():
+        # Find comment's user
+        try:
+            user = User.objects.get(username=row.by_user)
+        except User.DoesNotExist:
+            print(f'WARNING: User {row.by_user} not found')
+            continue
+
+        # TODO: think about finding comment's meta source by meta_ind
+        # Find comment's meta_source
+        try:
+            meta_source = MetaObject.objects.get(meta_ind=row.meta_ind, master_name=row.master_source_name,
+                                                 master_survey=row.master_survey)
+        except MetaObject.DoesNotExist:
+            print(f'WARNING: Meta Source {row.meta_ind} with name {row.master_source_name}, survey: {row.master_survey} not found')
+            continue
+
+        # Find/create comment
+        if com_type == 'Xray':
+            comment, create = Comment.objects.get_or_create(created_by=user, meta_source=meta_source)
+        else:
+            comment, create = OptComment.objects.get_or_create(created_by=user, meta_source=meta_source)
+
+        if not create:
+            # skip existing comment
+            print(f'{com_type} Comment by {row.by_user} for source {meta_source.master_name} exists')
+            continue
+        else:
+            print(f'Restore {com_type} Comment by {row.by_user} for meta source {meta_source.master_name}'
+                              f' survey {meta_source.master_survey}')
+            # Fill Comment fields
+            try:
+                comment.comment = row.comment
+                comment.follow_up = row.follow_up
+                if com_type == 'Xray': comment.source_class = row.source_class
+                # save time to comment
+                comment.created_at = pd.Timestamp(row.created_at)
+                comment.save()
+            except Exception as e:
+                comment.delete()
+                print(
+                    f'ERROR: Restoring {com_type} Comment by {row.by_user} for meta source {meta_source.master_name}'
+                    f' survey {meta_source.master_survey}')
+                raise e
