@@ -12,6 +12,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F, Count
 from django.http import QueryDict
 
+from surveys.utils import cone_search_filter
+
 import csv
 
 
@@ -24,10 +26,9 @@ def home(request):
     # filter meta objects
     f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)))
     meta_queryset = f.qs
-    # print current GET request and previous
+    # print current GET request
     # print(f'Request: {request.GET.urlencode}')
     # print(f'Sort by: {request.GET.get("sort_by")}')
-    # print(f'Sort by group: {request.GET.get("sort_by_group")}')
 
     sort_by_group = request.GET.get("sort_by_group")
     if sort_by_group:
@@ -37,11 +38,21 @@ def home(request):
     if field_order_by:
         meta_queryset = meta_queryset.order_by(F(field_order_by).desc(nulls_last=True))
 
+    # make cone search with requested RA, DEC, r
+    cone_search = None
+    cs_ra = request.GET.get("cs_RA"); cs_dec = request.GET.get("cs_DEC"); cs_r = request.GET.get("cs_r")
+    if cs_ra and cs_dec and cs_r:
+        cone_search = 'Cone Search for \nRA: {0} \nDEC: {1} \nR: {2}'.format(cs_ra, cs_dec, cs_r)
+        # print(cone_search)
+        meta_queryset = cone_search_filter(meta_queryset, cs_ra, cs_dec, cs_r)
+
+    # show total count for query
+    meta_count = meta_queryset.count()
     # which page to show
     page = request.GET.get('page', 1)
     # print(f'Previous req:', QueryDict(request.META.get('HTTP_REFERER')[23:]))
-    # 50 meta_objects per page
-    paginator = Paginator(meta_queryset, 10)
+    # 25 meta_objects per page
+    paginator = Paginator(meta_queryset, 25)
 
     try:
         meta_objects = paginator.page(page)
@@ -55,7 +66,8 @@ def home(request):
 
     return render(request, 'home.html', {'filter': f, 'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show(),
                                          'master_fields': master_fields, 'sort_fields': sort_fields,
-                                         'pre_class_filters': pre_class_filters})
+                                         'pre_class_filters': pre_class_filters, 'meta_count': meta_count,
+                                         'cone_search': cone_search})
 
 
 @login_required

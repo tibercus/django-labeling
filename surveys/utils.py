@@ -13,6 +13,10 @@ import datetime
 
 from django.utils.timezone import make_aware
 
+from django.db.models import ExpressionWrapper, FloatField
+from django.db.models.functions.math import ACos, Cos, Radians, Pi, Sin
+from math import radians
+
 
 def add_metadata_fields(comment_df):
     # Add metadata fields to comments table
@@ -99,3 +103,43 @@ def restore_comments(saved_comments, com_type='Xray'):
                     f'ERROR: Restoring {com_type} Comment by {row.by_user} for meta source {meta_source.master_name}'
                     f' survey {meta_source.master_survey}')
                 raise e
+
+
+def cone_search_filter(queryset, ra, dec, radius):
+    """
+    Executes cone search by annotating each target with separation distance from the specified RA/Dec.
+    Formula is from Wikipedia: https://en.wikipedia.org/wiki/Angular_distance
+    The result is converted to radians.
+
+    :param queryset: Queryset of Target objects
+    :type queryset: Target
+
+    :param ra: Right ascension of center of cone.
+    :type ra: float
+
+    :param dec: Declination of center of cone.
+    :type dec: float
+
+    :param radius: Radius of cone search in degrees.
+    :type radius: float
+    """
+    ra = float(ra)
+    dec = float(dec)
+    radius = float(radius)
+
+    # Cone search is preceded by a square search to reduce the search radius before annotating the queryset, in
+    # order to make the query faster.
+    double_radius = radius * 2
+    queryset = queryset.filter(
+        RA__gte=ra - double_radius, RA__lte=ra + double_radius,
+        DEC__gte=dec - double_radius, DEC__lte=dec + double_radius
+    )
+
+    separation = ExpressionWrapper(
+        180/Pi() * ACos(
+            (Sin(radians(dec)) * Sin(Radians('DEC'))) +
+            (Cos(radians(dec)) * Cos(Radians('DEC')) * Cos(radians(ra) - Radians('RA')))
+        ), FloatField()
+    )
+
+    return queryset.annotate(separation=separation).filter(separation__lte=radius)

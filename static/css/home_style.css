@@ -1,7 +1,7 @@
 /* Next is for Table Scrolling */
 .table-responsive
 {
-    margin-top: 40px;
+    margin-top: 10px;
     width:100%;
     overflow:auto;
 }
@@ -19,6 +19,7 @@
 
 .custom_bool
 {
+    width: 200px;
     /*border: 1px solid blue;*/
 }
 

@@ -173,7 +173,7 @@ class MetaObject(models.Model):
 
     @staticmethod
     def fields_to_show():
-        fields = ['meta_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'GLON', 'GLAT',
+        fields = ['id', 'meta_ind', 'master_name', 'master_survey', 'RA', 'DEC', 'GLON', 'GLAT',
                   'unchange_flag', 'comment', 'object_class', 'g_s', 'ls_g_s', 'flag_agn_wise', 'EXT', 'R98', 'LIKE',
                   'D2D_e1m', 'D2D_e2m', 'D2D_e3m', 'D2D_e4m', 'D2D_e5m', 'D2D_me1', 'D2D_me2', 'D2D_me3', 'D2D_me4', 'D2D_me5',
                   'EXP_e1', 'EXP_e2', 'EXP_e3', 'EXP_e4', 'EXP_e5', 'EXP_e1234',
@@ -267,10 +267,25 @@ class MetaObjFilter(django_filters.FilterSet):
     CHOICES = ((True, 'Primary'), (False, 'Secondary'))
     GAIA_CHOICES = ((-1, 'No sources'), (0, 'Not stars'), (1, 'Stars'), (2, 'Combined'))
 
+    # filters for ID_ei == -1
+    id_e1_gt_0 = django_filters.BooleanFilter(label='Source in e1', method='id_ei_gt_zero',
+                                            widget=BooleanWidget(attrs={'class': 'custom_bool'}))
+
+    id_e2_gt_0 = django_filters.BooleanFilter(label='Source in e2', method='id_ei_gt_zero',
+                                              widget=BooleanWidget(attrs={'class': 'custom_bool'}))
+
+    id_e3_gt_0 = django_filters.BooleanFilter(label='Source in e3', method='id_ei_gt_zero',
+                                              widget=BooleanWidget(attrs={'class': 'custom_bool'}))
+
+    id_e4_gt_0 = django_filters.BooleanFilter(label='Source in e4', method='id_ei_gt_zero',
+                                              widget=BooleanWidget(attrs={'class': 'custom_bool'}))
+
+    # filters for 'Primary' and 'EXT'
     is_primary = django_filters.BooleanFilter(
         field_name='primary_object', label='Status', required=False,
-        widget=forms.RadioSelect(attrs={'class': 'custom_radio form-check d-flex justify-content-between'}, choices=CHOICES),
-        )
+        widget=forms.RadioSelect(attrs={'class': 'custom_radio form-check d-flex justify-content-between'},
+                                 choices=CHOICES),
+    )
 
     ext_gt_0 = django_filters.BooleanFilter(label='EXT > 0', method='ext_gt_zero',
                                             widget=BooleanWidget(attrs={'class': 'custom_bool'}))
@@ -315,6 +330,52 @@ class MetaObjFilter(django_filters.FilterSet):
                     default=Value(False),
                     output_field=models.BooleanField())
             ).filter(ext_is_gt=value)
+
+        return queryset
+
+    @staticmethod
+    def id_ei_gt_zero(queryset, name, value):
+        if value is not None:
+            if 'e1' in name:
+                queryset = queryset.annotate(
+                    id_e1_is_gt=Case(
+                        When(
+                            ID_e1__gt=-1,
+                            then=Value(True)
+                        ),
+                        default=Value(False),
+                        output_field=models.BooleanField())
+                ).filter(id_e1_is_gt=value)
+            elif 'e2' in name:
+                queryset = queryset.annotate(
+                    id_e2_is_gt=Case(
+                        When(
+                            ID_e2__gt=-1,
+                            then=Value(True)
+                        ),
+                        default=Value(False),
+                        output_field=models.BooleanField())
+                ).filter(id_e2_is_gt=value)
+            elif 'e3' in name:
+                queryset = queryset.annotate(
+                    id_e3_is_gt=Case(
+                        When(
+                            ID_e3__gt=-1,
+                            then=Value(True)
+                        ),
+                        default=Value(False),
+                        output_field=models.BooleanField())
+                ).filter(id_e3_is_gt=value)
+            elif 'e4' in name:
+                queryset = queryset.annotate(
+                    id_e4_is_gt=Case(
+                        When(
+                            ID_e4__gt=-1,
+                            then=Value(True)
+                        ),
+                        default=Value(False),
+                        output_field=models.BooleanField())
+                ).filter(id_e4_is_gt=value)
 
         return queryset
 
@@ -500,7 +561,7 @@ class eROSITA(models.Model):
         opt_sources = None
         # TODO: think about adding coords to eROSITA fields
         # find cartesian coords for xray source
-        c_xray = SkyCoord(ra=self.RA * u.deg, dec = self.DEC * u.deg, distance = 1 * u.pc, frame = 'icrs')
+        c_xray = SkyCoord(ra=self.RA * u.deg, dec=self.DEC * u.deg, distance=1 * u.pc, frame='icrs')
         c_x = c_xray.cartesian.x.value
         c_y = c_xray.cartesian.y.value
         c_z = c_xray.cartesian.z.value

@@ -33,15 +33,13 @@
                 {% define survey.name|to_str as number %}
             {% endif %}
 
-            {% if source %}
-                {% comment %} For mark of 'master' sources {% endcomment %}
-                {% if  status == "active" %}
-                    <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">{{ tab_name }}{{ number }}
-                        <span class="badge">M</span>
-                    </a>
-                {% else %}
-                    <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">{{ tab_name }}{{ number }}</a>
-                {% endif %}
+            {% comment %} For mark of 'master' sources {% endcomment %}
+            {% if  status == "active" %}
+                <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">{{ tab_name }}{{ number }}
+                    <span class="badge">M</span>
+                </a>
+            {% else %}
+                <a href="#survey{{ survey.name }}" class="nav-link {{ status }}" data-toggle="tab">{{ tab_name }}{{ number }}</a>
             {% endif %}
             </li>
 
@@ -75,37 +73,39 @@
                 <div class="row">
 
                     <div class="col-sm-auto">
-                        {%  comment %} Source table with head:value(parameters) {% endcomment %}
-                        <div class="table_source">
-                            <table class="table table-bordered table-responsive-md">
-                              <thead class="thead-dark">
-                                <tr>
-                                    <th>Head</th>
-                                   <th>Value</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-
-                                {% for field,value in source %}
+                        {% if source %}
+                            {%  comment %} Source table with head:value(parameters) {% endcomment %}
+                            <div class="table_source">
+                                <table class="table table-bordered table-responsive-md">
+                                  <thead class="thead-dark">
                                     <tr>
-                                        <td>{{ field }}</td>
-                                        {% comment %} TODO: change this later {% endcomment %}
-                                        {% if 'FLUX' in field or 'flux' in field%}
-                                            <td>{{ value|stringformat:"e" }}</td>
-                                        {% else %}
-                                            <td>{{ value }}</td>
-                                        {% endif %}
+                                        <th>Head</th>
+                                       <th>Value</th>
                                     </tr>
-                                {% endfor %}
+                                  </thead>
+                                  <tbody>
 
-                              </tbody>
-                            </table>
-                        </div>
+                                    {% for field,value in source %}
+                                        <tr>
+                                            <td>{{ field }}</td>
+                                            {% comment %} TODO: change this later {% endcomment %}
+                                            {% if 'FLUX' in field or 'flux' in field%}
+                                                <td>{{ value|stringformat:"e" }}</td>
+                                            {% else %}
+                                                <td>{{ value }}</td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+
+                                  </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
 
                         <div class="container">
                             <div class = "comment_section overlay">
                                 {%  comment %} 'Master' form for xray source {% endcomment %}
-                                {% if user.is_superuser %}
+                                {% if source and user.is_superuser %}
                                     <form id="master_form" method="post" novalidate>
                                         {% csrf_token %}
                                         <input id="mas_field_id" type="hidden" name="source_id" value={{ source.pk }}>

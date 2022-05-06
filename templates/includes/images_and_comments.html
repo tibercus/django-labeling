@@ -28,15 +28,17 @@
     </div>
 
     <div class="col-sm">
-        <div class = "light_curve">
-                <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'lc_'|add:id|add:'.pdf'|file_exists%}"
-                        width="500px" height="450px"></iframe>
-        </div>
+        {% if source %}
+            <div class = "light_curve">
+                    <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'lc_'|add:id|add:'.pdf'|file_exists%}"
+                            width="500px" height="450px"></iframe>
+            </div>
 
-        <div class = "spectrum">
-                <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'spec_'|add:id|add:'.pdf'|file_exists%}"
-                        width="500px" height="430px"></iframe>
-        </div>
+            <div class = "spectrum">
+                    <iframe src="{% static 'images/e'|add:survey|add:'/'|add:'spec_'|add:id|add:'.pdf'|file_exists%}"
+                            width="500px" height="430px"></iframe>
+            </div>
+        {% endif %}
 
         {%  comment %} Show Pre-Classes {% endcomment %}
         <table class="table table-bordered mt-2" >
@@ -56,7 +58,7 @@
                     <td>{{ master_source.g_s }}</td>
                 </tr>
                 <tr>
-                    <td>{{ 'GAIA-EDR2 Star' }}</td>
+                    <td>{{ 'GAIA-DR2 Star' }}</td>
                     <td>{{ master_source.ls_g_s }}</td>
                 </tr>
                 <tr>
