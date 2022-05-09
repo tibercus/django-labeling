@@ -345,11 +345,11 @@
                     {# marker for AGN optical source #}
                     var markers_agn = A.catalog({name: '{{ opt_survey }} agn', sourceSize: 14, color: 'yellow'})
                     {# marker for GAIA optical source #}
-                    var markers_gaia = A.catalog({name: '{{ opt_survey }} agn', sourceSize: 14, color: 'limegreen'})
+                    var markers_star = A.catalog({name: '{{ opt_survey }} star', sourceSize: 14, color: 'limegreen'})
                     aladin.addCatalog(markers);
                     aladin.addCatalog(marker_dup);
                     aladin.addCatalog(markers_agn);
-                    aladin.addCatalog(markers_gaia);
+                    aladin.addCatalog(markers_star);
 
                     {% for opt_s in opt_sources %}
                         {% if master_source in opt_s.dup_xray.all %}
@@ -361,7 +361,7 @@
                                 popupDesc: '<em>RA:</em> {{ opt_s.ra }} <br/><em>DEC:</em> {{ opt_s.dec }} <br/>\
                                             More info <a target="_blank" href="http://simbad.u-strasbg.fr/simbad/sim-coo?Coord={{opt_s.ra|stringformat:'+.6f'}}{{opt_s.dec|stringformat:'+.6f'|escape}}&CooFrame=FK5&CooEpoch=2000&CooEqui=2000&CooDefinedFrames=none&Radius=40&Radius.unit=arcsec&submit=submit+query&CoordList=>SIMBAD">in Simbad</a>'})]);
                         {% elif master_source|is_gaia_star:opt_s.opt_id %}
-                            markers_gaia.addSources([A.marker({{ opt_s.ra }}, {{ opt_s.dec }}, {popupTitle: '{{opt_s}}',
+                            markers_star.addSources([A.marker({{ opt_s.ra }}, {{ opt_s.dec }}, {popupTitle: '{{opt_s}}',
                                 popupDesc: '<em>RA:</em> {{ opt_s.ra }} <br/><em>DEC:</em> {{ opt_s.dec }} <br/>\
                                             More info <a target="_blank" href="http://simbad.u-strasbg.fr/simbad/sim-coo?Coord={{opt_s.ra|stringformat:'+.6f'}}{{opt_s.dec|stringformat:'+.6f'|escape}}&CooFrame=FK5&CooEpoch=2000&CooEqui=2000&CooDefinedFrames=none&Radius=40&Radius.unit=arcsec&submit=submit+query&CoordList=>SIMBAD">in Simbad</a>'})]);
                         {% else %}
