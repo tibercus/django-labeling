@@ -65,10 +65,10 @@
 
                         {%  comment %} Filter Meta Obj by pre-class flags {% endcomment %}
                         <div class="col-5 text-center">
-                           <h5> Pre-Class Filters <a href="{% url 'criteria' %}"> Info </a></h5>
+                           <h5> Class Filters <a href="{% url 'criteria' %}"> Info </a></h5>
                             {% for field in filter.form %}
                                 {% if field.label in pre_class_filters %}
-                                    <div class="mx-auto mt-3" style="width: 200px;">
+                                    <div class="mx-auto mt-4" style="width: 200px;">
                                         {{ field.label_tag }}
                                         {{ field|add_class:'form-control' }}
                                         {% for error in field.errors %}

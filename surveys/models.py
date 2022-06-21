@@ -58,7 +58,7 @@ class MetaObject(models.Model):
             ('AGN', 'Class AGN'),
             ('Galactic', 'Class Galactic'),
             ('Other', 'Other Class'),
-            (None, 'Unknown Source'),
+            (None, 'Unknown'),
         ]
     object_class = models.CharField(
         max_length=100,
@@ -264,6 +264,12 @@ class MetaObject(models.Model):
 
 # Class for filtering Meta Objects by requested fields
 class MetaObjFilter(django_filters.FilterSet):
+
+    def __init__(self, *args, **kwargs):
+        # get request user
+        self.user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+
     CHOICES = ((True, 'Primary'), (False, 'Secondary'))
     GAIA_CHOICES = ((-1, 'No sources'), (0, 'Not stars'), (1, 'Stars'), (2, 'Combined'))
 
@@ -302,10 +308,18 @@ class MetaObjFilter(django_filters.FilterSet):
 
     tde_v3 = django_filters.BooleanFilter(field_name='tde_v3', label='TDE v.3',
                                           widget=BooleanWidget(attrs={'class': 'custom_bool'}))
+    # filters for meta object result classes
+    object_class = django_filters.ChoiceFilter(field_name='object_class', label='Final class', choices=MetaObject.CLASS_CHOICES,
+                                               empty_label=None, null_label=None)
+
+    comment_class = django_filters.ChoiceFilter(method='comments_class', label='Preliminary class', choices=MetaObject.CLASS_CHOICES,
+                                                empty_label=None, null_label=None)
 
     class Meta:
         model = MetaObject
-        fields = {'RA': ['gt', 'lt'],
+        fields = {'master_name': ['icontains'],
+                  'comment': ['icontains'],
+                  'RA': ['gt', 'lt'],
                   'DEC': ['gt', 'lt'],
                   'GLON': ['gt', 'lt'],
                   'GLAT': ['gt', 'lt'],
@@ -376,6 +390,14 @@ class MetaObjFilter(django_filters.FilterSet):
                         default=Value(False),
                         output_field=models.BooleanField())
                 ).filter(id_e4_is_gt=value)
+
+        return queryset
+
+    # look for meta objects where current user posted class = value
+    def comments_class(self, queryset, name, value):
+        queryset = queryset.filter(comments__created_by=self.user, comments__source_class=value) | \
+                   queryset.filter(comments__created_by=self.user, comments__source_class_1=value) | \
+                   queryset.filter(comments__created_by=self.user, comments__source_class_2=value)
 
         return queryset
 
@@ -598,6 +620,20 @@ class Comment(models.Model):
     follow_up = models.TextField(max_length=1000, blank=True, null=True)
 
     source_class = models.CharField(
+        max_length=100,
+        choices=MetaObject.CLASS_CHOICES,
+        default=None,
+        blank=True, null=True,
+    )
+
+    source_class_1 = models.CharField(
+        max_length=100,
+        choices=MetaObject.CLASS_CHOICES,
+        default=None,
+        blank=True, null=True,
+    )
+
+    source_class_2 = models.CharField(
         max_length=100,
         choices=MetaObject.CLASS_CHOICES,
         default=None,

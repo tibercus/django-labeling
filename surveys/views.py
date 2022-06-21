@@ -22,9 +22,9 @@ def home(request):
     master_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'EXT', 'R98', 'LIKE']
     sort_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'LIKE', 'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3']
     # form field names of pre-class filters
-    pre_class_filters = ['GAIA EDR3 Star', 'AGN Wise', 'TDE v.3']
+    pre_class_filters = ['GAIA EDR3 Star', 'AGN Wise', 'TDE v.3', 'Final class', 'Preliminary class']
     # filter meta objects
-    f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)))
+    f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)), user=request.user)
     meta_queryset = f.qs
     # print current GET request
     # print(f'Request: {request.GET.urlencode}')

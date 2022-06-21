@@ -22,8 +22,8 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_fields():
-        fields = ['survey_ind', 'name', 'RA', 'DEC', 'comment', 'source_class', 'GLON', 'GLAT',
-                    'pos_r98', 'DET_LIKE_0', 'ML_FLUX_0', 'ML_FLUX_ERR_0', 'ML_CTS_0', 'ML_CTS_ERR_0',
+        fields = ['survey_ind', 'name', 'RA', 'DEC', 'comment', 'source_class', 'source_class_1', 'source_class_2',
+                    'GLON', 'GLAT', 'pos_r98', 'DET_LIKE_0', 'ML_FLUX_0', 'ML_FLUX_ERR_0', 'ML_CTS_0', 'ML_CTS_ERR_0',
                     'ML_EXP_1', 'EXT', 'EXT_LIKE', 'EXT_ERR', 'hpidx', 'RADEC_ERR', 'ML_BKG_0', 'ML_RATE_0',
                     'ML_RATE_ERR_0', 'tilenum', 'ID_SRC', 'ID_CLUSTER', 'DIST_NN', 'SRCDENS', 'NH',
                     'RA_corr', 'DEC_corr', 'astro_indx', 'astro_nx', 'astro_mdra',
@@ -46,6 +46,8 @@ class Command(BaseCommand):
             pa.field('DEC', pa.float64(), False),
             pa.field('comment', pa.string()),
             pa.field('source_class', pa.string()),
+            pa.field('source_class_1', pa.string()),
+            pa.field('source_class_2', pa.string()),
             # pa.field('master_source', pa.bool_()),
 
             # eROSITA table fields

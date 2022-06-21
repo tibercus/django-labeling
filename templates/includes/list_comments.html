@@ -34,9 +34,11 @@
                         <small class="text-muted">Follow up: {{ comment.follow_up }} </small>
                     </div>
                 {% endif %}
-                {% if comment.source_class %}
-                    <div class="col-6 pull-right">
-                        <small class="text-muted">Class: {{ comment.source_class }} </small>
+                {% if comment.source_class or comment.source_class_1 or comment.source_class_2 %}
+                    <div class="col-8 pull-right">
+                        <small class="text-muted">
+                            Class1: {{ comment.source_class }} Class2: {{ comment.source_class_1 }} Class3: {{ comment.source_class_2 }}
+                        </small>
                     </div>
                 {% endif %}
             </div>

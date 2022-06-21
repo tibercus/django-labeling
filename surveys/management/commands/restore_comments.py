@@ -14,8 +14,8 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_saved_fields():
-        fields = ['comment', 'follow_up', 'source_class', 'created_at', 'created_by', 'updated_at',
-                  'meta_source', 'by_user', 'meta_ind', 'master_source_name', 'master_survey', 'RA', 'DEC']
+        fields = ['comment', 'follow_up', 'source_class', 'source_class_1', 'source_class_2', 'created_at', 'created_by',
+                  'updated_at', 'meta_source', 'by_user', 'meta_ind', 'master_source_name', 'master_survey', 'RA', 'DEC']
         return fields
 
     def handle(self, *args, **options):

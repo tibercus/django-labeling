@@ -11,7 +11,9 @@ class CustomImportForm(ImportForm):
 
 
 class NewCommentForm(forms.ModelForm):
-    source_class = forms.ChoiceField(choices=MetaObject.CLASS_CHOICES, required=False, label='Class', initial='')
+    source_class = forms.ChoiceField(choices=MetaObject.CLASS_CHOICES, required=False, label='Class 1', initial='')
+    source_class_1 = forms.ChoiceField(choices=MetaObject.CLASS_CHOICES, required=False, label='Class 2', initial='')
+    source_class_2 = forms.ChoiceField(choices=MetaObject.CLASS_CHOICES, required=False, label='Class 3', initial='')
 
     comment = forms.CharField(
         widget=forms.Textarea(),
@@ -21,7 +23,7 @@ class NewCommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ['source_class', 'comment', 'follow_up']
+        fields = ['source_class', 'source_class_1', 'source_class_2', 'comment', 'follow_up']
 
 
 class OptCommentForm(forms.ModelForm):

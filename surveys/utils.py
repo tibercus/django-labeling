@@ -33,7 +33,8 @@ def add_metadata_fields(comment_df):
 
 def backup_comments():
     # Saving xray comments
-    comment_df = pd.DataFrame.from_records(Comment.objects.all().values('comment', 'follow_up', 'source_class',
+    comment_df = pd.DataFrame.from_records(Comment.objects.all().values('comment', 'follow_up',
+                                                                        'source_class', 'source_class_1', 'source_class_2',
                                                                         'created_at', 'created_by', 'updated_at', 'meta_source'))
 
     if not comment_df.empty:
