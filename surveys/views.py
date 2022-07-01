@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from .forms import NewCommentForm, OptCommentForm
+from .forms import NewCommentForm, OptCommentForm, OptCounterpartForm
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
@@ -12,7 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F, Count
 from django.http import QueryDict
 
-from surveys.utils import cone_search_filter
+from surveys.utils import cone_search_filter, change_opt_cp
 
 import csv
 
@@ -83,8 +83,18 @@ def source(request, pk):
     opt_surveys = ['LS', 'PS', 'SDSS', 'GAIA']
     # get list of query sets - optical sources from different surveys
     opt_sources = []
+    opt_sources_ids = []
     for s_name in opt_surveys:
-        opt_sources.append(eROSITA.get_opt_survey_sources(master_source, s_name))
+        s_name_sources = eROSITA.get_opt_survey_sources(master_source, s_name)
+        opt_sources.append(s_name_sources)
+        # get opt_ids from all opt sources
+        if s_name_sources:
+            opt_sources_ids.append(list(s_name_sources.values_list('opt_id', flat=True)))
+
+    # list of lists to list
+    opt_sources_ids = sum(opt_sources_ids, [])
+    opt_sources_ids = list(set(opt_sources_ids))
+    print('All opt ids:', opt_sources_ids)
 
     # zip surveys and corresponding optical sources for template nested nav-tabs
     opt_survey_sources = dict(zip(opt_surveys, opt_sources))
@@ -157,15 +167,29 @@ def source(request, pk):
 
             return redirect('source', pk=meta_object.pk)
 
+        # Change optical counterpart
+        elif 'opt_counterpart' in request.POST:
+            opt_cp_form = OptCounterpartForm(opt_sources_ids=opt_sources_ids, data=request.POST)
+            # get name of optical survey
+            survey_name = request.POST.get('opt_survey')
+            if opt_cp_form.is_valid():
+                print('Opt survey: ', survey_name)
+                print('New counterpart id:', opt_cp_form.cleaned_data['cp_id'])
+                print(change_opt_cp(master_source, survey_name, int(opt_cp_form.cleaned_data['cp_id'])))
+
+            return redirect('source', pk=meta_object.pk)
+
     else:
         # create form for xray source
         form = NewCommentForm()
         # create form for optical source
         opt_form = OptCommentForm()
+        # opt counterpart
+        opt_cp_form = OptCounterpartForm(opt_sources_ids)
 
     return render(request, 'source.html', {'surveys': surveys, 'meta_group': meta_group, 'meta_object': meta_object,
                                            'sources': sources, 'admin_class': admin_class, 'form': form,
-                                           'opt_form': opt_form, 'opt_surveys': opt_surveys,
+                                           'opt_form': opt_form, 'opt_cp_form': opt_cp_form, 'opt_surveys': opt_surveys,
                                            'master_source': master_source, 'opt_survey_sources': opt_survey_sources})
 
 

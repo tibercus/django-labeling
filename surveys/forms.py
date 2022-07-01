@@ -36,3 +36,10 @@ class OptCommentForm(forms.ModelForm):
     class Meta:
         model = OptComment
         fields = ['comment', 'follow_up']
+
+
+class OptCounterpartForm(forms.Form):
+    def __init__(self, opt_sources_ids=None, *args, **kwargs):
+        super(OptCounterpartForm, self).__init__(*args, **kwargs)
+        if opt_sources_ids:
+            self.fields['cp_id'] = forms.ChoiceField(choices=[ (opt_id, str(opt_id)) for opt_id in opt_sources_ids ], label='Counterpart id')

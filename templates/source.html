@@ -2,7 +2,7 @@
 
 {% load static %}
 {% load filters_tags %}
-{% load widget_tweaks %}
+{% load form_tags widget_tweaks %}
 {% load humanize %}
 
 {% block title %} {{ meta_object.master_name }} {% endblock %}
@@ -390,6 +390,23 @@
                     {% endif %}
 
                 <div class="tab-pane {{ status }}" id="survey_{{ opt_survey }}" role="tabpanel" aria-labelledby="{{ opt_survey }}-tab">
+
+                    {%  comment %} Optical Counterpart form {% endcomment %}
+                    <div class="row">
+                        <div class = "col-3 offset-sm-3">
+                            <form class="form-inline" id="opt_cp_form" method="post">
+                                    {% csrf_token %}
+                                    {% for field in opt_cp_form %}
+                                        <div class="form-group">
+                                            <b class="col-auto">{{ field.label_tag }}</b>
+                                            {{ field|add_class:'form-control col-md m-1' }}
+                                        </div>
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-outline-success col-sm" value="button" name="opt_counterpart">Edit Single</button>
+                                    <input id="opt_survey_name" type="hidden" name="opt_survey" value={{ opt_survey }}>
+                            </form>
+                        </div>
+                    </div>
 
                     <div class="table_opt_sources">
                         <table id = "ScrollTable" class="table table-bordered table-responsive small" cellspacing="0">

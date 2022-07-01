@@ -30,6 +30,29 @@ def add_metadata_fields(comment_df):
 
     return comment_df
 
+def get_sep(master_source, opt_source):
+    """get separation between master source and optical source"""
+    c_xray = SkyCoord(ra=master_source.RA*u.degree, dec=master_source.DEC*u.degree, distance=1*u.pc, frame='icrs')
+    c_opt = SkyCoord(ra=opt_source.ra*u.degree, dec=opt_source.dec*u.degree, distance=1*u.pc, frame='icrs')
+    sep = c_xray.separation(c_opt)
+    return sep.arcsecond
+
+def change_opt_cp(source, opt_survey_name, opt_id):
+    opt_sources = eROSITA.get_opt_survey_sources(source, opt_survey_name)
+    if opt_sources is None:
+        return 'No opt sources in this survey'
+
+    new_opt_cp = opt_sources.filter(opt_id=opt_id)
+    if not new_opt_cp.exists():
+        return 'No opt sources with this opt_id'
+
+    new_opt_cp = new_opt_cp[0]
+    new_sep = get_sep(source, new_opt_cp)
+    print('Opt source:', new_opt_cp, 'sep:', new_sep)
+    eROSITA.change_dup_source(source, opt_survey_name, new_opt_cp, new_sep)
+    return 1
+
+
 
 def backup_comments():
     # Saving xray comments

@@ -579,6 +579,25 @@ class eROSITA(models.Model):
             value = getattr(self, field, None)
             yield field, value
 
+    def change_dup_source(self, survey_name, new_dup, new_dup_sep):
+        if survey_name == 'LS':
+            self.ls_dup = new_dup
+            self.ls_dup_sep = new_dup_sep
+
+        elif survey_name == 'PS':
+            self.ps_dup = new_dup
+            self.ps_dup_sep = new_dup_sep
+
+        elif survey_name == 'SDSS':
+            self.sdss_dup = new_dup
+            self.sdss_dup_sep = new_dup_sep
+
+        elif survey_name == 'GAIA':
+            self.gaia_dup = new_dup
+            self.gaia_dup_sep = new_dup_sep
+
+        self.save()
+
     def get_opt_survey_sources(self, survey_name):
         opt_sources = None
         # TODO: think about adding coords to eROSITA fields
