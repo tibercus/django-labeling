@@ -303,7 +303,7 @@
                 </form>
             </div>
 
-            {% comment %} General Aladin Lite {% endcomment %}
+            {% comment %} General Aladin Lite (TODO put into separate html) {% endcomment %}
             <div class="aladin_lite col-auto">
 
                 {% comment %} Aladin Lite container at requested dimensions {% endcomment %}
@@ -311,16 +311,35 @@
                 <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
 
                 {% comment %} Radio buttons with surveys {% endcomment %}
-                <input id="PS_DR1" type="radio" name="survey" value="P/PanSTARRS/DR1/color-i-r-g" checked><label for="PS_DR1">PS_DR1 color</label>
-                <input id="SDSS9" type="radio" name="survey" value="P/SDSS9/color"><label for="SDSS9">SDSS9 color</label>
-                <input id="GAIAedr3" type="radio" name="survey" value="P/DM/flux-Bp/I/350/gaiaedr3"><label for="GAIAedr3">gaiaedr3</label>
-                <input id="allwise" type="radio" name="survey" value="P/allWISE/color"><label for="allwise">AllWISE</label>
+                <input id="PS_DR1_g" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/g"}' checked><label for="PS_DR1_g">PS1_DR1 g</label>
+                <input id="PS_DR1_z" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/z", "reverse": true }'><label for="PS_DR1_z">PS_DR1 z</label>
+                <input id="GAIAedr3" type="radio" name="survey" value='{ "survey": "P/DM/flux-Bp/I/350/gaiaedr3" }'><label for="GAIAedr3">GAIA edr3</label>
+                <input id="allwise" type="radio" name="survey" value='{ "survey": "P/allWISE/color", "colormap": "rainbow" }'><label for="allwise">AllWISE</label>
+                <input id="galex" type="radio" name="survey" value='{ "survey": "P/GALEXGR6/AIS/color" }'><label for="galex">GALEX</label>
 
-                {% comment %} Creation of Aladin Lite instance {% endcomment %}
+                {% comment %} Creation of Aladin Lite instance (TODO make a separate js-script) {% endcomment %}
                 <script type="text/javascript">
-                    var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-i-r-g", fov: 0.03, target: "{{ meta_object.RA }} {{ meta_object.DEC }}"});
+                    var aladin = A.aladin(
+                        '#aladin-lite-div',
+                        {
+                            survey: "P/PanSTARRS/DR1/g",
+                            fov: 0.03,
+                            target: "{{ meta_object.RA }} {{ meta_object.DEC }}",
+                            showReticle: false,
+                        }
+                    );
                     $('input[name=survey]').change(function() {
-                        aladin.setImageSurvey($(this).val());
+                        let config = JSON.parse($(this).val());
+
+                        aladin.setImageSurvey(config["survey"]);
+
+                        if (config["colormap"] !== undefined) {
+                            aladin.getBaseImageLayer().getColorMap().update(config["colormap"]);
+                        }
+
+                        if (config["reverse"] !== undefined && config["reverse"] === true) {
+                            aladin.getBaseImageLayer().getColorMap().reverse();
+                        }
                     });
 
                     // marker at meta_object center
