@@ -557,6 +557,18 @@ class eROSITA(models.Model):
     def get_last_comment(self):
         return Comment.objects.filter(source=self).order_by('-created_at').first()
 
+    def __iter__(self):
+        fields = {}
+
+        for field in self._meta.get_fields():
+            value = getattr(self, field.name, "")
+            try:
+                name = field.verbose_name
+            except AttributeError:
+                name = field.name
+
+            yield name, value
+
     @staticmethod
     def fields_to_show():
         fields = ['survey_ind', 'name', 'RA', 'DEC', 'comment', 'source_class', 'GLON', 'GLAT',
@@ -574,10 +586,6 @@ class eROSITA(models.Model):
                     'c_dbb', 'dof_dbb', 'TSTART', 'TSTOP', 'survey']
         return fields
 
-    def __iter__(self):
-        for field in eROSITA.fields_to_show():
-            value = getattr(self, field, None)
-            yield field, value
 
     def change_dup_source(self, survey_name, new_dup, new_dup_sep):
         if survey_name == 'LS':
@@ -677,8 +685,8 @@ class Comment(models.Model):
 class LS(models.Model):
     opt_id = models.PositiveIntegerField(blank=True, null=True)
     objID = models.PositiveIntegerField(blank=True, null=True)
-    ra = models.FloatField()
-    dec = models.FloatField()
+    ra = models.FloatField(verbose_name='RA')
+    dec = models.FloatField(verbose_name='Dec')
     # cartesian coordinates with radius = 1pc
     c_x = models.FloatField(blank=True, null=True)
     c_y = models.FloatField(blank=True, null=True)
@@ -868,13 +876,26 @@ class LS(models.Model):
     # File from which source was loaded to system
     origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='ls_sources', blank=True, null=True)
 
+    mag_r_ab = models.FloatField(blank=True, null=True, verbose_name="R AB-mag")
+    mag_g_ab = models.FloatField(blank=True, null=True, verbose_name="G AB-mag")
+    mag_z_ab = models.FloatField(blank=True, null=True, verbose_name="Z AB-mag")
+    mag_w1_ab = models.FloatField(blank=True, null=True, verbose_name="W1 AB-mag")
+    mag_w2_ab = models.FloatField(blank=True, null=True, verbose_name="W2 AB-mag")
+    mag_w3_ab = models.FloatField(blank=True, null=True, verbose_name="W3 AB-mag")
+    mag_w4_ab = models.FloatField(blank=True, null=True, verbose_name="W4 AB-mag")
+
     def __str__(self):
         return '{} - LS Source: {}'.format(self.opt_hpidx, self.opt_id)
 
     def __iter__(self):
-        for field in LS._meta.get_fields():
-            value = getattr(self, field.name, None)
-            yield field.name, value
+        for field in self._meta.get_fields():
+            value = getattr(self, field.name, "")
+            try:
+                name = field.verbose_name
+            except AttributeError:
+                name = field.name
+
+            yield name, value
 
     class Meta:
         verbose_name_plural = 'LS sources'
@@ -939,9 +960,14 @@ class SDSS(models.Model):
         return '{} - SDSS Source: {}'.format(self.opt_hpidx, self.opt_id)
 
     def __iter__(self):
-        for field in SDSS._meta.get_fields():
-            value = getattr(self, field.name, None)
-            yield field.name, value
+        for field in self._meta.get_fields():
+            value = getattr(self, field.name, "")
+            try:
+                name = field.verbose_name
+            except AttributeError:
+                name = field.name
+
+            yield name, value
 
     class Meta:
         verbose_name_plural = 'SDSS sources'
@@ -1032,9 +1058,14 @@ class PS(models.Model):
         return '{} - PS Source: {}'.format(self.opt_hpidx, self.opt_id)
 
     def __iter__(self):
-        for field in PS._meta.get_fields():
-            value = getattr(self, field.name, None)
-            yield field.name, value
+        for field in self._meta.get_fields():
+            value = getattr(self, field.name, "")
+            try:
+                name = field.verbose_name
+            except AttributeError:
+                name = field.name
+
+            yield name, value
 
     class Meta:
         verbose_name_plural = 'PS sources'
@@ -1114,9 +1145,14 @@ class GAIA(models.Model):
         return '{} - GAIA Source: {}'.format(self.opt_hpidx, self.opt_id)
 
     def __iter__(self):
-        for field in GAIA._meta.get_fields():
-            value = getattr(self, field.name, None)
-            yield field.name, value
+        for field in self._meta.get_fields():
+            value = getattr(self, field.name, "")
+            try:
+                name = field.verbose_name
+            except AttributeError:
+                name = field.name
+
+            yield name, value
 
     class Meta:
         verbose_name_plural = 'GAIA sources'
