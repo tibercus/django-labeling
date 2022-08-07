@@ -3,6 +3,7 @@ from django.core.files.storage import default_storage
 from ..models import *
 
 from django.conf import settings
+from django.db.models import Model
 import os
 
 import astropy.units as u
@@ -135,3 +136,16 @@ def is_gaia_star(master_source, opt_id):
     gaia_source = master_source.gaia_sources.filter(opt_id=opt_id, star=True)
     return gaia_source.exists()
 
+
+@register.filter
+def field_verbose_name(obj: Model, field: str) -> str:
+    """A tag to get a human-readable name for object's field.
+
+    Some types of fields do not have verbose name. In that case ordinary name
+    is returned.
+    """
+    model_field = obj._meta.get_field(field)
+    try:
+        return model_field.verbose_name
+    except AttributeError:
+        return model_field.name
