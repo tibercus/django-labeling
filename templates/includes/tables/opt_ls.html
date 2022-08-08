@@ -35,8 +35,8 @@
                 {% define master_source|get_sep:opt_source as sep %}
                 <tr class="{% opt_row_class opt_source master_source sep %}">
                     <td class="align-middle"> {{ sep|stringformat:".5f"}} </td>
-                    <td class="align-middle"> {{ opt_source.opt_id|stringformat:".3f"          }} </td>
-                    <td class="align-middle"> {{ opt_source.objID|stringformat:".3f"           }} </td>
+                    <td class="align-middle"> {{ opt_source.opt_id                             }} </td>
+                    <td class="align-middle"> {{ opt_source.objID                              }} </td>
                     <td class="align-middle"> {{ opt_source.ra|stringformat:".3f"              }} </td>
                     <td class="align-middle"> {{ opt_source.dec|stringformat:".3f"             }} </td>
                     <td class="align-middle"> {{ opt_source.ebv|stringformat:".3f"             }} </td>
