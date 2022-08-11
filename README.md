@@ -1,2 +1,7 @@
-# django-labeling
-Labeling System for Astronomy
+# Django-Labeling: Labeling System for Astronomy
+
+## Setup project in PyCharm
+
+## Run
+
+
