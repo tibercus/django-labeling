@@ -913,8 +913,8 @@ class LS(models.Model):
 class SDSS(models.Model):
     opt_id = models.PositiveIntegerField(blank=True, null=True)
     objID = models.CharField(max_length=100, blank=True, null=True)
-    ra = models.FloatField()
-    dec = models.FloatField()
+    ra = models.FloatField(verbose_name='RA')
+    dec = models.FloatField(verbose_name='Dec')
     # cartesian coordinates with radius = 1pc
     c_x = models.FloatField(blank=True, null=True)
     c_y = models.FloatField(blank=True, null=True)
@@ -954,6 +954,17 @@ class SDSS(models.Model):
 
     psfFlux_z = models.FloatField(blank=True, null=True)
     psfFluxIvar_z = models.FloatField(blank=True, null=True)
+
+    cModelMag_u_ab = models.FloatField(blank=True, null=True, verbose_name="u")
+    cModelMagErr_u_ab = models.FloatField(blank=True, null=True, verbose_name="u err")
+    cModelMag_g_ab = models.FloatField(blank=True, null=True, verbose_name="g")
+    cModelMagErr_g_ab = models.FloatField(blank=True, null=True, verbose_name="g err")
+    cModelMag_r_ab = models.FloatField(blank=True, null=True, verbose_name="r")
+    cModelMagErr_r_ab = models.FloatField(blank=True, null=True, verbose_name="r err")
+    cModelMag_i_ab = models.FloatField(blank=True, null=True, verbose_name="i")
+    cModelMagErr_i_ab = models.FloatField(blank=True, null=True, verbose_name="i err")
+    cModelMag_z_ab = models.FloatField(blank=True, null=True, verbose_name="z")
+    cModelMagErr_z_ab = models.FloatField(blank=True, null=True, verbose_name="z err")
 
     counterparts_number = models.FloatField(blank=True, null=True)
     single_counterpart = models.BooleanField(blank=True, null=True)
@@ -1017,13 +1028,13 @@ class PS(models.Model):
 
     w1fit = models.BooleanField(blank=True, null=True)
     w1bad = models.BooleanField(blank=True, null=True)
-    w1mag = models.FloatField(blank=True, null=True)
-    dw1mag = models.FloatField(blank=True, null=True)
+    w1mag = models.FloatField(blank=True, null=True, verbose_name="w1")
+    dw1mag = models.FloatField(blank=True, null=True, verbose_name="w1 err")
 
     w2fit = models.BooleanField(blank=True, null=True)
     w2bad = models.BooleanField(blank=True, null=True)
-    w2mag = models.FloatField(blank=True, null=True)
-    dw2mag = models.FloatField(blank=True, null=True)
+    w2mag = models.FloatField(blank=True, null=True, verbose_name="w2")
+    dw2mag = models.FloatField(blank=True, null=True, verbose_name="w2 err")
 
     gKronFlux = models.FloatField(blank=True, null=True)
     gKronFluxErr = models.FloatField(blank=True, null=True)
@@ -1062,6 +1073,18 @@ class PS(models.Model):
     origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='ps_sources', blank=True,
                                     null=True)
 
+    # Magnitudes and errors in AB-system to show in Web UI tables
+    gKronMagAB = models.FloatField(blank=True, null=True, verbose_name="g")
+    gKronMagErrAB = models.FloatField(blank=True, null=True, verbose_name="g err")
+    rKronMagAB = models.FloatField(blank=True, null=True, verbose_name="r")
+    rKronMagErrAB = models.FloatField(blank=True, null=True, verbose_name="r err")
+    iKronMagAB = models.FloatField(blank=True, null=True, verbose_name="i")
+    iKronMagErrAB = models.FloatField(blank=True, null=True, verbose_name="i err")
+    zKronMagAB = models.FloatField(blank=True, null=True, verbose_name="z")
+    zKronMagErrAB = models.FloatField(blank=True, null=True, verbose_name="z err")
+    yKronMagAB = models.FloatField(blank=True, null=True, verbose_name="y")
+    yKronMagErrAB = models.FloatField(blank=True, null=True, verbose_name="y err")
+
     def __str__(self):
         return '{} - PS Source: {}'.format(self.opt_hpidx, self.opt_id)
 
@@ -1083,8 +1106,8 @@ class PS(models.Model):
 class GAIA(models.Model):
     opt_id = models.PositiveIntegerField(blank=True, null=True)
     objID = models.CharField(max_length=100, blank=True, null=True)
-    ra = models.FloatField()
-    dec = models.FloatField()
+    ra = models.FloatField(verbose_name="RA")
+    dec = models.FloatField(verbose_name="Dec")
     # cartesian coordinates with radius = 1pc
     c_x = models.FloatField(blank=True, null=True)
     c_y = models.FloatField(blank=True, null=True)

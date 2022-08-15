@@ -4,13 +4,25 @@
     <table id = "ScrollTable" class="table table-bordered table-responsive small" cellspacing="0">
         <thead class="thead-dark" >
             <tr>
-                {% if opt_sources %}
-                    <th>{{ 'sep' }}</th>
-                {% endif %}
-                {% for field,value in opt_sources.first %}
-                    <th>{{ field }}</th>
-                {% endfor %}
-
+                <th>{{ 'sep' }}</th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'opt_id'        }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'objID'         }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'ra'            }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'dec'           }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'gKronMagAB'    }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'gKronMagErrAB' }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'rKronMagAB'    }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'rKronMagErrAB' }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'iKronMagAB'    }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'iKronMagErrAB' }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'zKronMagAB'    }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'zKronMagErrAB' }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'yKronMagAB'    }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'yKronMagErrAB' }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'w1mag'         }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'dw1mag'        }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'w2mag'         }} </th>
+                <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'dw2mag'        }} </th>
             </tr>
         </thead>
         <tbody>
@@ -19,11 +31,24 @@
                 {% define master_source|get_sep:opt_source as sep %}
                 <tr class="{% opt_row_class opt_source master_source sep %}">
                     <td class="align-middle"> {{ sep|stringformat:".5f"}} </td>
-                    {% for field,value in opt_source %}
-                        <td class="align-middle">
-                            {{ value }}
-                        </td>
-                    {% endfor %}
+                    <td class="align-middle"> {{ opt_source.opt_id        }} </td>
+                    <td class="align-middle"> {{ opt_source.objID         }} </td>
+                    <td class="align-middle"> {{ opt_source.ra|stringformat:".3f"            }} </td>
+                    <td class="align-middle"> {{ opt_source.dec|stringformat:".3f"           }} </td>
+                    <td class="align-middle"> {{ opt_source.gKronMagAB|stringformat:".3f"    }} </td>
+                    <td class="align-middle"> {{ opt_source.gKronMagErrAB|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ opt_source.rKronMagAB|stringformat:".3f"    }} </td>
+                    <td class="align-middle"> {{ opt_source.rKronMagErrAB|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ opt_source.iKronMagAB|stringformat:".3f"    }} </td>
+                    <td class="align-middle"> {{ opt_source.iKronMagErrAB|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ opt_source.zKronMagAB|stringformat:".3f"    }} </td>
+                    <td class="align-middle"> {{ opt_source.zKronMagErrAB|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ opt_source.yKronMagAB|stringformat:".3f"    }} </td>
+                    <td class="align-middle"> {{ opt_source.yKronMagErrAB|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ opt_source.w1mag|stringformat:".3f"         }} </td>
+                    <td class="align-middle"> {{ opt_source.dw1mag|stringformat:".3f"        }} </td>
+                    <td class="align-middle"> {{ opt_source.w2mag|stringformat:".3f"         }} </td>
+                    <td class="align-middle"> {{ opt_source.dw2mag|stringformat:".3f"        }} </td>
                 </tr>
             {% endfor %}
         {% endif %}
