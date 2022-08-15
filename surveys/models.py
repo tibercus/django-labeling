@@ -876,13 +876,21 @@ class LS(models.Model):
     # File from which source was loaded to system
     origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='ls_sources', blank=True, null=True)
 
-    mag_r_ab = models.FloatField(blank=True, null=True, verbose_name="R AB-mag")
-    mag_g_ab = models.FloatField(blank=True, null=True, verbose_name="G AB-mag")
-    mag_z_ab = models.FloatField(blank=True, null=True, verbose_name="Z AB-mag")
-    mag_w1_ab = models.FloatField(blank=True, null=True, verbose_name="W1 AB-mag")
-    mag_w2_ab = models.FloatField(blank=True, null=True, verbose_name="W2 AB-mag")
-    mag_w3_ab = models.FloatField(blank=True, null=True, verbose_name="W3 AB-mag")
-    mag_w4_ab = models.FloatField(blank=True, null=True, verbose_name="W4 AB-mag")
+    # Magnitudes and errors in AB-system to show in Web UI tables
+    mag_r_ab = models.FloatField(blank=True, null=True, verbose_name="r")
+    mag_err_r_ab = models.FloatField(blank=True, null=True, verbose_name="r err")
+    mag_g_ab = models.FloatField(blank=True, null=True, verbose_name="g")
+    mag_err_g_ab = models.FloatField(blank=True, null=True, verbose_name="g err")
+    mag_z_ab = models.FloatField(blank=True, null=True, verbose_name="z")
+    mag_err_z_ab = models.FloatField(blank=True, null=True, verbose_name="z err")
+    mag_w1_ab = models.FloatField(blank=True, null=True, verbose_name="w1")
+    mag_err_w1_ab = models.FloatField(blank=True, null=True, verbose_name="w1 err")
+    mag_w2_ab = models.FloatField(blank=True, null=True, verbose_name="w2")
+    mag_err_w2_ab = models.FloatField(blank=True, null=True, verbose_name="w2 err")
+    mag_w3_ab = models.FloatField(blank=True, null=True, verbose_name="w3")
+    mag_err_w3_ab = models.FloatField(blank=True, null=True, verbose_name="w3 err")
+    mag_w4_ab = models.FloatField(blank=True, null=True, verbose_name="w4")
+    mag_err_w4_ab = models.FloatField(blank=True, null=True, verbose_name="w4 err")
 
     def __str__(self):
         return '{} - LS Source: {}'.format(self.opt_hpidx, self.opt_id)
