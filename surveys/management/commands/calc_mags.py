@@ -4,7 +4,7 @@ import textwrap
 from abc import ABC
 from typing import Callable, Any
 
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandError
 from django.utils import timezone
 from django.db.models import Q
 
@@ -281,4 +281,5 @@ class Command(BaseCommandWithFormattedHelp):
         elif catalog == 'SDSS':
             self.sdss()
         else:
-            raise ValueError("Only --catalog LS is supported")
+            raise CommandError("Only --catalog 'LS', 'PS' or 'SDSS' is "
+                               "supported")
