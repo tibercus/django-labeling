@@ -34,6 +34,7 @@ python manage.py createsuperuser
 
 ## Setup project in PyCharm
 
+
 1. Start creating a new project.
 2. Configure project like on the screenshot below. Key points are:
     - Choose Django instead of Pure Python to enable support of Django features in PyCharm (only available in Professional Edition)
