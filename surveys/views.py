@@ -64,10 +64,23 @@ def home(request):
         # in the url, so we fallback to the last page
         meta_objects = paginator.page(paginator.num_pages)
 
-    return render(request, 'home.html', {'filter': f, 'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show(),
-                                         'master_fields': master_fields, 'sort_fields': sort_fields,
-                                         'pre_class_filters': pre_class_filters, 'meta_count': meta_count,
-                                         'cone_search': cone_search})
+    bookmarks = MetaObjFilterBookmark.objects.all()
+
+    return render(
+        request,
+        'home.html',
+        {
+            'filter': f,
+            'meta_objects': meta_objects,
+            'meta_fields': MetaObject.fields_to_show(),
+            'master_fields': master_fields,
+            'sort_fields': sort_fields,
+            'pre_class_filters': pre_class_filters,
+            'meta_count': meta_count,
+            'cone_search': cone_search,
+            'bookmarks': bookmarks,
+        }
+    )
 
 
 @login_required
@@ -196,11 +209,59 @@ def source(request, pk):
 @login_required
 def criteria(request):
     # show page with pre-class criteria and it's description
-    criteria_list = [('TDE v.1', 'ID_e1 == -1 & ID_e2 == -1 & ID_e3 == -1 & ID_e123 == -1 & flag_xray==0  & flag_radio==0 & g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 10', 'Отсутствие любого рентгеновского детектирования в прошлом и детектирований в радио, не звзда и не АЯГ'),
-                     ('TDE v.2', 'ID_e1 == -1 & ID_e2 == -1 & ID_e3 == -1 & ID_e123 == -1 & g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 7', 'Текущая версия'),
-                     ('TDE v.3', 'ID_e3 == -1 & g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 & RATIO_e4e3 > 7', 'Предложенная, но не опробованная'),
-                     ('GAIA Star', 'parallax_over_error > 5 or pmra/pmra_error > 5 or pmdec / pmdec_error > 5', 'Звезда по данным Гайя (g_s) eDR3'),
-                     ('AGN WISE', 'w1-w2 > 0.8', 'АГН по цветам WISE (flag_agn_wise); If ls_flux_w1 < 0 or ls_flux_w2 < 0 then flag_agn_wise for this LS source = False')]
+    criteria_list = [
+        (
+            'TDE v.1',
+            '',
+            'ID_e1 == -1 & ID_e2 == -1 & ID_e3 == -1 & ID_e123 == -1 '
+                '& flag_xray==0  & flag_radio==0 & g_s != 1 '
+                '&  (qual != 0 & qual != 2) & flag_agn_wise != 1 '
+                '& RATIO_e4e3 > 10',
+            'Отсутствие любого рентгеновского детектирования в прошлом и'
+                'детектирований в радио, не звзда и не АЯГ',
+        ),
+        (
+            'TDE v.2',
+            '',
+            'ID_e1 == -1 & ID_e2 == -1 & ID_e3 == -1 & ID_e123 == -1 '
+                '& g_s != 1 &  (qual != 0 & qual != 2) & flag_agn_wise != 1 '
+                '& RATIO_e4e3 > 7',
+            'Текущая версия',
+        ),
+        (
+            'TDE v.3',
+            '',
+            'ID_e3 == -1 & g_s != 1 &  (qual != 0 & qual != 2) '
+                '& flag_agn_wise != 1 & RATIO_e4e3 > 7',
+            'Предложенная, но не опробованная',
+        ),
+        (
+            'GAIA Star',
+            '',
+            'parallax_over_error > 5 or pmra/pmra_error > 5 '
+                'or pmdec / pmdec_error > 5',
+            'Звезда по данным Гайя (g_s) eDR3',
+        ),
+        (
+            'AGN WISE',
+            '',
+            'w1-w2 > 0.8',
+            'АГН по цветам WISE (flag_agn_wise); If ls_flux_w1 < 0 '
+                'or ls_flux_w2 < 0 then flag_agn_wise for this '
+                'LS source = False',
+        ),
+    ]
+
+    for sources_filter in MetaObjFilterBookmark.objects.all().order_by("name"):
+        criteria_list.append(
+            (
+                sources_filter.name,
+                sources_filter.author.first_name or sources_filter.author,
+                sources_filter.human_readable_criteria,
+                sources_filter.description,
+            )
+        )
+
     return render(request, 'criteria.html', {'criteria_list': criteria_list})
 
 
