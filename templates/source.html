@@ -408,16 +408,20 @@
                         </div>
                     </div>
 
-                {% if opt_survey == 'LS' %}
-                    {% include 'includes/tables/opt_ls.html' %}
-                {% elif opt_survey == 'PS' %}
-                    {% include 'includes/tables/opt_ps.html' %}
-                {% elif opt_survey == 'SDSS' %}
-                    {% include 'includes/tables/opt_sdss.html' %}
-                {% elif opt_survey == 'GAIA' %}
-                    {% include 'includes/tables/opt_gaia.html' %}
+                {% if not opt_sources %}
+                    <p><b>No optical sources to display</b></p>
                 {% else %}
-                    <p>Survey not found</p>
+                    {% if opt_survey == 'LS' %}
+                        {% include 'includes/tables/opt_ls.html' %}
+                    {% elif opt_survey == 'PS' %}
+                        {% include 'includes/tables/opt_ps.html' %}
+                    {% elif opt_survey == 'SDSS' %}
+                        {% include 'includes/tables/opt_sdss.html' %}
+                    {% elif opt_survey == 'GAIA' %}
+                        {% include 'includes/tables/opt_gaia.html' %}
+                    {% else %}
+                        <p>Survey not found</p>
+                    {% endif %}
                 {% endif %}
                 </div>
             {% endfor %}
