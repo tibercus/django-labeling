@@ -64,10 +64,23 @@ def home(request):
         # in the url, so we fallback to the last page
         meta_objects = paginator.page(paginator.num_pages)
 
-    return render(request, 'home.html', {'filter': f, 'meta_objects': meta_objects, 'meta_fields': MetaObject.fields_to_show(),
-                                         'master_fields': master_fields, 'sort_fields': sort_fields,
-                                         'pre_class_filters': pre_class_filters, 'meta_count': meta_count,
-                                         'cone_search': cone_search})
+    bookmarks = MetaObjFilterBookmark.objects.all()
+
+    return render(
+        request,
+        'home.html',
+        {
+            'filter': f,
+            'meta_objects': meta_objects,
+            'meta_fields': MetaObject.fields_to_show(),
+            'master_fields': master_fields,
+            'sort_fields': sort_fields,
+            'pre_class_filters': pre_class_filters,
+            'meta_count': meta_count,
+            'cone_search': cone_search,
+            'bookmarks': bookmarks,
+        }
+    )
 
 
 @login_required
@@ -239,12 +252,12 @@ def criteria(request):
         ),
     ]
 
-    for sources_filter in CustomSourcesFilter.objects.all().order_by("name"):
+    for sources_filter in MetaObjFilterBookmark.objects.all().order_by("name"):
         criteria_list.append(
             (
                 sources_filter.name,
                 sources_filter.author.first_name or sources_filter.author,
-                sources_filter.criteria,
+                sources_filter.human_readable_criteria,
                 sources_filter.description,
             )
         )

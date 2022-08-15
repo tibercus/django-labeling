@@ -3,7 +3,7 @@ import argparse
 from django.core.management import BaseCommand, CommandError
 from django.contrib.auth.models import User
 
-from surveys.models import CustomSourcesFilter, MetaObject
+from surveys.models import MetaObjFilterBookmark
 
 
 def get_user_agreement(message: str, /) -> bool:
@@ -21,29 +21,40 @@ class Command(BaseCommand):
                             help="Author (valid username).")
         parser.add_argument("-c", "--criteria", type=str,
                             help="Filtering criteria. "
-                                 "Must be valid SQL filter.")
+                                 "Must be valid GET request.")
         parser.add_argument("-d", "--description", type=str,
                             help="Filter description "
                                  "(optional).")
         parser.add_argument("--overwrite", action="store_true")
-
-    @staticmethod
-    def check_user(username: str):
-        pass  # TODO
-
-    @staticmethod
-    def check_sql_filter(condition: str):
-        """Check that filter is valid and is not dummy
-        (does not return all objects)
-        """
-        pass  # TODO
+        parser.add_argument("--delete", action="store_true")
 
     def handle(self, *args, **options):
-        print("Setup new custom sources filter for homepage.")
+        if options["delete"]:
+            print("Delete custom sources filter from homepage.")
+        elif options["overwrite"]:
+            print("Edit custom sources filter on homepage.")
+        else:
+            print("Create new custom sources filter for homepage.")
 
         name = options["name"] or input("Enter filter name: ")
         if not name:
             raise CommandError("Name can not be empty")
+
+        try:
+            sources_filter = MetaObjFilterBookmark.objects.get(name=name)
+
+            if not options["overwrite"] and not options["delete"]:
+                raise CommandError(f"Filter already exists:\n{sources_filter}")
+
+            if options["delete"]:
+                sources_filter.delete()
+                return
+
+        except MetaObjFilterBookmark.DoesNotExist:
+            if options["delete"]:
+                raise CommandError(f"No filter named {name}")
+
+            sources_filter = MetaObjFilterBookmark(name=name)
 
         author = (
             options["author"]
@@ -61,7 +72,7 @@ class Command(BaseCommand):
         criteria = (
             options["criteria"]
             or input(
-                "Enter filtering criteria (Must be valid SQL filter): ")
+                "Enter filtering criteria (must be valid GET request): ")
         )
 
         description = options["description"]
@@ -70,26 +81,14 @@ class Command(BaseCommand):
                 "Filter description (optional, may be empty): "
             )
 
-        try:
-            sources_filter = CustomSourcesFilter.objects.get(name=name)
-            print(sources_filter)
-            if not options["overwrite"]:
-                raise CommandError(f"Filter already exists:\n{sources_filter}")
-
-        except CustomSourcesFilter.DoesNotExist:
-            sources_filter = CustomSourcesFilter(name=name)
-
         sources_filter.author = author
-        sources_filter.criteria = criteria
+        sources_filter.criteria = MetaObjFilterBookmark.parse_url(criteria)
         sources_filter.description = description
 
         if not get_user_agreement(
                 f"Please check input:\n{sources_filter}\nAdd filter?"):
             print("Aborting...")
             return
-
-
-        # TODO check if filter exists
 
         sources_filter.save()
         print("Done.")

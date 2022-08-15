@@ -1,3 +1,4 @@
+import re
 from typing import Type
 
 from django.db import models
@@ -1143,9 +1144,8 @@ class OptComment(models.Model):
         ordering = ('-created_by__is_superuser',)
 
 
-class CustomSourcesFilter(models.Model):
-    """A model for meta sources filtering (a.k.a. custom preclass).
-    TODO rename to MetaSourceFilter"""
+class MetaObjFilterBookmark(models.Model):
+    """A model for meta sources filtering (a.k.a. custom preclass)."""
     name = models.CharField(max_length=128, primary_key=True)
     author = models.ForeignKey(User, blank=False,
                                null=True, on_delete=models.SET_NULL)
@@ -1157,14 +1157,48 @@ class CustomSourcesFilter(models.Model):
             f"Custom Sources Filter:\n"
             f"\tName:        {self.name}\n"
             f"\tAuthor:      {str(self.author)}\n"
-            f"\tCondition:   {self.criteria}\n"
+            f"\tGET Request: {self.human_readable_criteria}\n"
             f"\tDescription: {self.description}\n"
         )
 
-    @staticmethod
-    def parse_to_orm(criteria: str):
-        """Parse criteria string and construct Django ORM filter."""
-        pass  # TODO
+    @property
+    def human_readable_criteria(self):
+        """Replaces Django Queryset API operations with human-readable
+        math signs."""
+        criteria = self.criteria
 
-    def apply(self):
-        pass  # TODO
+        queryset_api_to_signs = {
+            "__gt=": " > ",
+            "__ge=": " >= ",
+            "__lt=": " < ",
+            "__le=": " <= ",
+            "=": " = ",
+            "&": " AND ",
+        }
+
+        for api_from, sign_to in queryset_api_to_signs.items():
+            criteria = re.sub(
+                rf"[^ ]{api_from}[^ ]",
+                lambda match: match[0][0] + sign_to + match[0][-1],
+                criteria
+            )
+
+        return criteria
+
+    @staticmethod
+    def parse_url(url: str) -> str:
+        """Cuts GET request from url and cleans from redundant parts."""
+        try:
+            url_addr, get_request = re.findall(r"^(.*)?/\?(.*)$", url)[0]
+        except IndexError:
+            raise ValueError(f"Invalid url with get request: {url}")
+
+        get_request = re.split("&", get_request)
+        get_request = [clause for clause in get_request
+                       if re.fullmatch(r"[^=]*?=[^=]+", clause) is not None]
+
+        if len(get_request) == 0:
+            raise ValueError(f"Url has either empty of redundant get request: "
+                             f"{url}")
+
+        return "&".join(get_request)

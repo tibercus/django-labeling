@@ -82,6 +82,17 @@
                                     </div>
                                 {% endif %}
                             {% endfor %}
+
+                            <h5>Bookmarks:</h5>
+                            {% for bookmark in bookmarks %}
+                                <p>
+                                    <a href="{% url 'home' %}?{{ bookmark.criteria }}">
+                                        {{ bookmark.name }} ({{ bookmark.author }})
+                                    </a>
+                                </p>
+                            {% empty %}
+                                No bookmarks yet.
+                            {% endfor %}
                         </div>
                     </div>
                 </form>
