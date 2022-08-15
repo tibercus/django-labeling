@@ -200,7 +200,9 @@ class Command(BaseCommandWithFormattedHelp):
             )
         )
 
-    def sdss(self):
+    @staticmethod
+    @timeit("SDSS magnitudes calculation")
+    def sdss():
         """Calculate AB-mags in u, g, r, i, z for SDSS objects.
         """
         all_objs = SDSS.objects.all()
