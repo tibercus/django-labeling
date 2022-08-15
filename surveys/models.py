@@ -1,3 +1,5 @@
+from typing import Type
+
 from django.db import models
 from django.utils.text import Truncator
 from django.contrib.auth.models import User
@@ -1139,3 +1141,30 @@ class OptComment(models.Model):
 
     class Meta:
         ordering = ('-created_by__is_superuser',)
+
+
+class CustomSourcesFilter(models.Model):
+    """A model for meta sources filtering (a.k.a. custom preclass).
+    TODO rename to MetaSourceFilter"""
+    name = models.CharField(max_length=128, primary_key=True)
+    author = models.ForeignKey(User, blank=False,
+                               null=True, on_delete=models.SET_NULL)
+    criteria = models.TextField(null=False)
+    description = models.TextField(blank=True, null=False)
+
+    def __str__(self):
+        return (
+            f"Custom Sources Filter:\n"
+            f"\tName:        {self.name}\n"
+            f"\tAuthor:      {str(self.author)}\n"
+            f"\tCondition:   {self.criteria}\n"
+            f"\tDescription: {self.description}\n"
+        )
+
+    @staticmethod
+    def parse_to_orm(criteria: str):
+        """Parse criteria string and construct Django ORM filter."""
+        pass  # TODO
+
+    def apply(self):
+        pass  # TODO
