@@ -408,36 +408,21 @@
                         </div>
                     </div>
 
-                    <div class="table_opt_sources">
-                        <table id = "ScrollTable" class="table table-bordered table-responsive small" cellspacing="0">
-                            <thead class="thead-dark" >
-                                <tr>
-                                    {% if opt_sources %}
-                                        <th>{{ 'sep' }}</th>
-                                    {% endif %}
-                                    {% for field,value in opt_sources.first %}
-                                        <th>{{ field }}</th>
-                                    {% endfor %}
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% if opt_sources %}
-                                {% for opt_source in opt_sources %}
-                                    {% define master_source|get_sep:opt_source as sep %}
-                                    <tr class="{% opt_row_class opt_source master_source sep %}">
-                                        <td class="align-middle"> {{ sep|stringformat:".5f"}} </td>
-                                        {% for field,value in opt_source %}
-                                            <td class="align-middle">
-                                                {{ value }}
-                                            </td>
-                                        {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                            {% endif %}
-                          </tbody>
-                        </table>
-                    </div>
+                {% if not opt_sources %}
+                    <p><b>No optical sources to display</b></p>
+                {% else %}
+                    {% if opt_survey == 'LS' %}
+                        {% include 'includes/tables/opt_ls.html' %}
+                    {% elif opt_survey == 'PS' %}
+                        {% include 'includes/tables/opt_ps.html' %}
+                    {% elif opt_survey == 'SDSS' %}
+                        {% include 'includes/tables/opt_sdss.html' %}
+                    {% elif opt_survey == 'GAIA' %}
+                        {% include 'includes/tables/opt_gaia.html' %}
+                    {% else %}
+                        <p>Survey not found</p>
+                    {% endif %}
+                {% endif %}
                 </div>
             {% endfor %}
         </div>
