@@ -2,9 +2,10 @@
 
 ## Setup on a local machine
 
-1. Clone this project to a desired directory:
+1. Clone this project to a desired directory and checout to `dev` brhach to see the latest features in development:
 ```shell
-git@github.com:tibercus/django-labeling.git
+git clone git@github.com:tibercus/django-labeling.git
+git checkout dev
 ```
 2. Setup environment file `.env` in project's root. E.g.
 ```shell
@@ -33,7 +34,6 @@ python manage.py createsuperuser
 
 
 ## Setup project in PyCharm
-
 
 1. Start creating a new project.
 2. Configure project like on the screenshot below. Key points are:
