@@ -33,7 +33,7 @@ python manage.py createsuperuser
 ```
 
 
-## Setup project in PyCharm
+## Setup project in PyCharm (optional)
 
 1. Start creating a new project.
 2. Configure project like on the screenshot below. Key points are:
