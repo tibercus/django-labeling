@@ -7,11 +7,11 @@
     <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
 
     {% comment %} Radio buttons with surveys {% endcomment %}
-    <input id="PS_DR1_g" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/g"}' checked><label for="PS_DR1_g">PS1_DR1 g</label>
+    <input id="PS_DR1_g" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/g", "reverse": true }' checked><label for="PS_DR1_g">PS1_DR1 g</label>
     <input id="PS_DR1_z" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/z", "reverse": true }'><label for="PS_DR1_z">PS_DR1 z</label>
-    <input id="GAIAedr3" type="radio" name="survey" value='{ "survey": "P/DM/flux-Bp/I/350/gaiaedr3" }'><label for="GAIAedr3">GAIA edr3</label>
-    <input id="allwise" type="radio" name="survey" value='{ "survey": "P/allWISE/color", "colormap": "rainbow", "reverse": true }'><label for="allwise">AllWISE</label>
-    <input id="galex" type="radio" name="survey" value='{ "survey": "P/GALEXGR6/AIS/color" }'><label for="galex">GALEX</label>
+    <input id="GAIAedr3" type="radio" name="survey" value='{ "survey": "GAIAedr3", "reverse": true }'><label for="GAIAedr3">GAIA edr3</label>
+    <input id="allwise" type="radio" name="survey" value='{ "survey": "P/allWISE/color", "reverse": true }'><label for="allwise">AllWISE</label>
+    <input id="galex" type="radio" name="survey" value='{ "survey": "P/GALEXGR6/AIS/color", "reverse": true }'><label for="galex">GALEX</label>
 
     {% comment %} Creation of Aladin Lite instance (TODO make a separate js-script) {% endcomment %}
     <script type="text/javascript">
@@ -24,6 +24,19 @@
                 showReticle: false,
             }
         );
+        aladin.getBaseImageLayer().getColorMap().reverse();
+
+        // Add additional required surveys
+        aladin.createImageSurvey(
+            "GAIAedr3", "GAIAedr3",
+            "http://alasky.cds.unistra.fr/ancillary/GaiaEDR3/density-map",
+            // just copy link from list here https://aladin.u-strasbg.fr/hips/list
+            "j2000",
+            7, // Set value specified in "HiPS order" column (see link above).
+               // If specified value is greater then HiPS order it will show nothing
+               // with big zoom.
+        )
+
         $('input[name=survey]').change(function() {
             let config = JSON.parse($(this).val());
 
