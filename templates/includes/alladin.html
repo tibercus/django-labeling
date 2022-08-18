@@ -7,11 +7,24 @@
     <script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
 
     {% comment %} Radio buttons with surveys {% endcomment %}
-    <input id="PS_DR1_g" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/g", "reverse": true }' checked><label for="PS_DR1_g">PS1_DR1 g</label>
-    <input id="PS_DR1_z" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/z", "reverse": true }'><label for="PS_DR1_z">PS_DR1 z</label>
-    <input id="GAIAedr3" type="radio" name="survey" value='{ "survey": "GAIAedr3", "reverse": true }'><label for="GAIAedr3">GAIA edr3</label>
-    <input id="allwise" type="radio" name="survey" value='{ "survey": "P/allWISE/color", "reverse": true }'><label for="allwise">AllWISE</label>
-    <input id="galex" type="radio" name="survey" value='{ "survey": "P/GALEXGR6/AIS/color", "reverse": true }'><label for="galex">GALEX</label>
+    <p class="m-0">
+        <b>Optical: </b>
+        <input id="PS_DR1_g" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/g", "reverse": true }' checked><label for="PS_DR1_g">PS1_DR1 g</label>
+        <input id="PS_DR1_z" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/z", "reverse": true }'><label for="PS_DR1_z">PS_DR1 z</label>
+        <b>IR: </b>
+        <input id="allwise" type="radio" name="survey" value='{ "survey": "P/allWISE/color", "colormap": "grayscale", "reverse": true }'><label for="allwise">AllWISE</label>
+    </p>
+    <p class="m-0">
+        <b>Radio: </b>
+        <input id="vlass" type="radio" name="survey" value='{ "survey": "VLASS", "reverse": true }'><label for="vlass">VLASS (NVSS)</label>
+        <b>???: </b>
+        <input id="GAIAedr3" type="radio" name="survey" value='{ "survey": "GAIAedr3", "reverse": true }'><label for="GAIAedr3">GAIA edr3</label>
+        <input id="galex" type="radio" name="survey" value='{ "survey": "P/GALEXGR6/AIS/color", "reverse": true }'><label for="galex">GALEX</label>
+    </p>
+    <p class="m-0">
+        <b>X-Ray: </b>
+        <input id="rosat" type="radio" name="survey" value='{ "survey": "ROSAT", "reverse": true }'><label for="rosat">ROSAT</label>
+    </p>
 
     {% comment %} Creation of Aladin Lite instance (TODO make a separate js-script) {% endcomment %}
     <script type="text/javascript">
@@ -35,6 +48,18 @@
             7, // Set value specified in "HiPS order" column (see link above).
                // If specified value is greater then HiPS order it will show nothing
                // with big zoom.
+        );
+        aladin.createImageSurvey(
+            "VLASS", "VLASS",
+            "http://alasky.cds.unistra.fr/NVSS/intensity",
+            "j2000",
+            5,
+        )
+        aladin.createImageSurvey(
+            "ROSAT", "ROSAT",
+            "http://alasky.cds.unistra.fr/RASS",
+            "j2000",
+            4,
         )
 
         $('input[name=survey]').change(function() {
