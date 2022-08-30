@@ -133,10 +133,6 @@ class Command(BaseCommandWithFormattedHelp):
             )
         )
 
-    def add_arguments(self, parser: argparse.ArgumentParser):
-        parser.add_argument("--catalog", type=str, help="Example argument",
-                            required=True)
-
     @staticmethod
     @timeit("Pan-STARRS magnitudes calculation")
     def ps():
@@ -272,14 +268,27 @@ class Command(BaseCommandWithFormattedHelp):
             )
         )
 
-    def handle(self, *args, **options):
-        catalog = options["catalog"].upper()
-        if catalog == 'LS':
-            self.ls()
-        elif catalog == 'PS':
-            self.ps()
-        elif catalog == 'SDSS':
-            self.sdss()
-        else:
+    def add_arguments(self, parser: argparse.ArgumentParser):
+        parser.add_argument("--catalog", type=str, help="LS, PS, SDSS or ALL",
+                            required=True)
+
+    @staticmethod
+    def validate_arguments(*args, **options):
+        if options["catalog"].upper() not in ("LS", "PS", "SDSS", "ALL"):
             raise CommandError("Only --catalog 'LS', 'PS' or 'SDSS' is "
                                "supported")
+
+    def handle(self, *args, **options):
+        self.validate_arguments(*args, **options)
+
+        catalog = options["catalog"].upper()
+        run_all = catalog == "ALL"
+
+        if catalog == "LS" or run_all:
+            self.ls()
+
+        if catalog in "PS" or run_all:
+            self.ps()
+
+        if catalog == "SDSS" or run_all:
+            self.sdss()
