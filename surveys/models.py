@@ -1,3 +1,13 @@
+"""Module with Django models.
+
+Contains models for comments, X-ray sources in eRosita survey and
+sources in required optical surveys.
+
+TODO Refactor models: create several smaller modules.
+TODO Refactor models: add verbose names for attributes."""
+
+from typing import Tuple, List
+
 from django.db import models
 from django.utils.text import Truncator
 from django.contrib.auth.models import User
@@ -13,6 +23,8 @@ from decimal import Decimal
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
+from surveys.utils import string_representation
+
 
 # Class for files from where sources were loaded
 class OriginFile(models.Model):
@@ -22,6 +34,20 @@ class OriginFile(models.Model):
 
     def __str__(self):
         return 'MetaSource: {}'.format(self.file_name)
+
+
+@string_representation()
+class MetaObjectClass(models.Model):
+    """Meta object classes for comments.
+    TODO Make class attribute a FK in MetaObject class.
+    """
+    id = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100)
+    desc = models.TextField(blank=True, null=True)
+
+    @staticmethod
+    def choices() -> List[Tuple[str, str]]:
+        return MetaObjectClass.objects.all().values_list("id", "name")
 
 
 # Class for Meta Objects with common eROSITA sources
@@ -53,13 +79,7 @@ class MetaObject(models.Model):
 
     comment = models.TextField(max_length=2000, blank=True, null=True)
 
-    CLASS_CHOICES = [
-            ('TDE', 'Class TDE'),
-            ('AGN', 'Class AGN'),
-            ('Galactic', 'Class Galactic'),
-            ('Other', 'Other Class'),
-            (None, 'Unknown'),
-        ]
+    CLASS_CHOICES = MetaObjectClass.choices()
     object_class = models.CharField(
         max_length=100,
         choices=CLASS_CHOICES,
@@ -641,8 +661,17 @@ class eROSITA(models.Model):
         verbose_name_plural = 'eROSITA sources'
 
 
-# Class for comments on xray sources
 class Comment(models.Model):
+    """Comment class for Meta-object.
+
+    Can be posted only by superuser, and overwrites previous comment.
+    Contains comment, some follow up and three class fields. First class field
+    is considered as final class for meta-object.
+
+    Technical fields are time of creation/update and FK to MetaObject.
+
+    TODO: with two different superusers it throws and exception views.py on 105
+    """
     comment = models.TextField(max_length=2000)
     follow_up = models.TextField(max_length=1000, blank=True, null=True)
 
@@ -681,7 +710,6 @@ class Comment(models.Model):
         ordering = ('-created_by__is_superuser',)
 
 
-# Class for LS sources
 class LS(models.Model):
     opt_id = models.PositiveIntegerField(blank=True, null=True)
     objID = models.PositiveIntegerField(blank=True, null=True)

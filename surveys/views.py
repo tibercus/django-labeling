@@ -10,7 +10,6 @@ from django.utils.timezone import make_aware
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.db.models import F, Count
-from django.http import QueryDict
 
 from surveys.utils import cone_search_filter, change_opt_cp
 
