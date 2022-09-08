@@ -36,20 +36,6 @@ class OriginFile(models.Model):
         return 'MetaSource: {}'.format(self.file_name)
 
 
-@string_representation()
-class MetaObjectClass(models.Model):
-    """Meta object classes for comments.
-    TODO Make class attribute a FK in MetaObject class.
-    """
-    id = models.CharField(max_length=100, primary_key=True)
-    name = models.CharField(max_length=100)
-    desc = models.TextField(blank=True, null=True)
-
-    @staticmethod
-    def choices() -> List[Tuple[str, str]]:
-        return MetaObjectClass.objects.all().values_list("id", "name")
-
-
 # Class for Meta Objects with common eROSITA sources
 class MetaGroup(models.Model):
     # Pavel id in master table
@@ -79,7 +65,14 @@ class MetaObject(models.Model):
 
     comment = models.TextField(max_length=2000, blank=True, null=True)
 
-    CLASS_CHOICES = MetaObjectClass.choices()
+    CLASS_CHOICES = [
+        ('TDE', 'Class TDE'),
+        ('AGN', 'Class AGN'),
+        ('Galactic', 'Class Galactic'),
+        ('Other', 'Other Class'),
+        (None, 'Unknown'),
+    ]
+
     object_class = models.CharField(
         max_length=100,
         choices=CLASS_CHOICES,
