@@ -54,9 +54,10 @@ class MetaObject(models.Model):
     # Pavel id in master table
     meta_ind = models.PositiveIntegerField(blank=True, null=True)
     master_name = models.CharField(max_length=200, blank=True, null=True)
-    master_survey = models.PositiveIntegerField(blank=True, null=True)
-    RA = models.FloatField()
-    DEC = models.FloatField()
+    master_survey = models.PositiveIntegerField(blank=True, null=True,
+                                                verbose_name="Master survey")
+    RA = models.FloatField(verbose_name="Ra")
+    DEC = models.FloatField(verbose_name="Dec")
     # add galactic coordinates
     GLON = models.FloatField(blank=True, null=True)
     GLAT = models.FloatField(blank=True, null=True)
@@ -78,6 +79,7 @@ class MetaObject(models.Model):
         choices=CLASS_CHOICES,
         default=None,
         blank=True, null=True,
+        verbose_name="Object class",
     )
 
     # GAIA EDR3 Star flag of master source
@@ -92,8 +94,8 @@ class MetaObject(models.Model):
     tde_v3_ls = models.BooleanField(blank=True, null=True)
 
     # Columns of Master Table
-    EXT = models.FloatField(blank=True, null=True)
-    R98 = models.FloatField(blank=True, null=True)
+    EXT = models.FloatField(blank=True, null=True, verbose_name="Extension")
+    R98 = models.FloatField(blank=True, null=True, verbose_name="R98")
     LIKE = models.FloatField(blank=True, null=True)
 
     # TODO: think about next surveys: 5,6,7,8
@@ -179,7 +181,10 @@ class MetaObject(models.Model):
 
     primary_object = models.BooleanField(default=True, blank=True, null=True)
     # Meta Group object for meta objects with common sources
-    meta_group = models.ForeignKey(MetaGroup, on_delete=models.CASCADE, related_name='meta_objects', blank=True, null=True)
+    meta_group = models.ForeignKey(MetaGroup, on_delete=models.CASCADE,
+                                   related_name='meta_objects',
+                                   blank=True, null=True,
+                                   verbose_name="Meta group")
 
     def __str__(self):
         return '{} - MetaObject: {}'.format(self.meta_ind, self.master_name)
@@ -571,10 +576,9 @@ class eROSITA(models.Model):
         return Comment.objects.filter(source=self).order_by('-created_at').first()
 
     def __iter__(self):
-        fields = {}
-
         for field in self._meta.get_fields():
             value = getattr(self, field.name, "")
+
             try:
                 name = field.verbose_name
             except AttributeError:
@@ -644,11 +648,6 @@ class eROSITA(models.Model):
         opt_sources = opt_sources.annotate(separation=((F('c_x') - c_x)**2.0 + (F('c_y') - c_y)**2.0
                                                        + (F('c_z') - c_z)**2.0)).order_by('separation')
         return opt_sources if opt_sources.exists() else None
-
-    def __iter__(self):
-        for field in eROSITA.fields_to_show():
-            value = getattr(self, field, None)
-            yield field, value
 
     class Meta:
         verbose_name_plural = 'eROSITA sources'

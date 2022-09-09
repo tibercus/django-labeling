@@ -1,0 +1,88 @@
+{% load filters_tags %}
+
+<div class="table-responsive">
+    <table id = "ScrollTable" class="table table-bordered w-auto" cellspacing="0">
+        <thead class="thead-dark" >
+            <tr>
+                <th>ID</th>
+                <th>Meta ind</th>
+                <th>Master name</th>
+                <th>Master Survey</th>
+                <th>RA</th>
+                <th>Dec</th>
+                <th>Comment</th>
+                <th>Class</th>
+                <th>Extension</th>
+                <th>R98</th>
+                <th>Detection likelihood</th>
+                <th>ML_FLUX_0</th>
+                <th>ML_FLUX_ERR_0</th>
+                <th>Flux 05-20</th>
+
+                {% for field in meta_fields %}
+                    {% if field in master_fields %}
+                        <th>
+                            <div data-toggle="tooltip" data-placement="right"
+                                 title="Help text for master_{{ field }}">master_{{ field }}</div>
+                        </th>
+                    {% else %}
+                        <th>
+                            <div data-toggle="tooltip" data-placement="right"
+                                 title="Help text for {{ field }}">{{ field }}</div>
+                        </th>
+                    {% endif %}
+                {% endfor %}
+                <th>{{ 'master_flux_05_20' }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for meta_obj in meta_objects %}
+            {% define meta_obj|get_master_source as master_source %}
+            <tr>
+                <td class="align-middle"> {{ meta_obj.id }} </td>
+                <td class="align-middle"> {{ meta_obj.meta_ind }} </td>
+                <td class="align-middle">
+                    {% if  meta_obj.primary_object %}
+                        <a href="{% url 'source' meta_obj.pk %}">
+                            <span class="badge">P</span> {{ meta_obj.master_name }}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'source' meta_obj.pk %}"> {{ meta_obj.master_name }} </a>
+                    {% endif %}
+                </td>
+                <td class="align-middle"> {{ meta_obj.master_survey|is_summary }} </td>
+                <td class="align-middle"> {{ meta_obj.RA }} </td>
+                <td class="align-middle"> {{ meta_obj.DEC }} </td>
+                <td class="align-middle"> {{ meta_obj.comment }} </td>
+                <td class="align-middle"> {{ meta_obj.object_class }} </td>
+                <td class="align-middle"> {{ meta_obj.EXT }} </td>
+                <td class="align-middle"> {{ meta_obj.R98 }} </td>
+                <td class="align-middle"> {{ master_source.DET_LIKE_0 }} </td>
+                <td class="align-middle"> {{ master_source.ML_FLUX_0 }} </td>
+                <td class="align-middle"> {{ master_source.ML_FLUX_ERR_0 }} </td>
+
+                <td class="align-middle"> {{ master_source.flux_05_20|stringformat:"e" }} </td>
+
+                {% for field,value in meta_obj %}
+                    <td class="align-middle">
+                        {% if field == 'master_name' %}
+                            {% if  meta_obj.primary_object%}
+                                <a href="{% url 'source' meta_obj.pk %}"> <span class="badge">P</span> {{ value }} </a>
+                            {% else %}
+                                <a href="{% url 'source' meta_obj.pk %}"> {{ value }} </a>
+                            {% endif %}
+                        {% comment %} TODO: change this later {% endcomment %}
+                        {% elif field == 'master_survey' %}
+                            {{ value|is_summary }}
+                        {% elif 'UPLIM' in field %}
+                            {{ value|stringformat:"e" }}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
