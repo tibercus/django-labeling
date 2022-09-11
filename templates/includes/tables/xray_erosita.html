@@ -1,0 +1,102 @@
+{% load filters_tags %}
+
+<div class="table_source">
+    <table class="table table-bordered table-responsive-md">
+      <thead class="thead-dark">
+        <tr>
+          <th>Head</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr> <td> survey_ind       </td> <td>{{ source.survey_ind       }}</td> </tr>
+        <tr> <td> name             </td> <td>{{ source.name             }}</td> </tr>
+        <tr> <td> RA               </td> <td>{{ source.RA               }}</td> </tr>
+        <tr> <td> DEC              </td> <td>{{ source.DEC              }}</td> </tr>
+        <tr> <td> comment          </td> <td>{{ source.comment          }}</td> </tr>
+        <tr> <td> source_class     </td> <td>{{ source.source_class     }}</td> </tr>
+        <tr> <td> GLON             </td> <td>{{ source.GLON             }}</td> </tr>
+        <tr> <td> GLAT             </td> <td>{{ source.GLAT             }}</td> </tr>
+        <tr> <td> pos_r98          </td> <td>{{ source.pos_r98          }}</td> </tr>
+        <tr> <td> DET_LIKE_0       </td> <td>{{ source.DET_LIKE_0       }}</td> </tr>
+        <tr> <td> ML_FLUX_0        </td> <td>{{ source.ML_FLUX_0|stringformat:"e"        }}</td> </tr>
+        <tr> <td> ML_FLUX_ERR_0    </td> <td>{{ source.ML_FLUX_ERR_0|stringformat:"e"    }}</td> </tr>
+        <tr> <td> ML_CTS_0         </td> <td>{{ source.ML_CTS_0         }}</td> </tr>
+        <tr> <td> ML_CTS_ERR_0     </td> <td>{{ source.ML_CTS_ERR_0     }}</td> </tr>
+        <tr> <td> ML_EXP_1         </td> <td>{{ source.ML_EXP_1         }}</td> </tr>
+        <tr> <td> EXT              </td> <td>{{ source.EXT              }}</td> </tr>
+        <tr> <td> EXT_LIKE         </td> <td>{{ source.EXT_LIKE         }}</td> </tr>
+        <tr> <td> EXT_ERR          </td> <td>{{ source.EXT_ERR          }}</td> </tr>
+        <tr> <td> hpidx            </td> <td>{{ source.hpidx            }}</td> </tr>
+        <tr> <td> RADEC_ERR        </td> <td>{{ source.RADEC_ERR        }}</td> </tr>
+        <tr> <td> ML_BKG_0         </td> <td>{{ source.ML_BKG_0         }}</td> </tr>
+        <tr> <td> ML_RATE_0        </td> <td>{{ source.ML_RATE_0        }}</td> </tr>
+        <tr> <td> ML_RATE_ERR_0    </td> <td>{{ source.ML_RATE_ERR_0    }}</td> </tr>
+        <tr> <td> tilenum          </td> <td>{{ source.tilenum          }}</td> </tr>
+        <tr> <td> ID_SRC           </td> <td>{{ source.ID_SRC           }}</td> </tr>
+        <tr> <td> ID_CLUSTER       </td> <td>{{ source.ID_CLUSTER       }}</td> </tr>
+        <tr> <td> DIST_NN          </td> <td>{{ source.DIST_NN          }}</td> </tr>
+        <tr> <td> SRCDENS          </td> <td>{{ source.SRCDENS          }}</td> </tr>
+        <tr> <td> NH               </td> <td>{{ source.NH               }}</td> </tr>
+        <tr> <td> RA_corr          </td> <td>{{ source.RA_corr          }}</td> </tr>
+        <tr> <td> DEC_corr         </td> <td>{{ source.DEC_corr         }}</td> </tr>
+        <tr> <td> astro_indx       </td> <td>{{ source.astro_indx       }}</td> </tr>
+        <tr> <td> astro_nx         </td> <td>{{ source.astro_nx         }}</td> </tr>
+        <tr> <td> astro_mdra       </td> <td>{{ source.astro_mdra       }}</td> </tr>
+        <tr> <td> astro_mddec      </td> <td>{{ source.astro_mddec      }}</td> </tr>
+        <tr> <td> astro_fit_nx     </td> <td>{{ source.astro_fit_nx     }}</td> </tr>
+        <tr> <td> astro_fit_sigma  </td> <td>{{ source.astro_fit_sigma  }}</td> </tr>
+        <tr> <td> astro_fit_ro_opt </td> <td>{{ source.astro_fit_ro_opt }}</td> </tr>
+        <tr> <td> astro_flag       </td> <td>{{ source.astro_flag       }}</td> </tr>
+        <tr> <td> pos_sigma_2d     </td> <td>{{ source.pos_sigma_2d     }}</td> </tr>
+        <tr> <td> pos_r68          </td> <td>{{ source.pos_r68          }}</td> </tr>
+        <tr> <td> pos_r95          </td> <td>{{ source.pos_r95          }}</td> </tr>
+        <tr> <td> ELON             </td> <td>{{ source.ELON             }}</td> </tr>
+        <tr> <td> ELAT             </td> <td>{{ source.ELAT             }}</td> </tr>
+        <tr> <td> flux_05_20       </td> <td>{{ source.flux_05_20|stringformat:"e"       }}</td> </tr>
+        <tr> <td> nH_pow           </td> <td>{{ source.nH_pow           }}</td> </tr>
+        <tr> <td> nH_pow_l         </td> <td>{{ source.nH_pow_l         }}</td> </tr>
+        <tr> <td> nH_pow_u         </td> <td>{{ source.nH_pow_u         }}</td> </tr>
+        <tr> <td> nH_pow_st        </td> <td>{{ source.nH_pow_st        }}</td> </tr>
+        <tr> <td> G_pow            </td> <td>{{ source.G_pow            }}</td> </tr>
+        <tr> <td> G_pow_l          </td> <td>{{ source.G_pow_l          }}</td> </tr>
+        <tr> <td> G_pow_u          </td> <td>{{ source.G_pow_u          }}</td> </tr>
+        <tr> <td> G_pow_st         </td> <td>{{ source.G_pow_st         }}</td> </tr>
+        <tr> <td> norm_pow         </td> <td>{{ source.norm_pow         }}</td> </tr>
+        <tr> <td> norm_pow_l       </td> <td>{{ source.norm_pow_l       }}</td> </tr>
+        <tr> <td> norm_pow_u       </td> <td>{{ source.norm_pow_u       }}</td> </tr>
+        <tr> <td> norm_pow_st      </td> <td>{{ source.norm_pow_st      }}</td> </tr>
+        <tr> <td> c_pow            </td> <td>{{ source.c_pow            }}</td> </tr>
+        <tr> <td> dof_pow          </td> <td>{{ source.dof_pow          }}</td> </tr>
+        <tr> <td> nH_dbb           </td> <td>{{ source.nH_dbb           }}</td> </tr>
+        <tr> <td> nH_dbb_l         </td> <td>{{ source.nH_dbb_l         }}</td> </tr>
+        <tr> <td> nH_dbb_u         </td> <td>{{ source.nH_dbb_u         }}</td> </tr>
+        <tr> <td> nH_dbb_st        </td> <td>{{ source.nH_dbb_st        }}</td> </tr>
+        <tr> <td> kT_dbb           </td> <td>{{ source.kT_dbb           }}</td> </tr>
+        <tr> <td> kT_dbb_l         </td> <td>{{ source.kT_dbb_l         }}</td> </tr>
+        <tr> <td> kT_dbb_u         </td> <td>{{ source.kT_dbb_u         }}</td> </tr>
+        <tr> <td> kT_dbb_st        </td> <td>{{ source.kT_dbb_st        }}</td> </tr>
+        <tr> <td> norm_dbb         </td> <td>{{ source.norm_dbb         }}</td> </tr>
+        <tr> <td> norm_dbb_l       </td> <td>{{ source.norm_dbb_l       }}</td> </tr>
+        <tr> <td> norm_dbb_u       </td> <td>{{ source.norm_dbb_u       }}</td> </tr>
+        <tr> <td> norm_dbb_st      </td> <td>{{ source.norm_dbb_st      }}</td> </tr>
+        <tr> <td> c_dbb            </td> <td>{{ source.c_dbb            }}</td> </tr>
+        <tr> <td> dof_dbb          </td> <td>{{ source.dof_dbb          }}</td> </tr>
+        <tr> <td> TSTART           </td> <td>{{ source.TSTART           }}</td> </tr>
+        <tr> <td> TSTOP            </td> <td>{{ source.TSTOP            }}</td> </tr>
+        <tr> <td> survey           </td> <td>{{ source.survey           }}</td> </tr>
+{#        {% for field,value in source %}#}
+{#            <tr>#}
+{#                <td>{{ field }}</td>#}
+{#                {% comment %} TODO: change this later {% endcomment %}#}
+{#                {% if 'FLUX' in field or 'flux' in field%}#}
+{#                    <td>{{ value|stringformat:"e" }}</td>#}
+{#                {% else %}#}
+{#                    <td>{{ value }}</td>#}
+{#                {% endif %}#}
+{#            </tr>#}
+{#        {% endfor %}#}
+
+      </tbody>
+    </table>
+</div>

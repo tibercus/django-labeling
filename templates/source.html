@@ -75,31 +75,7 @@
                     <div class="col-sm-auto">
                         {% if source %}
                             {%  comment %} Source table with head:value(parameters) {% endcomment %}
-                            <div class="table_source">
-                                <table class="table table-bordered table-responsive-md">
-                                  <thead class="thead-dark">
-                                    <tr>
-                                        <th>Head</th>
-                                       <th>Value</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-
-                                    {% for field,value in source %}
-                                        <tr>
-                                            <td>{{ field }}</td>
-                                            {% comment %} TODO: change this later {% endcomment %}
-                                            {% if 'FLUX' in field or 'flux' in field%}
-                                                <td>{{ value|stringformat:"e" }}</td>
-                                            {% else %}
-                                                <td>{{ value }}</td>
-                                            {% endif %}
-                                        </tr>
-                                    {% endfor %}
-
-                                  </tbody>
-                                </table>
-                            </div>
+                            {% include "includes/tables/xray_erosita.html" %}
                         {% endif %}
 
                         <div class="container">

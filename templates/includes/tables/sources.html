@@ -2,7 +2,13 @@
 
 <div class="table-responsive">
     <table id = "ScrollTable" class="table table-bordered w-auto" cellspacing="0">
-        <thead class="thead-dark" >
+        <thead class="thead-dark">
+
+            <tr>
+                <th colspan="8" scope="colgroup"></th>
+                <th colspan="6" scope="colgroup">eRosita</th>
+                <th colspan="5" scope="colgroup">DESI LIS</th>
+            </tr>
             <tr>
                 <th>ID</th>
                 <th>Meta ind</th>
@@ -18,6 +24,11 @@
                 <th>ML_FLUX_0</th>
                 <th>ML_FLUX_ERR_0</th>
                 <th>Flux 05-20</th>
+                <th>g</th>
+                <th>r</th>
+                <th>z</th>
+                <th>w1</th>
+                <th>w2</th>
 
                 {% for field in meta_fields %}
                     {% if field in master_fields %}
@@ -38,7 +49,9 @@
         <tbody>
         {% for meta_obj in meta_objects %}
             {% define meta_obj|get_master_source as master_source %}
-            <tr>
+            {% define master_source|get_opt_source:"LS" as ls_source %}
+
+            <tr bgcolor="{% if meta_obj.primary_object %}#ddeeff{% else %}#FFFFFF{% endif %}">
                 <td class="align-middle"> {{ meta_obj.id }} </td>
                 <td class="align-middle"> {{ meta_obj.meta_ind }} </td>
                 <td class="align-middle">
@@ -51,17 +64,22 @@
                     {% endif %}
                 </td>
                 <td class="align-middle"> {{ meta_obj.master_survey|is_summary }} </td>
-                <td class="align-middle"> {{ meta_obj.RA }} </td>
-                <td class="align-middle"> {{ meta_obj.DEC }} </td>
-                <td class="align-middle"> {{ meta_obj.comment }} </td>
-                <td class="align-middle"> {{ meta_obj.object_class }} </td>
-                <td class="align-middle"> {{ meta_obj.EXT }} </td>
-                <td class="align-middle"> {{ meta_obj.R98 }} </td>
+                <td class="align-middle"> {{ meta_obj.RA|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ meta_obj.DEC|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ meta_obj.comment|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ meta_obj.object_class|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ meta_obj.EXT|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ meta_obj.R98|stringformat:".5f" }} </td>
                 <td class="align-middle"> {{ master_source.DET_LIKE_0 }} </td>
-                <td class="align-middle"> {{ master_source.ML_FLUX_0 }} </td>
-                <td class="align-middle"> {{ master_source.ML_FLUX_ERR_0 }} </td>
+                <td class="align-middle"> {{ master_source.ML_FLUX_0|stringformat:"e" }} </td>
+                <td class="align-middle"> {{ master_source.ML_FLUX_ERR_0|stringformat:"e" }} </td>
 
                 <td class="align-middle"> {{ master_source.flux_05_20|stringformat:"e" }} </td>
+                <td class="align-middle"> {{ ls_source.mag_g_ab|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ ls_source.mag_r_ab|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ ls_source.mag_z_ab|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ ls_source.mag_w1_ab|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ ls_source.mag_w2_ab|stringformat:".5f" }} </td>
 
                 {% for field,value in meta_obj %}
                     <td class="align-middle">
