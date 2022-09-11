@@ -1,6 +1,10 @@
+from typing import Union
+
 from django import template
 from django.core.files.storage import default_storage
 from ..models import *
+
+import surveys.models as sm
 
 from django.conf import settings
 from django.db.models import Model
@@ -35,7 +39,7 @@ def is_in_survey(sources, survey):
 
 
 @register.filter
-def get_master_source(meta_object):
+def get_master_source(meta_object: MetaObject) -> eROSITA:
     """add filter option in template"""
     try:
         sources = meta_object.object_sources.all()
@@ -43,6 +47,31 @@ def get_master_source(meta_object):
     except eROSITA.DoesNotExist:
         master_source = None
     return master_source
+
+
+@register.filter()
+def get_opt_source(master_source: eROSITA, survey: str
+                   ) -> Union[LS, PS, SDSS, GAIA]:
+    """Get an optical source to form full table at home page.
+
+    :param master_source: source to get optical object for.
+    :param survey: survey name.
+
+    :return: optical object.
+    """
+    if survey == "LS":
+        return master_source.ls_dup
+
+    if survey == "PS":
+        return master_source.ps_dup
+
+    if survey == "SDSS":
+        return master_source.sdss_dup
+
+    if survey == "GAIA":
+        return master_source.gaia_dup
+
+    raise ValueError(f"Invalid survey: '{survey}'")
 
 
 @register.filter

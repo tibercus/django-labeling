@@ -4,7 +4,7 @@ import textwrap
 from abc import ABC
 from typing import Callable, Any
 
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandError
 from django.utils import timezone
 from django.db.models import Q
 
@@ -132,10 +132,6 @@ class Command(BaseCommandWithFormattedHelp):
                 "flux_w4", "flux_ivar_w4"
             )
         )
-
-    def add_arguments(self, parser: argparse.ArgumentParser):
-        parser.add_argument("--catalog", type=str, help="Example argument",
-                            required=True)
 
     @staticmethod
     @timeit("Pan-STARRS magnitudes calculation")
@@ -272,13 +268,27 @@ class Command(BaseCommandWithFormattedHelp):
             )
         )
 
+    def add_arguments(self, parser: argparse.ArgumentParser):
+        parser.add_argument("--catalog", type=str, help="LS, PS, SDSS or ALL",
+                            required=True)
+
+    @staticmethod
+    def validate_arguments(*args, **options):
+        if options["catalog"].upper() not in ("LS", "PS", "SDSS", "ALL"):
+            raise CommandError("Only --catalog 'LS', 'PS' or 'SDSS' is "
+                               "supported")
+
     def handle(self, *args, **options):
+        self.validate_arguments(*args, **options)
+
         catalog = options["catalog"].upper()
-        if catalog == 'LS':
+        run_all = catalog == "ALL"
+
+        if catalog == "LS" or run_all:
             self.ls()
-        elif catalog == 'PS':
+
+        if catalog in "PS" or run_all:
             self.ps()
-        elif catalog == 'SDSS':
+
+        if catalog == "SDSS" or run_all:
             self.sdss()
-        else:
-            raise ValueError("Only --catalog LS is supported")

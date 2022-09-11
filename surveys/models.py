@@ -1,3 +1,13 @@
+"""Module with Django models.
+
+Contains models for comments, X-ray sources in eRosita survey and
+sources in required optical surveys.
+
+TODO Refactor models: create several smaller modules.
+TODO Refactor models: add verbose names for attributes."""
+
+from typing import Tuple, List
+
 import re
 from typing import Type
 
@@ -15,6 +25,8 @@ from decimal import Decimal
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+
+from surveys.utils import string_representation
 
 
 # Class for files from where sources were loaded
@@ -45,9 +57,10 @@ class MetaObject(models.Model):
     # Pavel id in master table
     meta_ind = models.PositiveIntegerField(blank=True, null=True)
     master_name = models.CharField(max_length=200, blank=True, null=True)
-    master_survey = models.PositiveIntegerField(blank=True, null=True)
-    RA = models.FloatField()
-    DEC = models.FloatField()
+    master_survey = models.PositiveIntegerField(blank=True, null=True,
+                                                verbose_name="Master survey")
+    RA = models.FloatField(verbose_name="Ra")
+    DEC = models.FloatField(verbose_name="Dec")
     # add galactic coordinates
     GLON = models.FloatField(blank=True, null=True)
     GLAT = models.FloatField(blank=True, null=True)
@@ -57,17 +70,19 @@ class MetaObject(models.Model):
     comment = models.TextField(max_length=2000, blank=True, null=True)
 
     CLASS_CHOICES = [
-            ('TDE', 'Class TDE'),
-            ('AGN', 'Class AGN'),
-            ('Galactic', 'Class Galactic'),
-            ('Other', 'Other Class'),
-            (None, 'Unknown'),
-        ]
+        ('TDE', 'Class TDE'),
+        ('AGN', 'Class AGN'),
+        ('Galactic', 'Class Galactic'),
+        ('Other', 'Other Class'),
+        (None, 'Unknown'),
+    ]
+
     object_class = models.CharField(
         max_length=100,
         choices=CLASS_CHOICES,
         default=None,
         blank=True, null=True,
+        verbose_name="Object class",
     )
 
     # GAIA EDR3 Star flag of master source
@@ -82,8 +97,8 @@ class MetaObject(models.Model):
     tde_v3_ls = models.BooleanField(blank=True, null=True)
 
     # Columns of Master Table
-    EXT = models.FloatField(blank=True, null=True)
-    R98 = models.FloatField(blank=True, null=True)
+    EXT = models.FloatField(blank=True, null=True, verbose_name="Extension")
+    R98 = models.FloatField(blank=True, null=True, verbose_name="R98")
     LIKE = models.FloatField(blank=True, null=True)
 
     # TODO: think about next surveys: 5,6,7,8
@@ -169,7 +184,10 @@ class MetaObject(models.Model):
 
     primary_object = models.BooleanField(default=True, blank=True, null=True)
     # Meta Group object for meta objects with common sources
-    meta_group = models.ForeignKey(MetaGroup, on_delete=models.CASCADE, related_name='meta_objects', blank=True, null=True)
+    meta_group = models.ForeignKey(MetaGroup, on_delete=models.CASCADE,
+                                   related_name='meta_objects',
+                                   blank=True, null=True,
+                                   verbose_name="Meta group")
 
     def __str__(self):
         return '{} - MetaObject: {}'.format(self.meta_ind, self.master_name)
@@ -561,10 +579,9 @@ class eROSITA(models.Model):
         return Comment.objects.filter(source=self).order_by('-created_at').first()
 
     def __iter__(self):
-        fields = {}
-
         for field in self._meta.get_fields():
             value = getattr(self, field.name, "")
+
             try:
                 name = field.verbose_name
             except AttributeError:
@@ -635,17 +652,21 @@ class eROSITA(models.Model):
                                                        + (F('c_z') - c_z)**2.0)).order_by('separation')
         return opt_sources if opt_sources.exists() else None
 
-    def __iter__(self):
-        for field in eROSITA.fields_to_show():
-            value = getattr(self, field, None)
-            yield field, value
-
     class Meta:
         verbose_name_plural = 'eROSITA sources'
 
 
-# Class for comments on xray sources
 class Comment(models.Model):
+    """Comment class for Meta-object.
+
+    Can be posted only by superuser, and overwrites previous comment.
+    Contains comment, some follow up and three class fields. First class field
+    is considered as final class for meta-object.
+
+    Technical fields are time of creation/update and FK to MetaObject.
+
+    TODO: with two different superusers it throws and exception views.py on 105
+    """
     comment = models.TextField(max_length=2000)
     follow_up = models.TextField(max_length=1000, blank=True, null=True)
 
@@ -684,7 +705,6 @@ class Comment(models.Model):
         ordering = ('-created_by__is_superuser',)
 
 
-# Class for LS sources
 class LS(models.Model):
     opt_id = models.PositiveIntegerField(blank=True, null=True)
     objID = models.PositiveIntegerField(blank=True, null=True)
@@ -1190,6 +1210,118 @@ class GAIA(models.Model):
 
     class Meta:
         verbose_name_plural = 'GAIA sources'
+
+
+class AllWise(models.Model):
+    ir_id = models.PositiveIntegerField()
+    opt_hpidx = models.BigIntegerField()
+    designation = models.CharField(max_length=19, blank=True, null=True)
+    ra = models.FloatField()
+    dec = models.FloatField()
+    sigra = models.FloatField(blank=True, null=True)
+    sigdec = models.FloatField(blank=True, null=True)
+    sigradec = models.FloatField(blank=True, null=True)
+    glon = models.FloatField(blank=True, null=True)
+    glat = models.FloatField(blank=True, null=True)
+    elon = models.FloatField(blank=True, null=True)
+    elat = models.FloatField(blank=True, null=True)
+    wx = models.FloatField(blank=True, null=True)
+    wy = models.FloatField(blank=True, null=True)
+    cntr = models.CharField(max_length=19, blank=True, null=True)
+    source_id = models.CharField(max_length=20, blank=True, null=True)
+    coadd_id = models.CharField(max_length=13, blank=True, null=True)
+    src = models.IntegerField(blank=True, null=True)
+    w1mpro = models.FloatField(blank=True, null=True)
+    w1sigmpro = models.FloatField(blank=True, null=True)
+    w1snr = models.FloatField(blank=True, null=True)
+    w1rchi2 = models.CharField(max_length=14, blank=True, null=True)
+    w2mpro = models.FloatField(blank=True, null=True)
+    w2sigmpro = models.FloatField(blank=True, null=True)
+    w2snr = models.FloatField(blank=True, null=True)
+    w2rchi2 = models.CharField(max_length=13, blank=True, null=True)
+    w3mpro = models.FloatField(blank=True, null=True)
+    w3sigmpro = models.FloatField(blank=True, null=True)
+    w3snr = models.FloatField(blank=True, null=True)
+    w3rchi2 = models.CharField(max_length=13, blank=True, null=True)
+    w4mpro = models.FloatField(blank=True, null=True)
+    w4sigmpro = models.FloatField(blank=True, null=True)
+    w4snr = models.FloatField(blank=True, null=True)
+    w4rchi2 = models.CharField(max_length=12, blank=True, null=True)
+    rchi2 = models.FloatField(blank=True, null=True)
+    nb = models.IntegerField(blank=True, null=True)
+    na = models.IntegerField(blank=True, null=True)
+    w1sat = models.FloatField(blank=True, null=True)
+    w2sat = models.FloatField(blank=True, null=True)
+    w3sat = models.FloatField(blank=True, null=True)
+    w4sat = models.FloatField(blank=True, null=True)
+    satnum = models.CharField(max_length=4, blank=True, null=True)
+    ra_pm = models.FloatField(blank=True, null=True)
+    dec_pm = models.FloatField(blank=True, null=True)
+    sigra_pm = models.FloatField(blank=True, null=True)
+    pmdec = models.IntegerField(blank=True, null=True)
+    sigpmdec = models.IntegerField(blank=True, null=True)
+    cc_flags = models.CharField(max_length=4, blank=True, null=True)
+    rel = models.CharField(max_length=4, blank=True, null=True)
+    ext_flg = models.IntegerField(blank=True, null=True)
+    var_flg = models.CharField(max_length=4, blank=True, null=True)
+    ph_qual = models.CharField(max_length=4, blank=True, null=True)
+    det_bit = models.IntegerField(blank=True, null=True)
+    moon_lev = models.CharField(max_length=4, blank=True, null=True)
+    w1nm = models.IntegerField(blank=True, null=True)
+    w1m = models.IntegerField(blank=True, null=True)
+    w2nm = models.IntegerField(blank=True, null=True)
+    w2m = models.IntegerField(blank=True, null=True)
+    w3nm = models.IntegerField(blank=True, null=True)
+    w3m = models.IntegerField(blank=True, null=True)
+    w4nm = models.IntegerField(blank=True, null=True)
+    w4m = models.IntegerField(blank=True, null=True)
+    best_use_cntr = models.CharField(max_length=19, blank=True, null=True)
+    w1cov = models.FloatField(blank=True, null=True)
+    w2cov = models.FloatField(blank=True, null=True)
+    w3cov = models.FloatField(blank=True, null=True)
+    w4cov = models.FloatField(blank=True, null=True)
+    w1cc_map = models.IntegerField(blank=True, null=True)
+    w1cc_map_str = models.CharField(max_length=4, blank=True, null=True)
+    w2cc_map = models.IntegerField(blank=True, null=True)
+    w2cc_map_str = models.CharField(max_length=4, blank=True, null=True)
+    w3cc_map = models.IntegerField(blank=True, null=True)
+    w3cc_map_str = models.CharField(max_length=4, blank=True, null=True)
+    w4cc_map = models.IntegerField(blank=True, null=True)
+    w4cc_map_str = models.CharField(max_length=4, blank=True, null=True)
+    tmass_key = models.CharField(max_length=10, blank=True, null=True)
+    r_2mass = models.FloatField(blank=True, null=True)
+    pa_2mass = models.FloatField(blank=True, null=True)
+    n_2mass = models.IntegerField(blank=True, null=True)
+    j_m_2mass = models.FloatField(blank=True, null=True)
+    j_msig_2mass = models.FloatField(blank=True, null=True)
+    h_m_2mass = models.FloatField(blank=True, null=True)
+    h_msig_2mass = models.FloatField(blank=True, null=True)
+    k_m_2mass = models.FloatField(blank=True, null=True)
+    k_msig_2mass = models.FloatField(blank=True, null=True)
+    x = models.FloatField(blank=True, null=True)
+    y = models.FloatField(blank=True, null=True)
+    z = models.FloatField(blank=True, null=True)
+    spt_ind = models.CharField(max_length=9, blank=True, null=True)
+    htm20 = models.CharField(max_length=14, blank=True, null=True)
+
+    def __str__(self):
+        return '{} - ALLWISE Source: {}'.format(self.opt_hpidx, self.ir_id)
+
+    def __iter__(self):
+        for field in self._meta.get_fields():
+            value = getattr(self, field.name, "")
+            try:
+                name = field.verbose_name
+            except AttributeError:
+                name = field.name
+
+            yield name, value
+
+    class Meta:
+        verbose_name_plural = 'GAIA sources'
+
+    # TODO -- побить на файлы каждый для своего обзора и доработать команду для загрузки данных
+    # TODO -- потом дорабатываем интерфейс
 
 
 # Class for comments on optical data

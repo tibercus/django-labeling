@@ -14,7 +14,7 @@ def mag_err_ab_from_flux_nanomaggies(
         flux_column: str, flux_ivar_column: str) -> CombinedExpression:
     """Calculate AB-magnitude error from flux (nanomaggies) and flux ivar"""
     # TODO оошибки получаются отрицательные ??? просто убрать минус?
-    return -2.5 / (Ln(10) * F(flux_column) * Sqrt(F(flux_ivar_column)))
+    return 2.5 / (Ln(10) * F(flux_column) * Sqrt(F(flux_ivar_column)))
 
 
 def mag_ab_from_flux_jy(flux_column: str) -> CombinedExpression:
@@ -29,4 +29,4 @@ def mag_ab_from_flux_jy(flux_column: str) -> CombinedExpression:
 def mag_err_ab_from_flux_jy(
         flux_column: str, flux_err_column: str) -> CombinedExpression:
     """Calculate AB-magnitude error from flux (Jy) and flux error."""
-    return -2.5 * F(flux_err_column) / (Ln(10) * F(flux_column))
+    return 2.5 * F(flux_err_column) / (Ln(10) * F(flux_column))

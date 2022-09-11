@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from .forms import NewCommentForm, OptCommentForm, OptCounterpartForm
@@ -10,7 +12,6 @@ from django.utils.timezone import make_aware
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.db.models import F, Count
-from django.http import QueryDict
 
 from surveys.utils import cone_search_filter, change_opt_cp
 
@@ -119,6 +120,18 @@ def source(request, pk):
         admin_class = admin_comment.source_class
     except Comment.DoesNotExist:
         admin_class = None
+    except Comment.MultipleObjectsReturned:
+        admin_class = defaultdict(list)
+        for comment in meta_object.comments.filter(
+                created_by__is_superuser=True):
+            admin_class[comment.source_class].append(
+                comment.created_by.username
+            )
+
+        admin_class = ", ".join(
+            f"{source_class} (by {', '.join(users)})"
+            for source_class, users in admin_class.items()
+        )
 
     # TODO: refactor POST request
     if request.method == 'POST':

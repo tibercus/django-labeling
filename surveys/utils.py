@@ -1,3 +1,6 @@
+import textwrap
+from typing import Type, List, Callable
+
 from django.core.management import BaseCommand
 from django.utils import timezone
 import pandas as pd
@@ -13,7 +16,7 @@ import datetime
 
 from django.utils.timezone import make_aware
 
-from django.db.models import ExpressionWrapper, FloatField
+from django.db.models import ExpressionWrapper, FloatField, Model
 from django.db.models.functions.math import ACos, Cos, Radians, Pi, Sin
 from math import radians
 
@@ -167,3 +170,62 @@ def cone_search_filter(queryset, ra, dec, radius):
     )
 
     return queryset.annotate(separation=separation).filter(separation__lte=radius)
+
+
+def string_representation(include_fields: List[str] = None,
+                          exclude_fields: List[str] = None,
+                          oneline: bool = False):
+    """Generates __str__ method for Django model.
+
+    :param include_fields: List of fields names to add to string
+    representation.
+    :param exclude_fields: List of fields names to exclude from string
+    representation.
+    :param oneline: if true, then will generate representation like a
+    constructor call. Else, multiline, like class description in Python.
+
+    :return: Django model decorator.
+
+    Does not work in following cases:
+    TODO model is inherited from user-defined model and include_fields is None
+    TODO recursive FK
+    """
+    exclude_fields = exclude_fields or list()
+
+    def decorator(model: Type[Model]) -> Type[Model]:
+
+        def __f(__o: Model) -> str:
+            beginning = f"{__o.__class__.__name__}"
+            if oneline:
+                beginning += "("
+                delimiter = ", "
+                ending = ")"
+            else:
+                beginning += ":\n"
+                delimiter = "\n"
+                ending = "\n"
+
+            if include_fields is None:
+                fields_names = [f.name for f in model._meta.get_fields()]
+            else:
+                fields_names = include_fields
+
+            values = delimiter.join(
+                [f"{f}={getattr(__o, f)}" for f in fields_names
+                 if f not in exclude_fields])
+
+            if not oneline:
+                values = textwrap.indent(values, " "*4)
+
+            return beginning + values + ending
+
+        setattr(model, "__str__", __f)
+        return model
+
+    return decorator
+
+
+def help_from_docstring(model: Type[BaseCommand]):
+    """Set's class `help` attribute equal to `__doc__`."""
+    setattr(model, "help", textwrap.dedent(model.__doc__))
+    return model
