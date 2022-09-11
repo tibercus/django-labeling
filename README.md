@@ -2,7 +2,10 @@
 
 ## Setup on a local machine
 
-1. Clone this project to a desired directory and checout to `dev` brhach to see the latest features in development:
+You may want to set up a project in PyCharm Professional, since it has support for Django projects.
+If you are, check instructions in the next section below first.
+
+1. Clone this project to a desired directory and checkout to `dev` branch to see the latest features in development:
 ```shell
 git clone git@github.com:tibercus/django-labeling.git
 git checkout dev
@@ -14,7 +17,7 @@ DEBUG=True
 SECRET_KEY=django-insecure-6**y5588(q@y#+^h54z$-j^8h%=kv$)4y!&56=u&+mk%wo#1ja
 ```
 3. Copy latest development SQLite database to project's root.
-4. Create environment (i.e. Virtualenv or Conda) and nstall all required dependendencies:
+4. Create environment (i.e. Virtualenv or Conda) and install all required dependencies:
 ```shell
 pip install -r requirements.txt
 ```
