@@ -27,13 +27,13 @@ python manage.py migrate
 ```shell
 python manage.py runserver
 ```
-7. Create Django superuser for development if you don't know one exists:
+7. Create Django superuser for development:
 ```shell
 python manage.py createsuperuser
 ```
 
 
-## Setup project in PyCharm (optional)
+## Setup project in PyCharm Professional (optional)
 
 1. Start creating a new project.
 2. Configure project like on the screenshot below. Key points are:
