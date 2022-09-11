@@ -25,6 +25,8 @@ python-decouple==3.5
 pytz==2021.1
 PyYAML==5.4.1
 six==1.16.0
+sphinx
+sphinx-material
 sqlparse==0.4.2
 tablib==3.0.0
 thrift==0.15.0

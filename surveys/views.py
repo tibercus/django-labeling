@@ -20,6 +20,7 @@ import csv
 
 @login_required
 def home(request):
+    """A view for home page. Renders list of sources."""
     master_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'EXT', 'R98', 'LIKE']
     sort_fields = ['RA', 'DEC', 'GLON', 'GLAT', 'LIKE', 'RATIO_e2e1', 'RATIO_e3e2', 'RATIO_e4e3']
     # form field names of pre-class filters
