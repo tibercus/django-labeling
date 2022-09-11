@@ -7,7 +7,10 @@
             <tr>
                 <th colspan="8" scope="colgroup"></th>
                 <th colspan="6" scope="colgroup">eRosita</th>
-                <th colspan="5" scope="colgroup">DESI LIS</th>
+                <th colspan="10" scope="colgroup">DESI LIS</th>
+                <th colspan="10" scope="colgroup">SDSS</th>
+                <th colspan="10" scope="colgroup">Pan-STARRS</th>
+                <th colspan="7" scope="colgroup">GAIA</th>
             </tr>
             <tr>
                 <th>ID</th>
@@ -20,36 +23,77 @@
                 <th>Class</th>
                 <th>Extension</th>
                 <th>R98</th>
+
                 <th>Detection likelihood</th>
                 <th>ML_FLUX_0</th>
                 <th>ML_FLUX_ERR_0</th>
                 <th>Flux 05-20</th>
-                <th>g</th>
-                <th>r</th>
-                <th>z</th>
-                <th>w1</th>
-                <th>w2</th>
 
-                {% for field in meta_fields %}
-                    {% if field in master_fields %}
-                        <th>
-                            <div data-toggle="tooltip" data-placement="right"
-                                 title="Help text for master_{{ field }}">master_{{ field }}</div>
-                        </th>
-                    {% else %}
-                        <th>
-                            <div data-toggle="tooltip" data-placement="right"
-                                 title="Help text for {{ field }}">{{ field }}</div>
-                        </th>
-                    {% endif %}
-                {% endfor %}
-                <th>{{ 'master_flux_05_20' }}</th>
+                <th>g</th>
+                <th>g_err</th>
+                <th>r</th>
+                <th>r_err</th>
+                <th>z</th>
+                <th>z_err</th>
+                <th>w1</th>
+                <th>w1_err</th>
+                <th>w2</th>
+                <th>w2_err</th>
+
+                <th>u</th>
+                <th>u_err</th>
+                <th>g</th>
+                <th>g_err</th>
+                <th>r</th>
+                <th>r_err</th>
+                <th>i</th>
+                <th>i_err</th>
+                <th>z</th>
+                <th>z_err</th>
+
+                <th>g</th>
+                <th>g_err</th>
+                <th>r</th>
+                <th>r_err</th>
+                <th>i</th>
+                <th>i_err</th>
+                <th>z</th>
+                <th>z_err</th>
+                <th>y</th>
+                <th>y_err</th>
+
+                <th>parallax</th>
+                <th>parallax_error</th>
+                <th>pm</th>
+                <th>pmra</th>
+                <th>pmra_error</th>
+                <th>pmdec</th>
+                <th>pmdec_error</th>
+
+{#                Old for-looped table #}
+{#                {% for field in meta_fields %}#}
+{#                    {% if field in master_fields %}#}
+{#                        <th>#}
+{#                            <div data-toggle="tooltip" data-placement="right"#}
+{#                                 title="Help text for master_{{ field }}">master_{{ field }}</div>#}
+{#                        </th>#}
+{#                    {% else %}#}
+{#                        <th>#}
+{#                            <div data-toggle="tooltip" data-placement="right"#}
+{#                                 title="Help text for {{ field }}">{{ field }}</div>#}
+{#                        </th>#}
+{#                    {% endif %}#}
+{#                {% endfor %}#}
+{#                <th>{{ 'master_flux_05_20' }}</th>#}
             </tr>
         </thead>
         <tbody>
         {% for meta_obj in meta_objects %}
             {% define meta_obj|get_master_source as master_source %}
             {% define master_source|get_opt_source:"LS" as ls_source %}
+            {% define master_source|get_opt_source:"PS" as ps_source %}
+            {% define master_source|get_opt_source:"SDSS" as sdss_source %}
+            {% define master_source|get_opt_source:"GAIA" as gaia_source %}
 
             <tr bgcolor="{% if meta_obj.primary_object %}#ddeeff{% else %}#FFFFFF{% endif %}">
                 <td class="align-middle"> {{ meta_obj.id }} </td>
@@ -70,35 +114,72 @@
                 <td class="align-middle"> {{ meta_obj.object_class }} </td>
                 <td class="align-middle"> {{ meta_obj.EXT|stringformat:".5f" }} </td>
                 <td class="align-middle"> {{ meta_obj.R98|stringformat:".5f" }} </td>
+
                 <td class="align-middle"> {{ master_source.DET_LIKE_0 }} </td>
                 <td class="align-middle"> {{ master_source.ML_FLUX_0|stringformat:"e" }} </td>
                 <td class="align-middle"> {{ master_source.ML_FLUX_ERR_0|stringformat:"e" }} </td>
-
                 <td class="align-middle"> {{ master_source.flux_05_20|stringformat:"e" }} </td>
-                <td class="align-middle"> {{ ls_source.mag_g_ab|stringformat:".5f" }} </td>
-                <td class="align-middle"> {{ ls_source.mag_r_ab|stringformat:".5f" }} </td>
-                <td class="align-middle"> {{ ls_source.mag_z_ab|stringformat:".5f" }} </td>
-                <td class="align-middle"> {{ ls_source.mag_w1_ab|stringformat:".5f" }} </td>
-                <td class="align-middle"> {{ ls_source.mag_w2_ab|stringformat:".5f" }} </td>
 
-                {% for field,value in meta_obj %}
-                    <td class="align-middle">
-                        {% if field == 'master_name' %}
-                            {% if  meta_obj.primary_object%}
-                                <a href="{% url 'source' meta_obj.pk %}"> <span class="badge">P</span> {{ value }} </a>
-                            {% else %}
-                                <a href="{% url 'source' meta_obj.pk %}"> {{ value }} </a>
-                            {% endif %}
-                        {% comment %} TODO: change this later {% endcomment %}
-                        {% elif field == 'master_survey' %}
-                            {{ value|is_summary }}
-                        {% elif 'UPLIM' in field %}
-                            {{ value|stringformat:"e" }}
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </td>
-                {% endfor %}
+                <td class="align-middle"> {{ ls_source.mag_g_ab|stringformat:".5f"      }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_g_ab|stringformat:".5f"  }} </td>
+                <td class="align-middle"> {{ ls_source.mag_r_ab|stringformat:".5f"      }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_r_ab|stringformat:".5f"  }} </td>
+                <td class="align-middle"> {{ ls_source.mag_z_ab|stringformat:".5f"      }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_z_ab|stringformat:".5f"  }} </td>
+                <td class="align-middle"> {{ ls_source.mag_w1_ab|stringformat:".5f"     }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_w1_ab|stringformat:".5f" }} </td>
+                <td class="align-middle"> {{ ls_source.mag_w2_ab|stringformat:".5f"     }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_w2_ab|stringformat:".5f" }} </td>
+
+                <td class="align-middle"> {{ sdss_source.cModelMag_u_ab|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_u_ab|stringformat:"5f"  }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMag_g_ab|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_g_ab|stringformat:"5f"  }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMag_r_ab|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_r_ab|stringformat:"5f"  }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMag_i_ab|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_i_ab|stringformat:"5f"  }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMag_z_ab|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_z_ab|stringformat:"5f"  }}</td>
+
+                <td class="align-middle"> {{ ps_source.gKronMagAB|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ ps_source.gKronMagErrAB|stringformat:"5f"  }}</td>
+                <td class="align-middle"> {{ ps_source.rKronMagAB|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ ps_source.rKronMagErrAB|stringformat:"5f"  }}</td>
+                <td class="align-middle"> {{ ps_source.iKronMagAB|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ ps_source.iKronMagErrAB|stringformat:"5f"  }}</td>
+                <td class="align-middle"> {{ ps_source.zKronMagAB|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ ps_source.zKronMagErrAB|stringformat:"5f"  }}</td>
+                <td class="align-middle"> {{ ps_source.yKronMagAB|stringformat:"5f"     }}</td>
+                <td class="align-middle"> {{ ps_source.yKronMagErrAB|stringformat:"5f"  }}</td>
+
+                <td class="align-middle"> {{ gaia_source.parallax|stringformat:"5f"        }} </td>
+                <td class="align-middle"> {{ gaia_source.parallax_error|stringformat:"5f"  }} </td>
+                <td class="align-middle"> {{ gaia_source.pm|stringformat:"5f"              }} </td>
+                <td class="align-middle"> {{ gaia_source.pmra|stringformat:"5f"            }} </td>
+                <td class="align-middle"> {{ gaia_source.pmra_error|stringformat:"5f"      }} </td>
+                <td class="align-middle"> {{ gaia_source.pmdec|stringformat:"5f"           }} </td>
+                <td class="align-middle"> {{ gaia_source.pmdec_error|stringformat:"5f"     }} </td>
+
+{#              Old for-looped table#}
+{#                {% for field,value in meta_obj %}#}
+{#                    <td class="align-middle">#}
+{#                        {% if field == 'master_name' %}#}
+{#                            {% if  meta_obj.primary_object%}#}
+{#                                <a href="{% url 'source' meta_obj.pk %}"> <span class="badge">P</span> {{ value }} </a>#}
+{#                            {% else %}#}
+{#                                <a href="{% url 'source' meta_obj.pk %}"> {{ value }} </a>#}
+{#                            {% endif %}#}
+{#                        {% comment %} TODO: change this later {% endcomment %}#}
+{#                        {% elif field == 'master_survey' %}#}
+{#                            {{ value|is_summary }}#}
+{#                        {% elif 'UPLIM' in field %}#}
+{#                            {{ value|stringformat:"e" }}#}
+{#                        {% else %}#}
+{#                            {{ value }}#}
+{#                        {% endif %}#}
+{#                    </td>#}
+{#                {% endfor %}#}
             </tr>
         {% endfor %}
       </tbody>
