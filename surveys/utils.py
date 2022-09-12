@@ -1,13 +1,15 @@
 import textwrap
 from typing import Type, List, Callable
 
+import astropy.units as u
+from astropy.coordinates import SkyCoord
 from django.core.management import BaseCommand
 from django.utils import timezone
 import pandas as pd
 import pickle
 import pyarrow.parquet as pq
 
-from surveys.models import *
+from surveys.models import eROSITA, MetaObject, Comment, OptComment
 from django.contrib.auth.models import User
 
 from django.conf import settings
@@ -33,12 +35,14 @@ def add_metadata_fields(comment_df):
 
     return comment_df
 
+
 def get_sep(master_source, opt_source):
     """get separation between master source and optical source"""
     c_xray = SkyCoord(ra=master_source.RA*u.degree, dec=master_source.DEC*u.degree, distance=1*u.pc, frame='icrs')
     c_opt = SkyCoord(ra=opt_source.ra*u.degree, dec=opt_source.dec*u.degree, distance=1*u.pc, frame='icrs')
     sep = c_xray.separation(c_opt)
     return sep.arcsecond
+
 
 def change_opt_cp(source, opt_survey_name, opt_id):
     opt_sources = eROSITA.get_opt_survey_sources(source, opt_survey_name)

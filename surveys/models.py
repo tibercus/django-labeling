@@ -26,8 +26,6 @@ from decimal import Decimal
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
-from surveys.utils import string_representation
-
 
 # Class for files from where sources were loaded
 class OriginFile(models.Model):
