@@ -36,7 +36,8 @@
                       <button type="submit" class="btn btn-sm btn-outline-success" value="button" name="final">Final</button>
                   </form>
 
-                    {% if user == comment.created_by %} {# Eidt comment #}
+                    {% if user == comment.created_by %}
+                        {# Eidt comment #}
                         <script>
                             $(document).ready(function(){
                                 let content = $('[data-name="popover-content-edit-comment"]')[0];
@@ -52,19 +53,54 @@
                                 });
                             });
                         </script>
-                    <div>
-                        <a tabindex="0"
-                           class="btn btn-sm btn-outline-info"
-                           data-container="body"
-                           role="button"
-                           data-toggle="popover-edit-message"
-                           data-placement="bottom">
-                            Edit
-                        </a>
-                    </div>
+                        <div>
+                            <a tabindex="0"
+                               class="btn btn-sm btn-outline-info"
+                               data-container="body"
+                               role="button"
+                               data-toggle="popover-edit-message"
+                               data-placement="bottom">
+                                Edit
+                            </a>
+                        </div>
+
+                        {# Delete comment #}
+                        <script>
+                            $(document).ready(function(){
+                                let content = $('[data-name="popover-content-delete-comment"]')[0];
+                                $('[data-toggle="popover-delete-message"]').popover({
+                                    title: `<h3 class="custom-title">
+                                                <i class="fa fa-info-circle"></i>
+                                                Achtung!
+                                            </h3>`,
+                                    content: content,
+                                    html: true
+                                });
+                            });
+                        </script>
+                        <div>
+                            <a tabindex="0"
+                               class="btn btn-sm btn-outline-danger"
+                               data-container="body"
+                               role="button"
+                               data-toggle="popover-delete-message"
+                               data-placement="bottom">
+                                Delete
+                            </a>
+                        </div>
+                        <div hidden><div data-name="popover-content-delete-comment">
+                            <form id="delete_comment" method="post">
+                                {% csrf_token %}
+                                <p style="color:red">Are you sure to delete this comment?</p>
+                                <p>{{ comment.comment }}</p>
+                                <button class="btn btn-sm btn-danger" name="delete_comment"
+                                        value="{{ comment.id }}">Yes, delete my comment!</button>
+                            </form>
+                        </div></div>
                     {% endif %}
-                {% else %}  {# Edit opt comment #}
+                {% else %}
                     {% if user == comment.created_by %}
+                        {# Edit opt comment #}
                         <script>
                             $(document).ready(function(){
                                 let content = $('[data-name="popover-content-edit-opt-comment"]')[0];
@@ -77,18 +113,54 @@
                                 });
                             });
                         </script>
-                    <div>
-                        <a tabindex="0"
-                           class="btn btn-sm btn-outline-info"
-                           data-container="body"
-                           role="button"
-                           data-toggle="popover-edit-opt-message"
-                           data-placement="bottom">
-                            Edit
-                        </a>
-                    </div>
+                        <div>
+                            <a tabindex="0"
+                               class="btn btn-sm btn-outline-info"
+                               data-container="body"
+                               role="button"
+                               data-toggle="popover-edit-opt-message"
+                               data-placement="bottom">
+                                Edit
+                            </a>
+                        </div>
+
+                        {# Delete opt comment #}
+                        <script>
+                            $(document).ready(function(){
+                                let content = $('[data-name="popover-content-delete-opt-comment"]')[0];
+                                $('[data-toggle="popover-delete-opt-message"]').popover({
+                                    title: `<h3 class="custom-title">
+                                                <i class="fa fa-info-circle"></i>
+                                                Achtung!
+                                            </h3>`,
+                                    content: content,
+                                    html: true
+                                });
+                            });
+                        </script>
+                        <div>
+                            <a tabindex="0"
+                               class="btn btn-sm btn-outline-danger"
+                               data-container="body"
+                               role="button"
+                               data-toggle="popover-delete-opt-message"
+                               data-placement="bottom">
+                                Delete
+                            </a>
+                        </div>
+                        <div hidden><div data-name="popover-content-delete-opt-comment">
+                            <form id="delete_opt_comment" method="post">
+                                {% csrf_token %}
+                                <p style="color:red">Are you sure to delete this comment?</p>
+                                <p>{{ comment.comment }}</p>
+                                <button class="btn btn-sm btn-danger" name="delete_opt_comment"
+                                        value="{{ comment.id }}">Yes, delete my comment!</button>
+                            </form>
+                        </div></div>
+
                     {% endif %}
                 {% endif %}
+
             </div>
             <div class="row bottom">
                 {% if comment.follow_up %}

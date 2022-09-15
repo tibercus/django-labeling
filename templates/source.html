@@ -93,11 +93,13 @@
                             {%  comment %} Comment form {% endcomment %}
                             <div class = "comment_section">
                                 {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
-                                <form id="comment_form" method="post">
-                                    {% csrf_token %}
-                                    {% include 'includes/form.html' %}
-                                    <button type="submit" class="btn btn-success" value="button" name="x_comment">Post</button>
-                                </form>
+                                {% if not comment_posted_by_user %}
+                                    <form id="comment_form" method="post">
+                                        {% csrf_token %}
+                                        {% include 'includes/form.html' %}
+                                        <button type="submit" class="btn btn-success" value="button" name="x_comment">Post</button>
+                                    </form>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -270,13 +272,15 @@
             {%  comment %} Optical Comment form {% endcomment %}
             <div class = "col-sm-3">
                 {%  comment %} add 'novalidate' when learn why widget_tweaks doesnt show errors {% endcomment %}
-                <form id="opt_comment_form" method="post">
-                    {% with opt_form as form %}
-                        {% csrf_token %}
-                        {% include 'includes/form.html' %}
-                    {% endwith %}
-                    <button type="submit" class="btn btn-success" value="button" name="opt_comment">Post</button>
-                </form>
+                {% if not opt_comment_posted_by_user %}
+                    <form id="opt_comment_form" method="post">
+                        {% with opt_form as form %}
+                            {% csrf_token %}
+                            {% include 'includes/form.html' %}
+                        {% endwith %}
+                        <button type="submit" class="btn btn-success" value="button" name="opt_comment">Post</button>
+                    </form>
+                {% endif %}
             </div>
 
             {% comment %} General Aladin Lite (TODO put into separate html) {% endcomment %}

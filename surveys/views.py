@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 from django.contrib.auth.models import User
@@ -178,6 +179,30 @@ def source(request, pk):
 
             return redirect('source', pk=meta_object.pk)
 
+        elif 'delete_opt_comment' in request.POST:
+            comment_id = int(request.POST["delete_opt_comment"])
+            try:
+                OptComment.objects.get(
+                    meta_source=meta_object, created_by=request.user).delete()
+            except OptComment.DoesNotExist:
+                logging.log(logging.WARN,
+                            f"Requested to delete opt-comment with id "
+                            f"{comment_id}, but there is no such comment!")
+
+            return redirect('source', pk=meta_object.pk)
+
+        elif 'delete_comment' in request.POST:
+            comment_id = int(request.POST["delete_comment"])
+            try:
+                Comment.objects.get(
+                    meta_source=meta_object, created_by=request.user).delete()
+            except Comment.DoesNotExist:
+                logging.log(logging.WARN,
+                            f"Requested to delete comment with id "
+                            f"{comment_id}, but there is no such comment!")
+
+            return redirect('source', pk=meta_object.pk)
+
         # Create/Edit comment for xray data
         elif 'opt_comment' in request.POST:
             # Edit existing opt_comment or create new one
@@ -214,10 +239,31 @@ def source(request, pk):
         # opt counterpart
         opt_cp_form = OptCounterpartForm(opt_sources_ids)
 
-    return render(request, 'source.html', {'surveys': surveys, 'meta_group': meta_group, 'meta_object': meta_object,
-                                           'sources': sources, 'admin_class': admin_class, 'form': form,
-                                           'opt_form': opt_form, 'opt_cp_form': opt_cp_form, 'opt_surveys': opt_surveys,
-                                           'master_source': master_source, 'opt_survey_sources': opt_survey_sources})
+        try:
+            Comment.objects.get(
+                meta_source=meta_object, created_by=request.user)
+            comment_posted_by_user = True
+        except Comment.DoesNotExist:
+            comment_posted_by_user = False
+
+        try:
+            OptComment.objects.get(
+                meta_source=meta_object, created_by=request.user)
+            opt_comment_posted_by_user = True
+        except OptComment.DoesNotExist:
+            opt_comment_posted_by_user = False
+
+    return render(
+        request, 'source.html',
+        {
+            'surveys': surveys, 'meta_group': meta_group, 'meta_object': meta_object,
+            'sources': sources, 'admin_class': admin_class, 'form': form,
+            'opt_form': opt_form, 'opt_cp_form': opt_cp_form, 'opt_surveys': opt_surveys,
+            'master_source': master_source, 'opt_survey_sources': opt_survey_sources,
+            'comment_posted_by_user': comment_posted_by_user,
+            'opt_comment_posted_by_user': opt_comment_posted_by_user,
+        }
+    )
 
 
 @login_required

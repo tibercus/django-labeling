@@ -23,7 +23,7 @@ def mag_ab_from_flux_jy(flux_column: str) -> CombinedExpression:
     Formula taken from here
     https://iopscience.iop.org/article/10.1088/0004-637X/750/2/99
     """
-    return -2.5 * Log(10, F(flux_column) / 3631)
+    return - 2.5 * Log(10, F(flux_column) / 3631)
 
 
 def mag_err_ab_from_flux_jy(
