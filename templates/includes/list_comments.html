@@ -36,7 +36,7 @@
                       <button type="submit" class="btn btn-sm btn-outline-success" value="button" name="final">Final</button>
                   </form>
 
-                    {% if user == comment.created_by %}
+                    {% if user == comment.created_by %} {# Eidt comment #}
                         <script>
                             $(document).ready(function(){
                                 let content = $('[data-name="popover-content-edit-comment"]')[0];
@@ -58,6 +58,31 @@
                            data-container="body"
                            role="button"
                            data-toggle="popover-edit-message"
+                           data-placement="bottom">
+                            Edit
+                        </a>
+                    </div>
+                    {% endif %}
+                {% else %}  {# Edit opt comment #}
+                    {% if user == comment.created_by %}
+                        <script>
+                            $(document).ready(function(){
+                                let content = $('[data-name="popover-content-edit-opt-comment"]')[0];
+                                content.getElementsByTagName("textarea")[0].defaultValue = `{{ comment.comment }}`;
+                                content.getElementsByTagName("textarea")[1].defaultValue = `{{ comment.follow_up }}`;
+                                $('[data-toggle="popover-edit-opt-message"]').popover({
+                                    title: '<h3 class="custom-title"><i class="fa fa-info-circle"></i>Edit comment:</h3>',
+                                    content: content,
+                                    html: true
+                                });
+                            });
+                        </script>
+                    <div>
+                        <a tabindex="0"
+                           class="btn btn-sm btn-outline-info"
+                           data-container="body"
+                           role="button"
+                           data-toggle="popover-edit-opt-message"
                            data-placement="bottom">
                             Edit
                         </a>
@@ -89,6 +114,18 @@
             {% csrf_token %}
             {% include 'includes/form.html' %}
             <button type="submit" class="btn btn-success" value="button" name="x_comment">Post</button>
+        </form>
+    </div>
+</div>
+
+<div hidden>
+    <div data-name="popover-content-edit-opt-comment">
+        <form id="opt_comment_form" method="post">
+            {% with opt_form as form %}
+                {% csrf_token %}
+                {% include 'includes/form.html' %}
+            {% endwith %}
+            <button type="submit" class="btn btn-success" value="button" name="opt_comment">Post</button>
         </form>
     </div>
 </div>
