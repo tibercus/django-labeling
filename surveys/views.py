@@ -27,6 +27,15 @@ def home(request):
     # filter meta objects
     f = MetaObjFilter(request.GET, queryset=MetaObject.objects.all().order_by(F('pk').desc(nulls_last=True)), user=request.user)
     meta_queryset = f.qs
+
+    # TODO FK and Many-to-many filtering
+    # for field, methods in MetaObjFilter.Meta.fields.items():
+    #     for method in methods:
+    #         filter_method = f"{field}__{method}"
+    #         value = request.GET.get(filter_method)
+    #         if value is not None and value != "":
+    #             meta_queryset = meta_queryset.filter()
+
     # print current GET request
     # print(f'Request: {request.GET.urlencode}')
     # print(f'Sort by: {request.GET.get("sort_by")}')
@@ -43,7 +52,7 @@ def home(request):
     cone_search = None
     cs_ra = request.GET.get("cs_RA"); cs_dec = request.GET.get("cs_DEC"); cs_r = request.GET.get("cs_r")
     if cs_ra and cs_dec and cs_r:
-        cone_search = 'Cone Search for \nRA: {0} \nDEC: {1} \nR: {2}'.format(cs_ra, cs_dec, cs_r)
+        cone_search = dict(ra=cs_ra, dec=cs_dec, r=cs_r)
         # print(cone_search)
         meta_queryset = cone_search_filter(meta_queryset, cs_ra, cs_dec, cs_r)
 

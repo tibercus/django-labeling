@@ -49,17 +49,17 @@
                             <h6 class="text-center mt-5"> Cone Search </h6>
                             <div class="form-group" style="width: 100px">
                                 <label class="form-label mt-2" for="cs_RA">RA</label>
-                                <input type="number" name="cs_RA" id="cs_RA" step="any" />
+                                <input type="number" name="cs_RA" id="cs_RA" step="any" class="form-control"
+                                       value="{% if cone_search %}{{ cone_search.ra }}{% endif %}"/>
 
                                 <label class="form-label mt-2" for="cs_DEC">DEC</label>
-                                <input type="number" name="cs_DEC" id="cs_DEC" step="any" />
+                                <input type="number" name="cs_DEC" id="cs_DEC" step="any" class="form-control"
+                                       value="{% if cone_search %}{{ cone_search.dec }}{% endif %}"/>
 
                                 <label class="form-label mt-2" for="cs_r">R</label>
-                                <input type="number" name="cs_r" id="cs_r" step="any" />
+                                <input type="number" name="cs_r" id="cs_r" step="any" class="form-control"
+                                       value="{% if cone_search %}{{ cone_search.r }}{% endif %}"/>
                             </div>
-                            {% if cone_search %}
-                                    <p class="text-center" style="width: 200px">{{ cone_search|linebreaksbr }}</p>
-                            {% endif %}
                         </div>
 
                         {%  comment %} Filter Meta Obj by pre-class flags {% endcomment %}
