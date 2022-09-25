@@ -11,19 +11,19 @@
         <b>Optical: </b>
         <input id="PS_DR1_g" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/g", "reverse": true }' checked><label for="PS_DR1_g">PS1_DR1 g</label>
         <input id="PS_DR1_z" type="radio" name="survey" value='{ "survey": "P/PanSTARRS/DR1/z", "reverse": true }'><label for="PS_DR1_z">PS_DR1 z</label>
-        <b>IR: </b>
-        <input id="allwise" type="radio" name="survey" value='{ "survey": "P/allWISE/color", "colormap": "grayscale", "reverse": true }'><label for="allwise">AllWISE</label>
+        <input id="GAIAedr3" type="radio" name="survey" value='{ "survey": "GAIAedr3", "reverse": true }'><label for="GAIAedr3">GAIA edr3</label>
     </p>
     <p class="m-0">
+        <b>IR: </b>
+        <input id="allwise" type="radio" name="survey" value='{ "survey": "P/allWISE/color", "colormap": "grayscale", "reverse": true }'><label for="allwise">AllWISE</label>
         <b>Radio: </b>
         <input id="vlass" type="radio" name="survey" value='{ "survey": "VLASS", "reverse": true }'><label for="vlass">VLASS (NVSS)</label>
-        <b>???: </b>
-        <input id="GAIAedr3" type="radio" name="survey" value='{ "survey": "GAIAedr3", "reverse": true }'><label for="GAIAedr3">GAIA edr3</label>
+        <b>UV: </b>
         <input id="galex" type="radio" name="survey" value='{ "survey": "P/GALEXGR6/AIS/color", "reverse": true }'><label for="galex">GALEX</label>
     </p>
     <p class="m-0">
         <b>X-Ray: </b>
-        <input id="rosat" type="radio" name="survey" value='{ "survey": "ROSAT", "reverse": true }'><label for="rosat">ROSAT</label>
+        <input id="rosat" type="radio" name="survey" value='{ "survey": "ROSAT", "reverse": true }'><label for="rosat">RASS</label>
     </p>
 
     {% comment %} Creation of Aladin Lite instance (TODO make a separate js-script) {% endcomment %}

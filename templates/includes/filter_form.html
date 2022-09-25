@@ -1,4 +1,149 @@
 {% load form_tags widget_tweaks %}
+
+{#<script>#}
+{#    // be careful, this code is a total trash!#}
+{#    // it uses global variables, cause I'm a newbie in JS:(#}
+{##}
+{#    class FilterConfig {#}
+{#        constructor(field_name, filter_class) {#}
+{#            this.field_name = field_name;#}
+{#            this.filter_class = filter_class;#}
+{#        }#}
+{#    }#}
+{##}
+{#    class BaseFilter {#}
+{#        constructor(number) {#}
+{#            this.number = number; // number identifier#}
+{#            this.id = BaseFilter.get_id(number); // identifier in format "sources-filtering-<number>"#}
+{#        }#}
+{##}
+{#        static get_id(number) {#}
+{#            return `sources-filtering-${number}`;#}
+{#        }#}
+{##}
+{#        // TODO add single get number and single get id for all types of element's ids#}
+{##}
+{#        static get_number_from_id(id) {#}
+{#            const regexp = /sources-filtering-(\d+)/;#}
+{#            return id.match(regexp)[1];#}
+{#        }#}
+{##}
+{#        static get_number_from_button_id(button_id) {#}
+{#            const regexp = /sources-filtering-(\d+)-button-.*/;#}
+{#            return button_id.match(regexp)[1];#}
+{#        }#}
+{##}
+{#        static get_id_from_button_id(button_id) {#}
+{#            return BaseFilter.get_id(BaseFilter.get_number_from_button_id(button_id));#}
+{#        }#}
+{##}
+{#        static get_condition_id_from_id(id) {#}
+{#            return `${id}-condition`;#}
+{#        }#}
+{##}
+{#        render_specific_filter() {#}
+{#            console.log("constructing specific filter for" + this.id);#}
+{#        }#}
+{##}
+{#        render() {#}
+{#            let options_list = "";#}
+{#            for (let filter_config of available_filters) {#}
+{#                options_list += `<option>${filter_config.field_name}</option>`;#}
+{#            }#}
+{##}
+{#            return `#}
+{#                <div id="${this.id}">#}
+{#                    Filter No. ${this.number}#}
+{#                    <select id=${this.id}, onchange="new BaseFilter(BaseFilter.get_number_from_id(this.id)).render_specific_filter();">#}
+{#                        ${options_list}#}
+{#                    </select>#}
+{#                    <div id="${BaseFilter.get_condition_id_from_id(this.id)}"></div>#}
+{#                    <button id="${this.id}-button-minus"#}
+{#                            type="button" class="btn btn-primary btn-md"#}
+{#                            onclick="new BaseFilter(BaseFilter.get_number_from_button_id(this.id)).remove();">#}
+{#                        -#}
+{#                    </button>#}
+{#                    <button id="sources-filtering-${this.id}-button-plus"#}
+{#                            type="button" class="btn btn-primary btn-md"#}
+{#                            onclick="add_filter(); document.getElementById(this.id).remove();">#}
+{#                        +#}
+{#                    </button>#}
+{#                </div>#}
+{#            `;#}
+{#        }#}
+{##}
+{#        remove() {#}
+{#            document.getElementById(this.id).remove();#}
+{#            remove_filter(this);#}
+{#            if (no_more_filters_left()) {#}
+{#                add_filter();#}
+{#            }#}
+{#        }#}
+{##}
+{#        remove_plus_button() {#}
+{#            document.getElementById(`${this.id}-button-plus`).remove();#}
+{#        }#}
+{##}
+{#        add_plus_button() {#}
+{#            console.log("Adding plus button");#}
+{#            document.getElementById(this.id).innerHTML +=#}
+{#                `<button id="sources-filtering-${this.id}-button-plus"#}
+{#                        type="button" class="btn btn-primary btn-md"#}
+{#                        onclick="add_filter(); document.getElementById(this.id).remove();">#}
+{#                    +#}
+{#                </button>`;#}
+{#        }#}
+{#    }#}
+{##}
+{#    class NumberFilter extends BaseFilter {#}
+{#        render() {#}
+            {#super.render();#}
+{#            const condition_id = BaseFilter.get_condition_id_from_id(this.id);#}
+{#            console.log(condition_id);#}
+{#            document.getElementById(condition_id).innerHTML = `#}
+{#                <label for="${condition_id}-from"> >= </label>#}
+{#                <input id="${condition_id}-from">#}
+{#                <label for="${condition_id}-to"> <= </label>#}
+{#                <input id="${condition_id}-to">#}
+{#            `;#}
+{#        }#}
+{#    }#}
+{##}
+{#    function add_filter() {#}
+{#        let filter = new BaseFilter(filters_count++);#}
+{#        console.log("adding filter " + filter.id);#}
+{#        filters_list.push(filter);#}
+{#        document.getElementById("Filters").innerHTML += filter.render();#}
+{#    }#}
+{##}
+{#    function remove_filter(filter) {#}
+{#        const index = filters_list.map(e => e.id).indexOf(filter.id);#}
+{#        console.log(index, filters_list.length);#}
+{#        filters_list.splice(index, 1);#}
+{#        console.log(index === filters_list.length && index > 0, index, filters_list.length)#}
+{#        if (index === filters_list.length && index > 0) {#}
+{#            filters_list[index-1].add_plus_button();#}
+{#        }#}
+{#    }#}
+{##}
+{#    function no_more_filters_left() {#}
+{#        return filters_list.length === 0;#}
+{#    }#}
+{##}
+{#    // variables to control list of available filters#}
+{#    var available_filters = [#}
+{#        new FilterConfig("some_magnitude", NumberFilter),#}
+{#        new FilterConfig("other_magnitude", NumberFilter),#}
+{#    ]#}
+{#    var filters_list = [];#}
+{#    var filters_count = 0;#}
+{#</script>#}
+{##}
+{#<div id="Filters">#}
+{#    <script>add_filter();</script>#}
+{#</div>#}
+
+
 <div class="row">
     {% for field in form %}
         {% if field.label not in not_simple_filter %}

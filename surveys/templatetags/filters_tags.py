@@ -178,3 +178,14 @@ def field_verbose_name(obj: Model, field: str) -> str:
         return model_field.verbose_name
     except AttributeError:
         return model_field.name
+
+
+@register.simple_tag
+def show_value_for_boolean_or_unknown(
+        value: bool or None,
+        true: str, false: str, unknown: str = ""):
+
+    if value is None:
+        return unknown
+
+    return true if value else false
