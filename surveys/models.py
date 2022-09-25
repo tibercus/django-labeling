@@ -5,7 +5,7 @@ sources in required optical surveys.
 
 TODO Refactor models: create several smaller modules.
 TODO Refactor models: add verbose names for attributes."""
-
+import json
 from typing import Tuple, List, Optional
 
 import re
@@ -352,6 +352,22 @@ class MetaObjFilter(django_filters.FilterSet):
                   'RATIO_e4e3': ['gt', 'lt'],
                   'RFLAG_e4e3': ['gt', 'lt'],
                   }
+
+    @property
+    def filter_custom_config_json(self):
+        config = dict()
+        config["RA"] = "numeric"
+        config["DEC"] = "numeric"
+        config["GLON"] = "numeric"
+        config["GLAT"] = "numeric"
+        config["LIKE"] = "numeric"
+        config["RATIO_e2e1"] = "numeric"
+        config["RFLAG_e2e1"] = "numeric"
+        config["RATIO_e3e2"] = "numeric"
+        config["RFLAG_e3e2"] = "numeric"
+        config["RATIO_e4e3"] = "numeric"
+        config["RFLAG_e4e3"] = "numeric"
+        return json.dumps(config)
 
     @staticmethod
     def ext_gt_zero(queryset, name, value):

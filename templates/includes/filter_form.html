@@ -1,166 +1,235 @@
 {% load form_tags widget_tweaks %}
 
-{#<script>#}
-{#    // be careful, this code is a total trash!#}
-{#    // it uses global variables, cause I'm a newbie in JS:(#}
-{##}
-{#    class FilterConfig {#}
-{#        constructor(field_name, filter_class) {#}
-{#            this.field_name = field_name;#}
-{#            this.filter_class = filter_class;#}
-{#        }#}
-{#    }#}
-{##}
-{#    class BaseFilter {#}
-{#        constructor(number) {#}
-{#            this.number = number; // number identifier#}
-{#            this.id = BaseFilter.get_id(number); // identifier in format "sources-filtering-<number>"#}
-{#        }#}
-{##}
-{#        static get_id(number) {#}
-{#            return `sources-filtering-${number}`;#}
-{#        }#}
-{##}
-{#        // TODO add single get number and single get id for all types of element's ids#}
-{##}
-{#        static get_number_from_id(id) {#}
-{#            const regexp = /sources-filtering-(\d+)/;#}
-{#            return id.match(regexp)[1];#}
-{#        }#}
-{##}
-{#        static get_number_from_button_id(button_id) {#}
-{#            const regexp = /sources-filtering-(\d+)-button-.*/;#}
-{#            return button_id.match(regexp)[1];#}
-{#        }#}
-{##}
-{#        static get_id_from_button_id(button_id) {#}
-{#            return BaseFilter.get_id(BaseFilter.get_number_from_button_id(button_id));#}
-{#        }#}
-{##}
-{#        static get_condition_id_from_id(id) {#}
-{#            return `${id}-condition`;#}
-{#        }#}
-{##}
-{#        render_specific_filter() {#}
-{#            console.log("constructing specific filter for" + this.id);#}
-{#        }#}
-{##}
-{#        render() {#}
-{#            let options_list = "";#}
-{#            for (let filter_config of available_filters) {#}
-{#                options_list += `<option>${filter_config.field_name}</option>`;#}
-{#            }#}
-{##}
-{#            return `#}
-{#                <div id="${this.id}">#}
-{#                    Filter No. ${this.number}#}
-{#                    <select id=${this.id}, onchange="new BaseFilter(BaseFilter.get_number_from_id(this.id)).render_specific_filter();">#}
-{#                        ${options_list}#}
-{#                    </select>#}
-{#                    <div id="${BaseFilter.get_condition_id_from_id(this.id)}"></div>#}
-{#                    <button id="${this.id}-button-minus"#}
-{#                            type="button" class="btn btn-primary btn-md"#}
-{#                            onclick="new BaseFilter(BaseFilter.get_number_from_button_id(this.id)).remove();">#}
-{#                        -#}
-{#                    </button>#}
-{#                    <button id="sources-filtering-${this.id}-button-plus"#}
-{#                            type="button" class="btn btn-primary btn-md"#}
-{#                            onclick="add_filter(); document.getElementById(this.id).remove();">#}
-{#                        +#}
-{#                    </button>#}
-{#                </div>#}
-{#            `;#}
-{#        }#}
-{##}
-{#        remove() {#}
-{#            document.getElementById(this.id).remove();#}
-{#            remove_filter(this);#}
-{#            if (no_more_filters_left()) {#}
-{#                add_filter();#}
-{#            }#}
-{#        }#}
-{##}
-{#        remove_plus_button() {#}
-{#            document.getElementById(`${this.id}-button-plus`).remove();#}
-{#        }#}
-{##}
-{#        add_plus_button() {#}
-{#            console.log("Adding plus button");#}
-{#            document.getElementById(this.id).innerHTML +=#}
-{#                `<button id="sources-filtering-${this.id}-button-plus"#}
-{#                        type="button" class="btn btn-primary btn-md"#}
-{#                        onclick="add_filter(); document.getElementById(this.id).remove();">#}
-{#                    +#}
-{#                </button>`;#}
-{#        }#}
-{#    }#}
-{##}
-{#    class NumberFilter extends BaseFilter {#}
-{#        render() {#}
-            {#super.render();#}
-{#            const condition_id = BaseFilter.get_condition_id_from_id(this.id);#}
-{#            console.log(condition_id);#}
-{#            document.getElementById(condition_id).innerHTML = `#}
-{#                <label for="${condition_id}-from"> >= </label>#}
-{#                <input id="${condition_id}-from">#}
-{#                <label for="${condition_id}-to"> <= </label>#}
-{#                <input id="${condition_id}-to">#}
-{#            `;#}
-{#        }#}
-{#    }#}
-{##}
-{#    function add_filter() {#}
-{#        let filter = new BaseFilter(filters_count++);#}
-{#        console.log("adding filter " + filter.id);#}
-{#        filters_list.push(filter);#}
-{#        document.getElementById("Filters").innerHTML += filter.render();#}
-{#    }#}
-{##}
-{#    function remove_filter(filter) {#}
-{#        const index = filters_list.map(e => e.id).indexOf(filter.id);#}
-{#        console.log(index, filters_list.length);#}
-{#        filters_list.splice(index, 1);#}
-{#        console.log(index === filters_list.length && index > 0, index, filters_list.length)#}
-{#        if (index === filters_list.length && index > 0) {#}
-{#            filters_list[index-1].add_plus_button();#}
-{#        }#}
-{#    }#}
-{##}
-{#    function no_more_filters_left() {#}
-{#        return filters_list.length === 0;#}
-{#    }#}
-{##}
-{#    // variables to control list of available filters#}
-{#    var available_filters = [#}
-{#        new FilterConfig("some_magnitude", NumberFilter),#}
-{#        new FilterConfig("other_magnitude", NumberFilter),#}
-{#    ]#}
-{#    var filters_list = [];#}
-{#    var filters_count = 0;#}
-{#</script>#}
-{##}
-{#<div id="Filters">#}
-{#    <script>add_filter();</script>#}
-{#</div>#}
+<script>
+    function parseJSONFromDiv(element_id) {
+        return $.parseJSON($(element_id).text());
+    }
 
+    class FilterTypes {
+        static NOTYPE = null;
+        static NUMERIC = "numeric";
+        static CATEGORY = "category";
+    }
 
-<div class="row">
-    {% for field in form %}
-        {% if field.label not in not_simple_filter %}
-        <div class="form-group">
-            <div class="col">
-                {{ field.label_tag }}
-                {{ field|add_class:'form-control' }}
-                {% for error in field.errors %}
-                    <span class="help-block">{{ error }}</span>
-                {% endfor %}
-                {% if field.help_text %}
-                    <small class="form-text text-muted">
-                        {{ field.help_text|safe }}
-                    </small>
-                {% endif %}
+    var filters_count = 0;
+    const url = new URL(window.location.href);
+    var available_filters;
+
+    class DefaultValueUtils {
+        static setInputValue(element_id, value) {
+            $(document).ready(function () {
+                const input_elemnt = document.getElementById(element_id);
+                input_elemnt.value = value;
+            })
+        }
+        static setSelectValue(element_id, value) {
+            $(document).ready(function () {
+                const select_element = document.getElementById(element_id);
+                select_element.value = value;
+            });
+        }
+    }
+
+    class FilterIdConverter {
+        static parseId(id_string) {
+            const regexp = /sources-filtering-(\d+)(-.*)?/;
+            return id_string.match(regexp)[1];
+        }
+
+        static idFromNumberId(number_id) {
+            return `sources-filtering-${number_id}`;
+        }
+
+        static selectIdFromNumberId(number_id) {
+            return `${FilterIdConverter.idFromNumberId(number_id)}-select`;
+        }
+
+        static conditionIdFromNumberId(number_id) {
+            return `${FilterIdConverter.idFromNumberId(number_id)}-condition`;
+        }
+
+        static buttonPlusIdFromNumberId(number_id) {
+            return `${FilterIdConverter.idFromNumberId(number_id)}-button-plus`;
+        }
+
+        static buttonMinusIdFromNumberId(number_id) {
+            return `${FilterIdConverter.idFromNumberId(number_id)}-button-minus`;
+        }
+    }
+
+    class FilterTools {
+        static addPlusButton(filter_id) {
+            document.getElementById(FilterIdConverter.idFromNumberId(filter_id)).innerHTML +=
+                `<button id="${FilterIdConverter.buttonPlusIdFromNumberId(filter_id)}"
+                        type="button" class="btn btn-primary btn-md"
+                        onclick="add_filter(); document.getElementById(this.id).remove();">
+                    +
+                </button>`
+        }
+
+        static removeFilterOnMinusButton(button_id) {
+            let filter_id = FilterIdConverter.parseId(button_id);
+            let has_plus_button = !(document.getElementById(
+                FilterIdConverter.buttonPlusIdFromNumberId(filter_id)
+            ) === null);
+            document.getElementById(FilterIdConverter.idFromNumberId(filter_id)).remove();
+
+            if (!has_plus_button) {
+                return;
+            }
+
+            while (document.getElementById(FilterIdConverter.idFromNumberId(filter_id)) === null
+                    && filter_id >= 0) {
+                filter_id--;
+            }
+
+            if (filter_id < 0) {
+                add_filter();
+                return;
+            }
+
+            FilterTools.addPlusButton(filter_id);
+        }
+
+        static renderFilterCondition(filter_id, field_id=null) {
+            let condition_element = document.getElementById(
+                FilterIdConverter.conditionIdFromNumberId(filter_id));
+            const select_element = document.getElementById(
+                FilterIdConverter.selectIdFromNumberId(filter_id));
+            if (field_id === null) {
+                field_id = select_element.value;
+            } else {
+                // for some reason `select_element.value = field_id;` does not work here.
+                DefaultValueUtils.setSelectValue(
+                    FilterIdConverter.selectIdFromNumberId(filter_id), field_id
+                );
+            }
+            let filter_type = available_filters[field_id];
+            let condition_html;
+
+            switch (filter_type) {
+                case "numeric": condition_html = `
+                    values in range from:
+                    <input type="number" name="${field_id}__gt" step="any" class="form-control" id="id_${field_id}__gt">
+                    to
+                    <input type="number" name="${field_id}__lt" step="any" class="form-control" id="id_${field_id}__lt">
+                `; break;
+                case "category": condition_html = `
+                    choose value from: <select>
+                        <option>Lol</option>
+                        <option>Kek</option>
+                    </select>
+                `; break
+                default: condition_html = "";
+            }
+
+            condition_element.innerHTML = condition_html;
+        }
+
+        static removePlusButton(filter_id) {
+            document.getElementById(
+                FilterIdConverter.buttonPlusIdFromNumberId(filter_id)
+            ).remove();
+        }
+    }
+
+    function add_filter() {
+        let filter_id = filters_count++;
+        let new_filter = document.createElement("DIV");
+        new_filter.innerHTML = render_filter(filter_id);
+        document.getElementById("sources-filters").appendChild(new_filter);
+        return filter_id;
+    }
+
+    function render_filter(filter_id) {
+        let options_list = "";
+        for (let field_id in available_filters) {
+            options_list += `<option value="${field_id}">${field_id}</option>`;
+        }
+
+        return `
+            <div id="${FilterIdConverter.idFromNumberId(filter_id)}">
+                Filter No. ${FilterIdConverter.idFromNumberId(filter_id)}
+                <select id=${FilterIdConverter.selectIdFromNumberId(filter_id)}
+                        onchange="FilterTools.renderFilterCondition(FilterIdConverter.parseId(this.id))">
+                    ${options_list}
+                </select>
+                <div id="${FilterIdConverter.conditionIdFromNumberId(filter_id)}"></div>
+                <button id="${FilterIdConverter.buttonMinusIdFromNumberId(filter_id)}"
+                        type="button" class="btn btn-primary btn-md"
+                        onclick="FilterTools.removeFilterOnMinusButton(this.id);">
+                    -
+                </button>
+                <button id="${FilterIdConverter.buttonPlusIdFromNumberId(filter_id)}"
+                        type="button" class="btn btn-primary btn-md"
+                        onclick="add_filter(); FilterTools.removePlusButton(FilterIdConverter.parseId(this.id));">
+                    +
+                </button>
             </div>
-        </div>
-        {% endif %}
-    {% endfor %}
+        `;
+    }
+
+    function initializeFilters() {
+        available_filters = Object.assign(
+            {"-- Choose Filter --": FilterTypes.NOTYPE},
+            parseJSONFromDiv("#sources-filters-available-fields"),
+        );
+        for (let field_id in available_filters) {
+            let field_type = available_filters[field_id];
+            if (field_type === null) {
+                continue;
+            }
+
+            if (field_type === FilterTypes.NUMERIC) {
+                let id_from = `${field_id}__gt`;
+                let id_to = `${field_id}__lt`;
+                let value_from = url.searchParams.get(id_from);
+                let value_to = url.searchParams.get(id_to);
+
+                if (value_from === null && value_to === null) {
+                    continue;
+                }
+
+                let filter_id = add_filter();
+                FilterTools.removePlusButton(filter_id);
+                FilterTools.renderFilterCondition(filter_id, field_id);
+                if (value_from !== null) {
+                    DefaultValueUtils.setInputValue(`id_${field_id}__gt`, value_from);
+                }
+                if (value_to !== null) {
+                    DefaultValueUtils.setInputValue(`id_${field_id}__lt`, value_to);
+                }
+            }
+        }
+        add_filter();
+    }
+</script>
+
+<div id="sources-filters">
+    <div hidden id="sources-filters-available-fields">
+        {{ filter_custom_config_json }}
+    </div>
+    <script>initializeFilters();</script>
 </div>
+
+
+{#<div class="row">#}
+{#    {% for field in form %}#}
+{#        {% if field.label not in not_simple_filter %}#}
+{#        <div class="form-group">#}
+{#            <div class="col">#}
+{#                {{ field.label_tag }}#}
+{#                {{ field|add_class:'form-control' }}#}
+{#                {% for error in field.errors %}#}
+{#                    <span class="help-block">{{ error }}</span>#}
+{#                {% endfor %}#}
+{#                {% if field.help_text %}#}
+{#                    <small class="form-text text-muted">#}
+{#                        {{ field.help_text|safe }}#}
+{#                    </small>#}
+{#                {% endif %}#}
+{#            </div>#}
+{#        </div>#}
+{#        {% endif %}#}
+{#    {% endfor %}#}
+{#</div>#}

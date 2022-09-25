@@ -72,6 +72,7 @@ def home(request):
         'home.html',
         {
             'filter': f,
+            'filter_custom_config_json': f.filter_custom_config_json,
             'meta_objects': meta_objects,
             'meta_fields': MetaObject.fields_to_show(),
             'master_fields': master_fields,
