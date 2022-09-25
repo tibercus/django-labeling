@@ -10,39 +10,13 @@
                 <th>{{ opt_sources.first|field_verbose_name:'ra'                           }}</th>
                 <th>{{ opt_sources.first|field_verbose_name:'dec'                          }}</th>
                 <th>{{ opt_sources.first|field_verbose_name:'star'                         }}</th>
+                <th>{{ opt_sources.first|field_verbose_name:'autoclass_star'               }}</th>
                 <th>{{ opt_sources.first|field_verbose_name:'parallax'                     }}</th>
                 <th>{{ opt_sources.first|field_verbose_name:'parallax_error'               }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'pm'                           }}</th>
                 <th>{{ opt_sources.first|field_verbose_name:'pmra'                         }}</th>
                 <th>{{ opt_sources.first|field_verbose_name:'pmra_error'                   }}</th>
                 <th>{{ opt_sources.first|field_verbose_name:'pmdec'                        }}</th>
                 <th>{{ opt_sources.first|field_verbose_name:'pmdec_error'                  }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'astrometric_n_good_obs_al'    }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'astrometric_gof_al'           }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'astrometric_chi2_al'          }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'astrometric_excess_noise'     }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'astrometric_excess_noise_sig' }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'pseudocolour'                 }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'pseudocolour_error'           }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'visibility_periods_used'      }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'ruwe'                         }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'duplicated_source'            }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_g_n_obs'                 }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_g_mean_mag'              }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_bp_mean_flux'            }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_bp_mean_flux_error'      }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_bp_mean_mag'             }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_rp_mean_flux'            }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_rp_mean_flux_error'      }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_rp_mean_mag'             }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'dr2_radial_velocity'          }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'dr2_radial_velocity_error'    }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'ecl_lon'                      }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'ecl_lat'                      }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_g_mean_flux'             }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'phot_g_mean_flux_error'       }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'xray_sources'                 }}</th>
-                <th>{{ opt_sources.first|field_verbose_name:'origin_file'                  }}</th>
             </tr>
         </thead>
         <tbody>
@@ -53,42 +27,16 @@
                     <td class="align-middle"> {{ sep|stringformat:".5f"}} </td>
                     <td class="align-middle">{{ opt_source.opt_id                       }}</td>
                     <td class="align-middle">{{ opt_source.objID                        }}</td>
-                    <td class="align-middle">{{ opt_source.ra|stringformat:".3f"                           }}</td>
-                    <td class="align-middle">{{ opt_source.dec|stringformat:".3f"                          }}</td>
+                    <td class="align-middle">{{ opt_source.ra|stringformat:".5f"                           }}</td>
+                    <td class="align-middle">{{ opt_source.dec|stringformat:".5f"                          }}</td>
                     <td class="align-middle">{{ opt_source.star                                            }}</td>
+                    <td class="align-middle">{% show_value_for_boolean_or_unknown opt_source.autoclass_star "Star" "Non-star" %}</td>
                     <td class="align-middle">{{ opt_source.parallax|stringformat:".3f"                     }}</td>
                     <td class="align-middle">{{ opt_source.parallax_error|stringformat:".3f"               }}</td>
-                    <td class="align-middle">{{ opt_source.pm|stringformat:".3f"                           }}</td>
                     <td class="align-middle">{{ opt_source.pmra|stringformat:".3f"                         }}</td>
                     <td class="align-middle">{{ opt_source.pmra_error|stringformat:".3f"                   }}</td>
                     <td class="align-middle">{{ opt_source.pmdec|stringformat:".3f"                        }}</td>
                     <td class="align-middle">{{ opt_source.pmdec_error|stringformat:".3f"                  }}</td>
-                    <td class="align-middle">{{ opt_source.astrometric_n_good_obs_al                       }}</td>
-                    <td class="align-middle">{{ opt_source.astrometric_gof_al|stringformat:".3f"           }}</td>
-                    <td class="align-middle">{{ opt_source.astrometric_chi2_al|stringformat:".3f"          }}</td>
-                    <td class="align-middle">{{ opt_source.astrometric_excess_noise|stringformat:".3f"     }}</td>
-                    <td class="align-middle">{{ opt_source.astrometric_excess_noise_sig|stringformat:".3f" }}</td>
-                    <td class="align-middle">{{ opt_source.pseudocolour|stringformat:".3f"                 }}</td>
-                    <td class="align-middle">{{ opt_source.pseudocolour_error|stringformat:".3f"           }}</td>
-                    <td class="align-middle">{{ opt_source.visibility_periods_used                         }}</td>
-                    <td class="align-middle">{{ opt_source.ruwe|stringformat:".3f"                         }}</td>
-                    <td class="align-middle">{{ opt_source.duplicated_source                               }}</td>
-                    <td class="align-middle">{{ opt_source.phot_g_n_obs                                    }}</td>
-                    <td class="align-middle">{{ opt_source.phot_g_mean_mag|stringformat:".3f"              }}</td>
-                    <td class="align-middle">{{ opt_source.phot_bp_mean_flux|stringformat:".3f"            }}</td>
-                    <td class="align-middle">{{ opt_source.phot_bp_mean_flux_error|stringformat:".3f"      }}</td>
-                    <td class="align-middle">{{ opt_source.phot_bp_mean_mag|stringformat:".3f"             }}</td>
-                    <td class="align-middle">{{ opt_source.phot_rp_mean_flux|stringformat:".3f"            }}</td>
-                    <td class="align-middle">{{ opt_source.phot_rp_mean_flux_error|stringformat:".3f"      }}</td>
-                    <td class="align-middle">{{ opt_source.phot_rp_mean_mag|stringformat:".3f"             }}</td>
-                    <td class="align-middle">{{ opt_source.dr2_radial_velocity|stringformat:".3f"          }}</td>
-                    <td class="align-middle">{{ opt_source.dr2_radial_velocity_error|stringformat:".3f"    }}</td>
-                    <td class="align-middle">{{ opt_source.ecl_lon|stringformat:".3f"                      }}</td>
-                    <td class="align-middle">{{ opt_source.ecl_lat|stringformat:".3f"                      }}</td>
-                    <td class="align-middle">{{ opt_source.phot_g_mean_flux|stringformat:".3f"             }}</td>
-                    <td class="align-middle">{{ opt_source.phot_g_mean_flux_error|stringformat:".3f"       }}</td>
-                    <td class="align-middle">{{ opt_source.xray_sources                                    }}</td>
-                    <td class="align-middle">{{ opt_source.origin_file                                     }}</td>
                 </tr>
             {% endfor %}
         {% endif %}

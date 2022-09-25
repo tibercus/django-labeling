@@ -6,7 +6,7 @@ sources in required optical surveys.
 TODO Refactor models: create several smaller modules.
 TODO Refactor models: add verbose names for attributes."""
 
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 import re
 from typing import Type
@@ -1194,6 +1194,37 @@ class GAIA(models.Model):
     # File from which source was loaded to system
     origin_file = models.ForeignKey(OriginFile, on_delete=models.CASCADE, related_name='gaia_sources', blank=True,
                                     null=True)
+
+    autoclass_star = models.BooleanField(
+        default=None, null=True,
+        verbose_name="Star auto-class"
+    )
+
+    def save(self, *args, **kwargs):
+        """Save method for automatic attributes calculation."""
+        self.autoclass_star = self.calculate_autoclass_star()
+        super().save(*args, **kwargs)
+
+    def calculate_autoclass_star(self) -> Optional[bool]:
+        """Automatic star/non-star classification based on GAIA edr3
+        parallax data.
+        """
+        def criteria(parallax, parallax_error) -> Optional[bool]:
+            if parallax is None or parallax_error is None:
+                return None
+
+            return abs(parallax) > 5 * abs(parallax_error)
+
+        result = (
+            criteria(self.parallax, self.parallax_error),
+            criteria(self.pmra, self.pmra_error),
+            criteria(self.pmdec, self.pmdec_error),
+        )
+
+        if all(e is None for e in result):
+            return None
+
+        return any(result)
 
     def __str__(self):
         return '{} - GAIA Source: {}'.format(self.opt_hpidx, self.opt_id)

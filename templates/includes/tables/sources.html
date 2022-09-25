@@ -5,12 +5,21 @@
         <thead class="thead-dark">
 
             <tr>
-                <th colspan="8" scope="colgroup"></th>
-                <th colspan="6" scope="colgroup">eRosita</th>
-                <th colspan="10" scope="colgroup">DESI LIS</th>
-                <th colspan="10" scope="colgroup">SDSS</th>
-                <th colspan="10" scope="colgroup">Pan-STARRS</th>
-                <th colspan="7" scope="colgroup">GAIA</th>
+                <th colspan="10" scope="colgroup"></th>
+                <th colspan="4" scope="colgroup">Auto-class</th>
+                <th colspan="2" scope="colgroup">eRosita</th>
+                <th colspan="6" scope="colgroup">GAIA</th>
+                <th colspan="2" scope="colgroup">u</th>
+                <th colspan="6" scope="colgroup">g</th>
+                <th colspan="6" scope="colgroup">r</th>
+                <th colspan="4" scope="colgroup">i</th>
+                <th colspan="6" scope="colgroup">z</th>
+                <th colspan="2" scope="colgroup">y</th>
+                <th colspan="2" scope="colgroup">w1</th>
+                <th colspan="2" scope="colgroup">w2</th>
+{#                <th colspan="10" scope="colgroup">DESI LIS</th>#}
+{#                <th colspan="10" scope="colgroup">SDSS</th>#}
+{#                <th colspan="10" scope="colgroup">Pan-STARRS</th>#}
             </tr>
             <tr>
                 <th>ID</th>
@@ -21,54 +30,69 @@
                 <th>Dec</th>
                 <th>Comment</th>
                 <th>Class</th>
-                <th>Extension</th>
+                <th>Extent</th>
                 <th>R98</th>
 
+                <th>TDE v3</th>
+                <th>LS TDE v3</th>
+                <th>AGN WISE</th>
+                <th>Gaia Star</th>
+
                 <th>Detection likelihood</th>
-                <th>ML_FLUX_0</th>
-                <th>ML_FLUX_ERR_0</th>
                 <th>Flux 05-20</th>
-
-                <th>g</th>
-                <th>g_err</th>
-                <th>r</th>
-                <th>r_err</th>
-                <th>z</th>
-                <th>z_err</th>
-                <th>w1</th>
-                <th>w1_err</th>
-                <th>w2</th>
-                <th>w2_err</th>
-
-                <th>u</th>
-                <th>u_err</th>
-                <th>g</th>
-                <th>g_err</th>
-                <th>r</th>
-                <th>r_err</th>
-                <th>i</th>
-                <th>i_err</th>
-                <th>z</th>
-                <th>z_err</th>
-
-                <th>g</th>
-                <th>g_err</th>
-                <th>r</th>
-                <th>r_err</th>
-                <th>i</th>
-                <th>i_err</th>
-                <th>z</th>
-                <th>z_err</th>
-                <th>y</th>
-                <th>y_err</th>
 
                 <th>parallax</th>
                 <th>parallax_error</th>
-                <th>pm</th>
                 <th>pmra</th>
                 <th>pmra_error</th>
                 <th>pmdec</th>
                 <th>pmdec_error</th>
+
+{#                u #}
+                <th>SDSS</th>
+                <th>SDSS err</th>
+
+{#                g #}
+                <th>LS</th>
+                <th>LS err</th>
+                <th>PS</th>
+                <th>PS err</th>
+                <th>SDSS</th>
+                <th>SDSS err</th>
+
+{#                r #}
+                <th>LS</th>
+                <th>LS err</th>
+                <th>PS</th>
+                <th>PS err</th>
+                <th>SDSS</th>
+                <th>SDSS err</th>
+
+{#                i#}
+                <th>PS</th>
+                <th>PS err</th>
+                <th>SDSS</th>
+                <th>SDSS err</th>
+
+{#                z #}
+                <th>LS</th>
+                <th>LS err</th>
+                <th>PS</th>
+                <th>PS err</th>
+                <th>SDSS</th>
+                <th>SDSS err</th>
+
+{#                y #}
+                <th>PS</th>
+                <th>PS err</th>
+
+{#                w1 #}
+                <th>LS</th>
+                <th>LS err</th>
+
+{#                w2 #}
+                <th>LS</th>
+                <th>LS err</th>
 
 {#                Old for-looped table #}
 {#                {% for field in meta_fields %}#}
@@ -115,51 +139,57 @@
                 <td class="align-middle"> {{ meta_obj.EXT|stringformat:".5f" }} </td>
                 <td class="align-middle"> {{ meta_obj.R98|stringformat:".5f" }} </td>
 
+                <td class="align-middle">{% show_value_for_boolean_or_unknown opt_source.tde_v3 "Yes" "No" %}</td>
+                <td class="align-middle">{% show_value_for_boolean_or_unknown opt_source.tde_v3_ls "Yes" "No" %}</td>
+                <td class="align-middle">{% show_value_for_boolean_or_unknown meta_obj.flag_agn_wise "Yes" "No" %}</td>
+                <td class="align-middle">{% show_value_for_boolean_or_unknown gaia_source.autoclass_star "Star" "Non-star" %}</td>
+
                 <td class="align-middle"> {{ master_source.DET_LIKE_0 }} </td>
-                <td class="align-middle"> {{ master_source.ML_FLUX_0|stringformat:"e" }} </td>
-                <td class="align-middle"> {{ master_source.ML_FLUX_ERR_0|stringformat:"e" }} </td>
                 <td class="align-middle"> {{ master_source.flux_05_20|stringformat:"e" }} </td>
-
-                <td class="align-middle"> {{ ls_source.mag_g_ab|stringformat:".5f"      }} </td>
-                <td class="align-middle"> {{ ls_source.mag_err_g_ab|stringformat:".5f"  }} </td>
-                <td class="align-middle"> {{ ls_source.mag_r_ab|stringformat:".5f"      }} </td>
-                <td class="align-middle"> {{ ls_source.mag_err_r_ab|stringformat:".5f"  }} </td>
-                <td class="align-middle"> {{ ls_source.mag_z_ab|stringformat:".5f"      }} </td>
-                <td class="align-middle"> {{ ls_source.mag_err_z_ab|stringformat:".5f"  }} </td>
-                <td class="align-middle"> {{ ls_source.mag_w1_ab|stringformat:".5f"     }} </td>
-                <td class="align-middle"> {{ ls_source.mag_err_w1_ab|stringformat:".5f" }} </td>
-                <td class="align-middle"> {{ ls_source.mag_w2_ab|stringformat:".5f"     }} </td>
-                <td class="align-middle"> {{ ls_source.mag_err_w2_ab|stringformat:".5f" }} </td>
-
-                <td class="align-middle"> {{ sdss_source.cModelMag_u_ab|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ sdss_source.cModelMagErr_u_ab|stringformat:"5f"  }}</td>
-                <td class="align-middle"> {{ sdss_source.cModelMag_g_ab|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ sdss_source.cModelMagErr_g_ab|stringformat:"5f"  }}</td>
-                <td class="align-middle"> {{ sdss_source.cModelMag_r_ab|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ sdss_source.cModelMagErr_r_ab|stringformat:"5f"  }}</td>
-                <td class="align-middle"> {{ sdss_source.cModelMag_i_ab|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ sdss_source.cModelMagErr_i_ab|stringformat:"5f"  }}</td>
-                <td class="align-middle"> {{ sdss_source.cModelMag_z_ab|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ sdss_source.cModelMagErr_z_ab|stringformat:"5f"  }}</td>
-
-                <td class="align-middle"> {{ ps_source.gKronMagAB|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ ps_source.gKronMagErrAB|stringformat:"5f"  }}</td>
-                <td class="align-middle"> {{ ps_source.rKronMagAB|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ ps_source.rKronMagErrAB|stringformat:"5f"  }}</td>
-                <td class="align-middle"> {{ ps_source.iKronMagAB|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ ps_source.iKronMagErrAB|stringformat:"5f"  }}</td>
-                <td class="align-middle"> {{ ps_source.zKronMagAB|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ ps_source.zKronMagErrAB|stringformat:"5f"  }}</td>
-                <td class="align-middle"> {{ ps_source.yKronMagAB|stringformat:"5f"     }}</td>
-                <td class="align-middle"> {{ ps_source.yKronMagErrAB|stringformat:"5f"  }}</td>
 
                 <td class="align-middle"> {{ gaia_source.parallax|stringformat:"5f"        }} </td>
                 <td class="align-middle"> {{ gaia_source.parallax_error|stringformat:"5f"  }} </td>
-                <td class="align-middle"> {{ gaia_source.pm|stringformat:"5f"              }} </td>
                 <td class="align-middle"> {{ gaia_source.pmra|stringformat:"5f"            }} </td>
                 <td class="align-middle"> {{ gaia_source.pmra_error|stringformat:"5f"      }} </td>
                 <td class="align-middle"> {{ gaia_source.pmdec|stringformat:"5f"           }} </td>
                 <td class="align-middle"> {{ gaia_source.pmdec_error|stringformat:"5f"     }} </td>
+
+                <td class="align-middle"> {{ sdss_source.cModelMag_u_ab|stringformat:".2f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_u_ab|stringformat:".2f"  }}</td>
+
+                <td class="align-middle"> {{ ls_source.mag_g_ab|stringformat:".2f"      }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_g_ab|stringformat:".2f"  }} </td>
+                <td class="align-middle"> {{ ps_source.gKronMagAB|stringformat:"2f"     }}</td>
+                <td class="align-middle"> {{ ps_source.gKronMagErrAB|stringformat:"2f"  }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMag_g_ab|stringformat:".2f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_g_ab|stringformat:".2f"  }}</td>
+
+                <td class="align-middle"> {{ ls_source.mag_r_ab|stringformat:".2f"      }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_r_ab|stringformat:".2f"  }} </td>
+                <td class="align-middle"> {{ ps_source.rKronMagAB|stringformat:"2f"     }}</td>
+                <td class="align-middle"> {{ ps_source.rKronMagErrAB|stringformat:"2f"  }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMag_r_ab|stringformat:".2f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_r_ab|stringformat:".2f"  }}</td>
+
+                <td class="align-middle"> {{ ps_source.iKronMagAB|stringformat:"2f"     }}</td>
+                <td class="align-middle"> {{ ps_source.iKronMagErrAB|stringformat:"2f"  }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMag_i_ab|stringformat:".2f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_i_ab|stringformat:".2f"  }}</td>
+
+                <td class="align-middle"> {{ ls_source.mag_z_ab|stringformat:".2f"      }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_z_ab|stringformat:".2f"  }} </td>
+                <td class="align-middle"> {{ ps_source.zKronMagAB|stringformat:"2f"     }}</td>
+                <td class="align-middle"> {{ ps_source.zKronMagErrAB|stringformat:"2f"  }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMag_z_ab|stringformat:".2f"     }}</td>
+                <td class="align-middle"> {{ sdss_source.cModelMagErr_z_ab|stringformat:".2f"  }}</td>
+
+                <td class="align-middle"> {{ ps_source.yKronMagAB|stringformat:"2f"     }}</td>
+                <td class="align-middle"> {{ ps_source.yKronMagErrAB|stringformat:"2f"  }}</td>
+
+                <td class="align-middle"> {{ ls_source.mag_w1_ab|stringformat:".2f"     }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_w1_ab|stringformat:".2f" }} </td>
+                <td class="align-middle"> {{ ls_source.mag_w2_ab|stringformat:".2f"     }} </td>
+                <td class="align-middle"> {{ ls_source.mag_err_w2_ab|stringformat:".2f" }} </td>
 
 {#              Old for-looped table#}
 {#                {% for field,value in meta_obj %}#}
