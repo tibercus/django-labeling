@@ -55,11 +55,15 @@
         static buttonMinusIdFromNumberId(number_id) {
             return `${FilterIdConverter.idFromNumberId(number_id)}-button-minus`;
         }
+
+        static buttonsPlaceIdFromNumberId(number_id) {
+            return `${FilterIdConverter.idFromNumberId(number_id)}-buttons`;
+        }
     }
 
     class FilterTools {
         static addPlusButton(filter_id) {
-            document.getElementById(FilterIdConverter.idFromNumberId(filter_id)).innerHTML +=
+            document.getElementById(FilterIdConverter.buttonsPlaceIdFromNumberId(filter_id)).innerHTML +=
                 `<button id="${FilterIdConverter.buttonPlusIdFromNumberId(filter_id)}"
                         type="button" class="btn btn-primary btn-md"
                         onclick="add_filter(); document.getElementById(this.id).remove();">
@@ -109,10 +113,12 @@
 
             switch (filter_type) {
                 case "numeric": condition_html = `
-                    values in range from:
-                    <input type="number" name="${field_id}__gt" step="any" class="form-control" id="id_${field_id}__gt">
-                    to
-                    <input type="number" name="${field_id}__lt" step="any" class="form-control" id="id_${field_id}__lt">
+                    <div class="col-sm-6">
+                    from: <input type="number" name="${field_id}__gt" step="any" class="form-control" id="id_${field_id}__gt">
+                    </div>
+                    <div class="col-sm-6">
+                    to: <input type="number" name="${field_id}__lt" step="any" class="form-control" id="id_${field_id}__lt">
+                    </div>
                 `; break;
                 case "category": condition_html = `
                     choose value from: <select>
@@ -148,24 +154,33 @@
         }
 
         return `
-            <div id="${FilterIdConverter.idFromNumberId(filter_id)}">
-                Filter No. ${FilterIdConverter.idFromNumberId(filter_id)}
-                <select id=${FilterIdConverter.selectIdFromNumberId(filter_id)}
-                        onchange="FilterTools.renderFilterCondition(FilterIdConverter.parseId(this.id))">
-                    ${options_list}
-                </select>
-                <div id="${FilterIdConverter.conditionIdFromNumberId(filter_id)}"></div>
-                <button id="${FilterIdConverter.buttonMinusIdFromNumberId(filter_id)}"
-                        type="button" class="btn btn-primary btn-md"
-                        onclick="FilterTools.removeFilterOnMinusButton(this.id);">
-                    -
-                </button>
-                <button id="${FilterIdConverter.buttonPlusIdFromNumberId(filter_id)}"
-                        type="button" class="btn btn-primary btn-md"
-                        onclick="add_filter(); FilterTools.removePlusButton(FilterIdConverter.parseId(this.id));">
-                    +
-                </button>
-            </div>
+            <div id="${FilterIdConverter.idFromNumberId(filter_id)}"
+                 class="mb-2 container rounded"
+                 style="border:2px solid lightgray">
+                <div class="mt-2 row">
+                    <div class="col-sm-9">
+                        <select id=${FilterIdConverter.selectIdFromNumberId(filter_id)}
+                                class="form-control"
+                                onchange="FilterTools.renderFilterCondition(FilterIdConverter.parseId(this.id))">
+                            ${options_list}
+                        </select>
+                    </div>
+                    <div id="${FilterIdConverter.buttonsPlaceIdFromNumberId(filter_id)}"
+                         class="col-sm" align="right">
+                        <button id="${FilterIdConverter.buttonMinusIdFromNumberId(filter_id)}"
+                                type="button" class="btn btn-primary btn-md"
+                                onclick="FilterTools.removeFilterOnMinusButton(this.id);">
+                            -
+                        </button>
+                        <button id="${FilterIdConverter.buttonPlusIdFromNumberId(filter_id)}"
+                                type="button" class="btn btn-primary btn-md"
+                                onclick="add_filter(); FilterTools.removePlusButton(FilterIdConverter.parseId(this.id));">
+                            +
+                        </button>
+                    </div>
+                </div>
+                <div id="${FilterIdConverter.conditionIdFromNumberId(filter_id)}" class="mb-2 row">
+            </div></div>
         `;
     }
 
@@ -205,7 +220,7 @@
     }
 </script>
 
-<div id="sources-filters">
+<div id="sources-filters" class="col">
     <div hidden id="sources-filters-available-fields">
         {{ filter_custom_config_json }}
     </div>
