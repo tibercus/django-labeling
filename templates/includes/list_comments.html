@@ -33,6 +33,7 @@
                 {%  comment %} Comment for 'Final' button in comment card {% endcomment %}
                   <form class="ml-3" method="post">
                       {% csrf_token %}
+                      <input type="hidden" name="comment_id" value="{{ comment.id }}" />
                       <button type="submit" class="btn btn-sm btn-outline-success" value="button" name="final">Final</button>
                   </form>
 

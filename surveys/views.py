@@ -1,7 +1,6 @@
 import logging
 from collections import defaultdict
 
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from .forms import NewCommentForm, OptCommentForm, OptCounterpartForm
 from django.http import HttpResponse
@@ -156,7 +155,11 @@ def source(request, pk):
 
         # Make superuser comment final for meta object by superuser
         elif 'final' in request.POST and request.user.is_superuser:
-            comment = meta_object.comments.get(created_by=request.user)
+            print(request.POST)
+            print(int(request.POST["comment_id"]))
+            comment = meta_object.comments.get(
+                id=int(request.POST["comment_id"]))
+
             meta_object.comment = comment.comment
             meta_object.object_class = comment.source_class
             meta_object.save()
