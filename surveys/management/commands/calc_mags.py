@@ -1,45 +1,17 @@
 import argparse
-import logging
 import textwrap
-from abc import ABC
-from typing import Callable, Any
 
-from django.core.management import BaseCommand, CommandError
-from django.utils import timezone
+from django.core.management import CommandError
 from django.db.models import Q
 
-from surveys.models import LS, PS, SDSS
 import surveys.astro as saf
+from surveys.models import LS, PS, SDSS
+from .utlis import timeit
+from .utlis import BaseCommandWithFormattedHelp
+from .utlis import docstringhelp
 
 
-def timeit(job_name: str) -> Callable:
-    def decorator(function: Callable) -> Callable:
-        def wrapper(*args, **kwargs) -> Any:
-            start_time = timezone.now()
-            logging.info(f"{start_time} - {job_name} started.")
-
-            # TODO add exception handling for full logging.
-            result = function(*args, **kwargs)
-
-            finish_time = timezone.now()
-            logging.info(f"{finish_time} - {job_name} ended.")
-            logging.info(
-                f"{finish_time} - "
-                f"Took {(finish_time - start_time).total_seconds()} seconds."
-            )
-            return result
-
-        return wrapper
-    return decorator
-
-
-class BaseCommandWithFormattedHelp(BaseCommand, ABC):
-    def create_parser(self, *args, **kwargs):
-        parser = super().create_parser(*args, **kwargs)
-        parser.formatter_class = argparse.RawTextHelpFormatter
-        return parser
-
-
+@docstringhelp
 class Command(BaseCommandWithFormattedHelp):
     """
     A command to calculate additional source attributes not present in raw
@@ -47,7 +19,6 @@ class Command(BaseCommandWithFormattedHelp):
 
     - TODO
     """
-    help = textwrap.dedent(__doc__)
 
     @staticmethod
     @timeit("DESI LIS magnitude calculation")
