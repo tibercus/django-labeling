@@ -3,7 +3,8 @@
 Contains models for comments, X-ray sources in eRosita survey and
 sources in required optical surveys.
 
-TODO Refactor models: create several smaller modules.
+TODO Refactor models: create several smaller modules
+    + https://stackoverflow.com/questions/20272042/django-refactoring-models-into-sub-modules.
 TODO Refactor models: add verbose names for attributes."""
 
 from typing import Tuple, List, Optional
@@ -1430,3 +1431,22 @@ class MetaObjFilterBookmark(models.Model):
                              f"{url}")
 
         return "&".join(get_request)
+
+
+class PhotoZPrediction(models.Model):
+    """A model to store photo-z predictions with zConf and confidence intervals
+
+    There are stored all the photo-z data. Connections to objects are given via
+    foreign keys.
+    """
+    ps_object = models.ForeignKey(PS, related_name="photoz",
+                                  on_delete=models.CASCADE, null=True)
+    ls_object = models.ForeignKey(LS, related_name="photoz",
+                                  on_delete=models.CASCADE, null=True)
+
+    z_max = models.FloatField(null=True, verbose_name="Point-prediction")
+    z_conf = models.FloatField(null=True, verbose_name="zConf")
+    ci_68_a = models.FloatField(null=True, verbose_name="68-CI beginning.")
+    ci_68_b = models.FloatField(null=True, verbose_name="68-CI ending.")
+    ci_95_a = models.FloatField(null=True, verbose_name="95-CI beginning.")
+    ci_95_b = models.FloatField(null=True, verbose_name="95-CI ending.")
