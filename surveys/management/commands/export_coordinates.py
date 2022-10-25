@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
+from astropy.table import Table
 from django.core.management import CommandError
 import pandas as pd
 
@@ -24,6 +25,9 @@ class Command(BaseCommandWithFormattedHelp):
                             help="Column name with Declination.")
         parser.add_argument("--format", type=str, default="gz_pkl")
         parser.add_argument("--additional_columns", type=str, nargs="*")
+        parser.add_argument("--column_rename_prefix", type=str, default="",
+                            help="Prefix to add to colums names for "
+                                 "compatibility with something other. idk)")
 
     @timeit("Exporting coordinates")
     def handle(self, *args, **options):
@@ -31,6 +35,7 @@ class Command(BaseCommandWithFormattedHelp):
         ra_column = options["ra"]
         dec_column = options["dec"]
         additional_columns = options["additional_columns"] or []
+        column_rename_prefix = options["column_rename_prefix"]
 
         try:
             model = getattr(smd, catalog_model_name)
@@ -47,15 +52,25 @@ class Command(BaseCommandWithFormattedHelp):
             raise CommandError(f"Those columns are not present in {model}: "
                                f"{', '.join(invalid_columns)}.")
 
-        coordinates_df = model.objects.all().values(
-            model._meta.pk.name, ra_column, dec_column, *additional_columns
+        required_columns = [model._meta.pk.name, ra_column, dec_column]
+        required_columns += additional_columns
+        renamed_columns = {column: column_rename_prefix + column
+                           for column in required_columns}
+
+        coordinates_df = model.objects.all().values(*required_columns)
+        coordinates_df = (
+            pd.DataFrame.from_records(coordinates_df).rename(renamed_columns)
         )
 
-        coordinates_df = pd.DataFrame.from_records(coordinates_df)
+        save_format = options["format"]
+        dst_path = options["output"]
 
-        if options["format"] != "gz_pkl":
-            raise CommandError(
-                "Formats other than 'gz_pkl' are not supported yet.")
+        if save_format == "gz_pkl":
+            coordinates_df.to_pickle(dst_path, compression="gzip", protocol=4)
+            return
 
-        coordinates_df.to_pickle(options["output"],
-                                 compression="gzip", protocol=4)
+        if save_format == "fits":
+            Table.from_pandas(coordinates_df).write(dst_path, overwrite=True)
+            return
+
+        raise CommandError("Only gz_pkl and fits formats are supported")
