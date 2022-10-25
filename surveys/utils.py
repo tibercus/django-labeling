@@ -1,3 +1,4 @@
+import re
 import textwrap
 from typing import Type, List, Callable
 
@@ -132,7 +133,7 @@ def restore_comments(saved_comments, com_type='Xray'):
                 raise e
 
 
-def cone_search_filter(queryset, ra, dec, radius):
+def cone_search_filter(queryset, ra: float, dec: float, radius: float):
     """
     Executes cone search by annotating each target with separation distance from the specified RA/Dec.
     Formula is from Wikipedia: https://en.wikipedia.org/wiki/Angular_distance
@@ -150,9 +151,6 @@ def cone_search_filter(queryset, ra, dec, radius):
     :param radius: Radius of cone search in degrees.
     :type radius: float
     """
-    ra = float(ra)
-    dec = float(dec)
-    radius = float(radius)
 
     # Cone search is preceded by a square search to reduce the search radius before annotating the queryset, in
     # order to make the query faster.
@@ -225,7 +223,32 @@ def string_representation(include_fields: List[str] = None,
     return decorator
 
 
-def help_from_docstring(model: Type[BaseCommand]):
-    """Set's class `help` attribute equal to `__doc__`."""
-    setattr(model, "help", textwrap.dedent(model.__doc__))
-    return model
+class Conversions:
+    """An util class to contain different type conversions to handle numeric
+    input from HTML-forms."""
+
+    @staticmethod
+    def string_to_float_or_none(_float: Optional[str], /) -> Optional[float]:
+        """Returns None for empty string and None,converts to float otherwise.
+        """
+        if _float is None or len(_float) == 0:
+            return None
+
+        return float(_float)
+
+    @staticmethod
+    def expression_to_float_or_none(
+            _expr: Optional[str], /) -> Optional[float]:
+        """Returns None for empty string and None, tries to convert to float
+        otherwise. If fails, and if string contains only numbers and arithmetic
+        operations, calculates the expression. Otherwise, raises an error.
+        """
+        try:
+            return Conversions.string_to_float_or_none(_expr)
+        except ValueError:
+            pass
+
+        if re.match(r"[\d.+\-*/, ]+", _expr):
+            return eval(_expr.replace(",", "."))
+
+        raise ValueError(f"Illegal expression: {_expr}")

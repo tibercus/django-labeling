@@ -13,8 +13,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.db.models import F, Count
 
-from surveys.utils import cone_search_filter, change_opt_cp
-
+from surveys.utils import cone_search_filter, change_opt_cp, Conversions
 import csv
 
 
@@ -49,10 +48,14 @@ def home(request):
         meta_queryset = meta_queryset.order_by(F(field_order_by).desc(nulls_last=True))
 
     # make cone search with requested RA, DEC, r
-    cone_search = None
-    cs_ra = request.GET.get("cs_RA"); cs_dec = request.GET.get("cs_DEC"); cs_r = request.GET.get("cs_r")
+    cone_search = dict(ra="", dec="", r=1)  # default values for cone search
+    cs_ra = Conversions.string_to_float_or_none(request.GET.get("cs_RA"))
+    cs_dec = Conversions.string_to_float_or_none(request.GET.get("cs_DEC"))
+    cs_r = Conversions.expression_to_float_or_none(request.GET.get("cs_r"))
+    print(cs_ra, cs_dec, cs_r, request.GET.get("cs_r"))
     if cs_ra and cs_dec and cs_r:
         cone_search = dict(ra=cs_ra, dec=cs_dec, r=cs_r)
+        print(cone_search)
         # print(cone_search)
         meta_queryset = cone_search_filter(meta_queryset, cs_ra, cs_dec, cs_r)
 
