@@ -59,7 +59,9 @@ class Command(BaseCommandWithFormattedHelp):
 
         coordinates_df = model.objects.all().values(*required_columns)
         coordinates_df = (
-            pd.DataFrame.from_records(coordinates_df).rename(renamed_columns)
+            pd.DataFrame
+            .from_records(coordinates_df)
+            .rename(renamed_columns, axis=1)
         )
 
         save_format = options["format"]
