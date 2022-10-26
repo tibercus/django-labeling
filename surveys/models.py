@@ -1438,6 +1438,9 @@ class PhotoZPrediction(models.Model):
 
     There are stored all the photo-z data. Connections to objects are given via
     foreign keys.
+
+    A record is uniquely defined by LS and PS objects and model name.
+    TODO это даст проблемы, когда нужно будет хранить прогнозы разных моделей
     """
     ps_object = models.ForeignKey(PS, related_name="photoz",
                                   on_delete=models.CASCADE, null=True)
@@ -1450,3 +1453,9 @@ class PhotoZPrediction(models.Model):
     ci_68_b = models.FloatField(null=True, verbose_name="68-CI ending.")
     ci_95_a = models.FloatField(null=True, verbose_name="95-CI beginning.")
     ci_95_b = models.FloatField(null=True, verbose_name="95-CI ending.")
+
+    model_name = models.CharField(
+        null=False, max_length=16, verbose_name="Photo-z model name.")
+
+    class Meta:
+        unique_together = ("ps_object", "ls_object", "model_name")
