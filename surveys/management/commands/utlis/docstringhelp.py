@@ -1,6 +1,6 @@
 """Sets "help" attribute for Django Command to be docstring."""
 import textwrap
-from typing import Type, Callable
+from typing import Type
 
 from django.core.management import BaseCommand
 
