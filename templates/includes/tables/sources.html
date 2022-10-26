@@ -8,6 +8,7 @@
                 <th colspan="10" scope="colgroup"></th>
                 <th colspan="4" scope="colgroup">Auto-class</th>
                 <th colspan="2" scope="colgroup">eRosita</th>
+                <th colspan="7" scope="colgroup">Photo-z</th>
                 <th colspan="6" scope="colgroup">GAIA</th>
                 <th colspan="2" scope="colgroup">u</th>
                 <th colspan="6" scope="colgroup">g</th>
@@ -40,6 +41,14 @@
 
                 <th>Detection likelihood</th>
                 <th>Flux 05-20</th>
+
+                <th>z<sub>ph</sub></th>
+                <th>zConf</th>
+                <th>CI<sub>68</sub>[</th>
+                <th>CI<sub>68</sub>]</th>
+                <th>CI<sub>95</sub>[</th>
+                <th>CI<sub>95</sub>]</th>
+                <th>Source</th>
 
                 <th>parallax</th>
                 <th>parallax_error</th>
@@ -119,6 +128,21 @@
             {% define master_source|get_opt_source:"SDSS" as sdss_source %}
             {% define master_source|get_opt_source:"GAIA" as gaia_source %}
 
+            {% define ls_source|get_related_foreign_key:"photoz" as ls_photoz %}
+            {% define ps_source|get_related_foreign_key:"photoz" as ps_photoz %}
+{#            {% define float_greater ls_photoz.zConf ps_photoz.zConf as ls_zconf_greater %}#}
+
+            {% if ls_photoz.z_conf|greater_than:ps_photoz.z_conf %}
+                {% define ls_photoz as photoz %}
+                {% define "DESI LIS" as photoz_source %}
+            {% elif ps_photoz != None %}
+                {% define ps_photoz as photoz %}
+                {% define "Pan-STARRS" as photoz_source %}
+            {% else %}
+                {% define None as photoz %}
+                {% define "" as photoz_source %}
+            {% endif %}
+
             <tr bgcolor="{% if meta_obj.primary_object %}#ddeeff{% else %}#FFFFFF{% endif %}">
                 <td class="align-middle"> {{ meta_obj.id }} </td>
                 <td class="align-middle"> {{ meta_obj.meta_ind }} </td>
@@ -146,6 +170,14 @@
 
                 <td class="align-middle"> {{ master_source.DET_LIKE_0 }} </td>
                 <td class="align-middle"> {{ master_source.flux_05_20|stringformat:"e" }} </td>
+
+                <td class="align-middle"> {{ photoz.z_max|stringformat:".3f" }} </td>
+                <td class="align-middle"> {{ photoz.z_conf|stringformat:".3f" }} </td>
+                <td class="align-middle"> {{ photoz.ci_68_a|stringformat:".3f" }} </td>
+                <td class="align-middle"> {{ photoz.ci_68_b|stringformat:".3f" }} </td>
+                <td class="align-middle"> {{ photoz.ci_95_a|stringformat:".3f" }} </td>
+                <td class="align-middle"> {{ photoz.ci_95_b|stringformat:".3f" }} </td>
+                <td class="align-middle"> {{ photoz_source }} </td>
 
                 <td class="align-middle"> {{ gaia_source.parallax|stringformat:".5f"        }} </td>
                 <td class="align-middle"> {{ gaia_source.parallax_error|stringformat:".5f"  }} </td>

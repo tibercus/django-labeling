@@ -10,6 +10,14 @@
                 <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'ra'              }} </th>
                 <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'dec'             }} </th>
                 <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'ebv'             }} </th>
+
+                <th class="align-middle">z<sub>ph</sub></th>
+                <th class="align-middle">zConf</th>
+                <th class="align-middle">CI<sub>68</sub>[</th>
+                <th class="align-middle">CI<sub>68</sub>]</th>
+                <th class="align-middle">CI<sub>95</sub>[</th>
+                <th class="align-middle">CI<sub>95</sub>]</th>
+
                 <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'mag_r_ab'        }} </th>
                 <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'mag_err_r_ab'    }} </th>
                 <th class="align-middle"> {{ opt_sources.first|field_verbose_name:'mag_g_ab'        }} </th>
@@ -38,6 +46,8 @@
         {% if opt_sources %}
             {% for opt_source in opt_sources %}
                 {% define master_source|get_sep:opt_source as sep %}
+                {% define opt_source|get_related_foreign_key:"photoz" as photoz %}
+
                 <tr class="{% opt_row_class opt_source master_source sep %}">
                     <td class="align-middle"> {{ sep|stringformat:".5f"}} </td>
                     <td class="align-middle"> {{ opt_source.opt_id                             }} </td>
@@ -45,6 +55,14 @@
                     <td class="align-middle"> {{ opt_source.ra|stringformat:".5f"              }} </td>
                     <td class="align-middle"> {{ opt_source.dec|stringformat:".5f"             }} </td>
                     <td class="align-middle"> {{ opt_source.ebv|stringformat:".5f"             }} </td>
+
+                    <td class="align-middle"> {{ photoz.z_max|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ photoz.z_conf|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ photoz.ci_68_a|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ photoz.ci_68_b|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ photoz.ci_95_a|stringformat:".3f" }} </td>
+                    <td class="align-middle"> {{ photoz.ci_95_b|stringformat:".3f" }} </td>
+
                     <td class="align-middle"> {{ opt_source.mag_r_ab|stringformat:".2f"        }} </td>
                     <td class="align-middle"> {{ opt_source.mag_err_r_ab|stringformat:".2f"    }} </td>
                     <td class="align-middle"> {{ opt_source.mag_g_ab|stringformat:".2f"        }} </td>

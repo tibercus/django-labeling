@@ -75,6 +75,38 @@ def get_opt_source(master_source: eROSITA, survey: str
 
 
 @register.filter
+def get_related_foreign_key(
+        obj: Optional[Model], related_name: str) -> Optional[Model]:
+    """A filter to get objects by foreign key's related_name."""
+    if obj is None:
+        return None
+
+    try:
+        relation = getattr(obj, related_name)
+    except AttributeError:
+        raise ValueError(f"No relation named '{related_name}' "
+                         f"for '{obj.__class__.__name__}'")
+
+    try:
+        return relation.get()
+    except Exception:  # TODO too broad exception
+        return None  # TODO returns None, if several records exist
+
+
+@register.filter
+def greater_than(a: float or str, b: float or str) -> bool:
+    if a is None:
+        return False
+
+    if b is None:
+        return True
+
+    a = float(a)
+    b = float(b)
+    return a > b
+
+
+@register.filter
 def is_summary(survey):
     """add filter option in template"""
     result = 1234 if survey == 9 else survey
