@@ -99,12 +99,12 @@ class Command(BaseCommandWithFormattedHelp):
 
             try:
                 ps_object_id = row[fk_columns[PS]]
-            except (KeyError, PS.DoesNotExist):
+            except KeyError:
                 ps_object_id = None
 
             try:
                 ls_object_id = row[fk_columns[LS]]
-            except (KeyError, PS.DoesNotExist):
+            except KeyError:
                 ls_object_id = None
 
             prediction_object, _ = (
