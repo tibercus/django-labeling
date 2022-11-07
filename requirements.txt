@@ -21,6 +21,7 @@ pipreqs==0.4.11
 psycopg2-binary==2.9.2
 pyarrow==6.0.1
 pydotplus==2.0.2
+pytest==7.2.0
 python-decouple==3.5
 sphinx-material==0.0.35
 SQLAlchemy==1.4.27
